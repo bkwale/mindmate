@@ -1,7 +1,9 @@
 "use client";
 
 import { getProfile, getThemes, getSessions, clearAllData } from "@/lib/storage";
+import { isPINEnabled, removePIN } from "@/lib/security";
 import { useState, useEffect } from "react";
+import PINSetup from "./PINSetup";
 
 interface SettingsProps {
   onBack: () => void;
@@ -13,7 +15,9 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
   const [themeCount, setThemeCount] = useState(0);
   const [sessionCount, setSessionCount] = useState(0);
   const [joinedDate, setJoinedDate] = useState("");
-  const [showConfirm, setShowConfirm] = useState<"themes" | "all" | null>(null);
+  const [showConfirm, setShowConfirm] = useState<"themes" | "all" | "pin" | null>(null);
+  const [pinEnabled, setPinEnabled] = useState(false);
+  const [showPINSetup, setShowPINSetup] = useState(false);
 
   useEffect(() => {
     const profile = getProfile();
@@ -29,6 +33,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
     }
     setThemeCount(getThemes().length);
     setSessionCount(getSessions().length);
+    setPinEnabled(isPINEnabled());
   }, []);
 
   const handleClearThemes = () => {
@@ -40,8 +45,30 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
 
   const handleClearAll = () => {
     clearAllData();
+    removePIN();
     onResetApp();
   };
+
+  const handleRemovePIN = () => {
+    removePIN();
+    setPinEnabled(false);
+    setShowConfirm(null);
+  };
+
+  const handlePINSetupComplete = () => {
+    setShowPINSetup(false);
+    setPinEnabled(true);
+  };
+
+  // Show PIN setup as full-screen overlay
+  if (showPINSetup) {
+    return (
+      <PINSetup
+        onComplete={handlePINSetupComplete}
+        isChange={pinEnabled}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-calm-bg flex flex-col">
@@ -67,14 +94,93 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center">
                 <span className="text-mind-600 font-medium text-lg">
-                  {name.charAt(0).toUpperCase()}
+                  {name ? name.charAt(0).toUpperCase() : "M"}
                 </span>
               </div>
               <div>
-                <p className="text-base font-medium text-calm-text">{name}</p>
+                <p className="text-base font-medium text-calm-text">{name || "MindMate User"}</p>
                 <p className="text-xs text-calm-muted">Using MindMate since {joinedDate}</p>
               </div>
             </div>
+          </div>
+
+          {/* Security */}
+          <div className="bg-white rounded-xl p-5 border border-calm-border">
+            <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
+              Security
+            </p>
+            <p className="text-xs text-calm-muted mb-4 leading-relaxed">
+              Protect your reflections with a PIN lock.
+            </p>
+
+            {pinEnabled ? (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-2">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-600">
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <span className="text-sm text-calm-text">PIN lock is on</span>
+                  </div>
+                  <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Active</span>
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowPINSetup(true)}
+                    className="flex-1 px-4 py-2.5 rounded-xl text-xs text-calm-text border border-calm-border
+                               hover:border-mind-300 hover:bg-mind-50 transition-all"
+                  >
+                    Change PIN
+                  </button>
+
+                  {showConfirm === "pin" ? (
+                    <div className="flex-1 flex gap-1">
+                      <button
+                        onClick={handleRemovePIN}
+                        className="flex-1 px-2 py-2.5 rounded-xl text-xs text-red-600 bg-red-50 border border-red-200
+                                   hover:bg-red-100 transition-all"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setShowConfirm(null)}
+                        className="flex-1 px-2 py-2.5 rounded-xl text-xs text-calm-muted border border-calm-border
+                                   hover:bg-warm-50 transition-all"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setShowConfirm("pin")}
+                      className="flex-1 px-4 py-2.5 rounded-xl text-xs text-red-500 border border-red-200
+                                 hover:border-red-300 hover:bg-red-50 transition-all"
+                    >
+                      Remove PIN
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowPINSetup(true)}
+                className="w-full text-left px-4 py-3 rounded-xl text-sm border border-calm-border
+                           hover:border-mind-300 hover:bg-mind-50 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-500">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  <span className="text-calm-text">Set up PIN lock</span>
+                </div>
+                <p className="text-[10px] text-calm-muted mt-0.5 ml-6">
+                  Requires a 4-digit PIN each time you open MindMate.
+                </p>
+              </button>
+            )}
           </div>
 
           {/* Data summary */}
@@ -144,7 +250,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
               {showConfirm === "all" ? (
                 <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                   <p className="text-sm text-red-800 mb-3">
-                    This will delete everything — sessions, themes, and your profile. You&apos;ll start fresh.
+                    This will delete everything — sessions, themes, your PIN, and your profile. You&apos;ll start fresh.
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -167,7 +273,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                   className="w-full text-left px-4 py-3 rounded-xl text-sm border border-red-200
                              hover:border-red-300 hover:bg-red-50 transition-all"
                 >
-                  <span className="text-red-600">Delete all data & reset</span>
+                  <span className="text-red-600">Delete all data &amp; reset</span>
                   <p className="text-[10px] text-calm-muted mt-0.5">
                     Removes everything. You&apos;ll go through onboarding again.
                   </p>
@@ -188,7 +294,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
             <p className="text-xs text-calm-muted leading-relaxed mt-2">
               Not therapy. Not a chatbot. A place to reflect.
             </p>
-            <p className="text-[10px] text-calm-muted/50 mt-3">v1.0 — MVP</p>
+            <p className="text-[10px] text-calm-muted/50 mt-3">v1.1 — MVP</p>
           </div>
         </div>
       </main>
