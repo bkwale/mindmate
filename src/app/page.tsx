@@ -2,26 +2,41 @@
 
 import { useState, useEffect } from "react";
 import { isOnboarded } from "@/lib/storage";
+import { isPINEnabled } from "@/lib/security";
 import { SessionMode } from "@/lib/prompts";
 import Onboarding from "@/components/Onboarding";
 import Home from "@/components/Home";
 import Session from "@/components/Session";
 import Insights from "@/components/Insights";
 import Settings from "@/components/Settings";
+import PINLock from "@/components/PINLock";
 
-type AppState = "loading" | "onboarding" | "home" | "session" | "insights" | "settings";
+type AppState = "loading" | "locked" | "onboarding" | "home" | "session" | "insights" | "settings";
 
 export default function MindMate() {
   const [appState, setAppState] = useState<AppState>("loading");
   const [activeMode, setActiveMode] = useState<SessionMode | null>(null);
 
   useEffect(() => {
-    // Check if user has completed onboarding
     const onboarded = isOnboarded();
-    setAppState(onboarded ? "home" : "onboarding");
+    if (!onboarded) {
+      setAppState("onboarding");
+      return;
+    }
+
+    // If onboarded and PIN is set, show lock screen
+    if (isPINEnabled()) {
+      setAppState("locked");
+    } else {
+      setAppState("home");
+    }
   }, []);
 
   const handleOnboardingComplete = () => {
+    setAppState("home");
+  };
+
+  const handleUnlock = () => {
     setAppState("home");
   };
 
@@ -63,6 +78,11 @@ export default function MindMate() {
         </div>
       </div>
     );
+  }
+
+  // PIN lock screen
+  if (appState === "locked") {
+    return <PINLock onUnlock={handleUnlock} />;
   }
 
   // Onboarding

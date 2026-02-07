@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { saveProfile } from "@/lib/storage";
+import PINSetup from "./PINSetup";
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -24,6 +25,16 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     });
     onComplete();
   };
+
+  // PIN setup gets its own full-screen layout
+  if (screen === 2) {
+    return (
+      <PINSetup
+        onComplete={() => setScreen(3)}
+        onSkip={() => setScreen(3)}
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-calm-bg flex items-center justify-center p-6">
@@ -55,7 +66,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <div className="w-10 h-10 rounded-full bg-warm-100 flex items-center justify-center mx-auto">
-                <span className="text-warm-600 text-lg">⚠</span>
+                <span className="text-warm-600 text-lg">&#9888;</span>
               </div>
               <h2 className="text-xl font-serif text-calm-text">
                 Before we begin
@@ -73,7 +84,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 </p>
                 <ul className="text-sm text-warm-700 mt-2 space-y-1">
                   <li>UK: Samaritans — 116 123</li>
-                  <li>US: 988 Suicide & Crisis Lifeline</li>
+                  <li>US: 988 Suicide &amp; Crisis Lifeline</li>
                   <li>International: findahelpline.com</li>
                 </ul>
               </div>
@@ -88,7 +99,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           </div>
         )}
 
-        {screen === 2 && (
+        {screen === 3 && (
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <h2 className="text-xl font-serif text-calm-text">
