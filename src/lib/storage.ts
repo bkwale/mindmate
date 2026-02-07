@@ -140,3 +140,137 @@ export function getLastTheme(): ThemeEntry | null {
 export function clearAllData(): void {
   Object.values(KEYS).forEach(key => localStorage.removeItem(key));
 }
+
+// ============================================================
+// Aggregate Metrics — anonymous, no personal data, investor-ready
+// ============================================================
+
+export interface UsageMetrics {
+  totalSessions: number;
+  sessionsByMode: { reflect: number; prepare: number; ground: number };
+  completionRate: number; // % who finish all exchanges
+  clarityRate: number; // % who said "that helped"
+  avgExchangesPerSession: number;
+  takeawayRate: number; // % who wrote a personal takeaway
+  topEmotions: { emotion: string; count: number }[];
+  topContexts: { context: string; count: number }[];
+  returnRate: number; // % of days with >1 session (engagement)
+  totalThemesExtracted: number;
+  firstSessionDate: string | null;
+  daysSinceFirstSession: number;
+}
+
+export function getUsageMetrics(): UsageMetrics {
+  const sessions = getSessions();
+  const themes = getThemes();
+
+  const totalSessions = sessions.length;
+
+  // Sessions by mode
+  const sessionsByMode = { reflect: 0, prepare: 0, ground: 0 };
+  sessions.forEach(s => {
+    if (s.mode in sessionsByMode) {
+      sessionsByMode[s.mode as keyof typeof sessionsByMode]++;
+    }
+  });
+
+  // Average exchanges
+  const avgExchangesPerSession =
+    totalSessions > 0
+      ? Math.round((sessions.reduce((sum, s) => sum + s.exchanges, 0) / totalSessions) * 10) / 10
+      : 0;
+
+  // Clarity rate (of those who responded, not skipped)
+  const clarityResponses = sessions.filter(
+    s => s.clarityResponse && s.clarityResponse !== "skip"
+  );
+  const clarityRate =
+    clarityResponses.length > 0
+      ? Math.round(
+          (clarityResponses.filter(s => s.clarityResponse === "yes").length /
+            clarityResponses.length) *
+            100
+        )
+      : 0;
+
+  // Completion rate (sessions where exchanges = max for that mode)
+  const limits: Record<string, number> = { reflect: 5, prepare: 7, ground: 3 };
+  const completedSessions = sessions.filter(
+    s => s.exchanges >= (limits[s.mode] || 5)
+  );
+  const completionRate =
+    totalSessions > 0
+      ? Math.round((completedSessions.length / totalSessions) * 100)
+      : 0;
+
+  // Takeaway rate
+  const takeawayRate =
+    totalSessions > 0
+      ? Math.round(
+          (sessions.filter(s => s.takeaway && s.takeaway.trim().length > 0).length /
+            totalSessions) *
+            100
+        )
+      : 0;
+
+  // Top emotions from themes
+  const emotionCounts: Record<string, number> = {};
+  themes.forEach(t => {
+    emotionCounts[t.emotion] = (emotionCounts[t.emotion] || 0) + 1;
+  });
+  const topEmotions = Object.entries(emotionCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([emotion, count]) => ({ emotion, count }));
+
+  // Top contexts
+  const contextCounts: Record<string, number> = {};
+  themes.forEach(t => {
+    contextCounts[t.context] = (contextCounts[t.context] || 0) + 1;
+  });
+  const topContexts = Object.entries(contextCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([context, count]) => ({ context, count }));
+
+  // Return rate: % of unique days with more than one session
+  const sessionDays = new Set(
+    sessions.map(s => new Date(s.completedAt).toISOString().slice(0, 10))
+  );
+  const multiSessionDays = new Set<string>();
+  const dayCounts: Record<string, number> = {};
+  sessions.forEach(s => {
+    const day = new Date(s.completedAt).toISOString().slice(0, 10);
+    dayCounts[day] = (dayCounts[day] || 0) + 1;
+    if (dayCounts[day] > 1) multiSessionDays.add(day);
+  });
+  const returnRate =
+    sessionDays.size > 0
+      ? Math.round((multiSessionDays.size / sessionDays.size) * 100)
+      : 0;
+
+  // First session date
+  const firstSessionDate =
+    sessions.length > 0 ? sessions[0].completedAt : null;
+  const daysSinceFirstSession = firstSessionDate
+    ? Math.floor(
+        (Date.now() - new Date(firstSessionDate).getTime()) /
+          (1000 * 60 * 60 * 24)
+      )
+    : 0;
+
+  return {
+    totalSessions,
+    sessionsByMode,
+    completionRate,
+    clarityRate,
+    avgExchangesPerSession,
+    takeawayRate,
+    topEmotions,
+    topContexts,
+    returnRate,
+    totalThemesExtracted: themes.length,
+    firstSessionDate,
+    daysSinceFirstSession,
+  };
+}

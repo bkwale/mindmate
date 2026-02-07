@@ -1,6 +1,6 @@
 "use client";
 
-import { getThemes, getSessions, getProfile, ThemeEntry, SessionRecord } from "@/lib/storage";
+import { getThemes, getSessions, getProfile, getUsageMetrics, ThemeEntry, SessionRecord, UsageMetrics } from "@/lib/storage";
 import { useState, useEffect } from "react";
 
 interface InsightsProps {
@@ -11,11 +11,13 @@ interface InsightsProps {
 export default function Insights({ onBack, onSettings }: InsightsProps) {
   const [themes, setThemes] = useState<ThemeEntry[]>([]);
   const [sessions, setSessions] = useState<SessionRecord[]>([]);
-  const [activeTab, setActiveTab] = useState<"overview" | "themes" | "history">("overview");
+  const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "themes" | "history" | "metrics">("overview");
 
   useEffect(() => {
     setThemes(getThemes());
     setSessions(getSessions());
+    setMetrics(getUsageMetrics());
   }, []);
 
   const totalSessions = sessions.length;
@@ -113,7 +115,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
       {/* Tabs */}
       <div className="px-6 mb-4">
         <div className="max-w-md mx-auto flex gap-1 bg-white rounded-xl p-1 border border-calm-border">
-          {(["overview", "themes", "history"] as const).map(tab => (
+          {(["overview", "themes", "history", "metrics"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -292,6 +294,86 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                   ))}
                 </>
               )}
+            </div>
+          )}
+          {/* METRICS TAB */}
+          {activeTab === "metrics" && metrics && (
+            <div className="space-y-3 animate-fade-in">
+              <p className="text-xs text-calm-muted">
+                Anonymous usage data. No personal content.
+              </p>
+
+              {/* Key metrics grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white rounded-xl p-4 border border-calm-border">
+                  <p className="text-2xl font-medium text-calm-text">{metrics.totalSessions}</p>
+                  <p className="text-[10px] text-calm-muted mt-0.5">Total sessions</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-calm-border">
+                  <p className="text-2xl font-medium text-calm-text">{metrics.completionRate}%</p>
+                  <p className="text-[10px] text-calm-muted mt-0.5">Completion rate</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-calm-border">
+                  <p className="text-2xl font-medium text-calm-text">{metrics.clarityRate}%</p>
+                  <p className="text-[10px] text-calm-muted mt-0.5">Said &ldquo;that helped&rdquo;</p>
+                </div>
+                <div className="bg-white rounded-xl p-4 border border-calm-border">
+                  <p className="text-2xl font-medium text-calm-text">{metrics.takeawayRate}%</p>
+                  <p className="text-[10px] text-calm-muted mt-0.5">Wrote a takeaway</p>
+                </div>
+              </div>
+
+              {/* Mode breakdown */}
+              <div className="bg-white rounded-xl p-4 border border-calm-border">
+                <p className="text-xs text-calm-muted mb-3">Sessions by mode</p>
+                <div className="space-y-2">
+                  {(["reflect", "prepare", "ground"] as const).map(m => {
+                    const count = metrics.sessionsByMode[m];
+                    const pct = metrics.totalSessions > 0
+                      ? Math.round((count / metrics.totalSessions) * 100)
+                      : 0;
+                    return (
+                      <div key={m} className="flex items-center gap-3">
+                        <span className="text-xs text-calm-text w-16 capitalize">{m}</span>
+                        <div className="flex-1 h-2 bg-calm-border rounded-full overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-500 ${
+                              m === "reflect" ? "bg-mind-500" :
+                              m === "prepare" ? "bg-warm-500" :
+                              "bg-calm-muted"
+                            }`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="text-[10px] text-calm-muted w-8 text-right">{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Engagement */}
+              <div className="bg-white rounded-xl p-4 border border-calm-border">
+                <p className="text-xs text-calm-muted mb-3">Engagement</p>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-calm-text">Avg exchanges per session</span>
+                    <span className="text-sm font-medium text-calm-text">{metrics.avgExchangesPerSession}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-calm-text">Multi-session day rate</span>
+                    <span className="text-sm font-medium text-calm-text">{metrics.returnRate}%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-calm-text">Themes extracted</span>
+                    <span className="text-sm font-medium text-calm-text">{metrics.totalThemesExtracted}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-calm-text">Days active</span>
+                    <span className="text-sm font-medium text-calm-text">{metrics.daysSinceFirstSession}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
