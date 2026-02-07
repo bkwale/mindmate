@@ -1,6 +1,6 @@
 "use client";
 
-import { getProfile, getThemes, getSessions, clearAllData } from "@/lib/storage";
+import { getProfile, getThemes, getSessions, clearAllData, updateAboutMe } from "@/lib/storage";
 import { isPINEnabled, removePIN } from "@/lib/security";
 import { useState, useEffect } from "react";
 import PINSetup from "./PINSetup";
@@ -18,11 +18,14 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
   const [showConfirm, setShowConfirm] = useState<"themes" | "all" | "pin" | null>(null);
   const [pinEnabled, setPinEnabled] = useState(false);
   const [showPINSetup, setShowPINSetup] = useState(false);
+  const [aboutMe, setAboutMe] = useState("");
+  const [aboutMeSaved, setAboutMeSaved] = useState(false);
 
   useEffect(() => {
     const profile = getProfile();
     if (profile) {
       setName(profile.name);
+      setAboutMe(profile.aboutMe || "");
       setJoinedDate(
         new Date(profile.createdAt).toLocaleDateString("en-GB", {
           day: "numeric",
@@ -181,6 +184,42 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                 </p>
               </button>
             )}
+          </div>
+
+          {/* About you */}
+          <div className="bg-white rounded-xl p-5 border border-calm-border">
+            <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
+              About you
+            </p>
+            <p className="text-xs text-calm-muted mb-3 leading-relaxed">
+              Help MindMate understand you better. This context shapes how it asks questions.
+            </p>
+            <textarea
+              value={aboutMe}
+              onChange={(e) => {
+                setAboutMe(e.target.value);
+                setAboutMeSaved(false);
+              }}
+              placeholder="e.g. I'm going through a career change and struggling with a difficult relationship with my mum."
+              className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                         placeholder:text-calm-muted/50 focus:outline-none focus:border-mind-300
+                         resize-none leading-relaxed"
+              rows={3}
+            />
+            <button
+              onClick={() => {
+                updateAboutMe(aboutMe);
+                setAboutMeSaved(true);
+                setTimeout(() => setAboutMeSaved(false), 2000);
+              }}
+              className={`mt-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-all ${
+                aboutMeSaved
+                  ? "bg-green-50 text-green-600 border border-green-200"
+                  : "bg-mind-50 text-mind-600 border border-mind-200 hover:bg-mind-100"
+              }`}
+            >
+              {aboutMeSaved ? "Saved ✓" : "Save"}
+            </button>
           </div>
 
           {/* Data summary */}

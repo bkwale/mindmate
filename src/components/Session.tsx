@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
-import { getThemeSummaries, addSession, addTheme } from "@/lib/storage";
+import { getThemeSummaries, getAboutMe, addSession, addTheme } from "@/lib/storage";
 import RelationshipTag from "./RelationshipTag";
 
 interface SessionProps {
@@ -69,6 +69,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
     try {
       const themes = getThemeSummaries();
+      const aboutMe = getAboutMe();
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -77,6 +78,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
           mode,
           exchangeCount,
           themes: themes.length > 0 ? themes : null,
+          aboutMe,
         }),
       });
 

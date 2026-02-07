@@ -10,17 +10,14 @@ interface OnboardingProps {
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [screen, setScreen] = useState(0);
-  const [seedAnswers, setSeedAnswers] = useState({
-    relationship: "",
-    feeling: "",
-    conversation: "",
-  });
+  const [aboutMe, setAboutMe] = useState("");
 
   const handleFinish = () => {
     saveProfile({
       name: "",
       onboarded: true,
-      seedAnswers,
+      aboutMe: aboutMe.trim() || undefined,
+      seedAnswers: {},
       createdAt: new Date().toISOString(),
     });
     onComplete();
@@ -103,61 +100,26 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <h2 className="text-xl font-serif text-calm-text">
-                What&apos;s on your mind?
+                Help MindMate understand you
               </h2>
-              <p className="text-calm-muted text-sm">
-                These are optional. Answer any, all, or none.
+              <p className="text-calm-muted text-sm leading-relaxed">
+                What should MindMate know about you? This helps it ask
+                better questions from the start.
               </p>
             </div>
-            <div className="space-y-5 text-left">
-              <div>
-                <label className="block text-sm text-calm-muted mb-2">
-                  What relationship is most on your mind right now?
-                </label>
-                <input
-                  type="text"
-                  value={seedAnswers.relationship}
-                  onChange={e =>
-                    setSeedAnswers(s => ({ ...s, relationship: e.target.value }))
-                  }
-                  placeholder="e.g. my partner, my mother, a friend..."
-                  className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
-                             text-calm-text placeholder:text-calm-muted/50 text-sm
-                             focus:outline-none focus:border-mind-400 transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-calm-muted mb-2">
-                  What&apos;s one feeling you&apos;ve been carrying this week?
-                </label>
-                <input
-                  type="text"
-                  value={seedAnswers.feeling}
-                  onChange={e =>
-                    setSeedAnswers(s => ({ ...s, feeling: e.target.value }))
-                  }
-                  placeholder="e.g. frustration, sadness, uncertainty..."
-                  className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
-                             text-calm-text placeholder:text-calm-muted/50 text-sm
-                             focus:outline-none focus:border-mind-400 transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block text-sm text-calm-muted mb-2">
-                  Is there a conversation you&apos;ve been putting off?
-                </label>
-                <input
-                  type="text"
-                  value={seedAnswers.conversation}
-                  onChange={e =>
-                    setSeedAnswers(s => ({ ...s, conversation: e.target.value }))
-                  }
-                  placeholder="e.g. telling my boss I need a break..."
-                  className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
-                             text-calm-text placeholder:text-calm-muted/50 text-sm
-                             focus:outline-none focus:border-mind-400 transition-colors"
-                />
-              </div>
+            <div className="text-left">
+              <textarea
+                value={aboutMe}
+                onChange={e => setAboutMe(e.target.value)}
+                placeholder={"e.g. I\u2019m going through a career change and struggling with a difficult relationship with my mum. I tend to overthink and avoid confrontation."}
+                rows={4}
+                className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
+                           text-calm-text placeholder:text-calm-muted/40 text-sm leading-relaxed
+                           focus:outline-none focus:border-mind-400 transition-colors resize-none"
+              />
+              <p className="text-[10px] text-calm-muted mt-2">
+                This stays on your device. You can change it anytime in Settings.
+              </p>
             </div>
             <div className="flex gap-3">
               <button
