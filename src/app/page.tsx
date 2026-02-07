@@ -6,8 +6,10 @@ import { SessionMode } from "@/lib/prompts";
 import Onboarding from "@/components/Onboarding";
 import Home from "@/components/Home";
 import Session from "@/components/Session";
+import Insights from "@/components/Insights";
+import Settings from "@/components/Settings";
 
-type AppState = "loading" | "onboarding" | "home" | "session";
+type AppState = "loading" | "onboarding" | "home" | "session" | "insights" | "settings";
 
 export default function MindMate() {
   const [appState, setAppState] = useState<AppState>("loading");
@@ -31,6 +33,22 @@ export default function MindMate() {
   const handleSessionEnd = () => {
     setActiveMode(null);
     setAppState("home");
+  };
+
+  const handleOpenInsights = () => {
+    setAppState("insights");
+  };
+
+  const handleOpenSettings = () => {
+    setAppState("settings");
+  };
+
+  const handleBackToHome = () => {
+    setAppState("home");
+  };
+
+  const handleResetApp = () => {
+    setAppState("onboarding");
   };
 
   // Loading state
@@ -57,6 +75,16 @@ export default function MindMate() {
     return <Session mode={activeMode} onEnd={handleSessionEnd} />;
   }
 
+  // Insights
+  if (appState === "insights") {
+    return <Insights onBack={handleBackToHome} onSettings={handleOpenSettings} />;
+  }
+
+  // Settings
+  if (appState === "settings") {
+    return <Settings onBack={handleBackToHome} onResetApp={handleResetApp} />;
+  }
+
   // Home (three doors)
-  return <Home onSelectMode={handleSelectMode} />;
+  return <Home onSelectMode={handleSelectMode} onOpenInsights={handleOpenInsights} />;
 }

@@ -5,6 +5,7 @@ import { recentSessionCount } from "@/lib/storage";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
+  onOpenInsights: () => void;
 }
 
 const doors = [
@@ -46,20 +47,35 @@ const doors = [
   },
 ];
 
-export default function Home({ onSelectMode }: HomeProps) {
+export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   const recentCount = recentSessionCount();
   const showPauseMessage = recentCount >= 3;
 
   return (
     <div className="min-h-screen bg-calm-bg flex flex-col">
       {/* Header */}
-      <header className="pt-12 pb-6 px-6 text-center">
-        <h1 className="text-2xl font-serif text-calm-text tracking-tight">
-          MindMate
-        </h1>
-        <p className="text-calm-muted text-sm mt-2">
-          What brings you here?
-        </p>
+      <header className="pt-12 pb-6 px-6">
+        <div className="max-w-md mx-auto flex items-center justify-between">
+          <div className="w-8" />
+          <div className="text-center">
+            <h1 className="text-2xl font-serif text-calm-text tracking-tight">
+              MindMate
+            </h1>
+            <p className="text-calm-muted text-sm mt-2">
+              What brings you here?
+            </p>
+          </div>
+          <button
+            onClick={onOpenInsights}
+            className="text-calm-muted hover:text-mind-600 transition-colors p-1"
+            aria-label="Your reflections"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </button>
+        </div>
       </header>
 
       {/* Three Doors */}
