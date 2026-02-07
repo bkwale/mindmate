@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  background-color: #f7f6f3;
+  color: #2d3436;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dfe6e9;
+  border-radius: 4px;
+}
+
+/* Textarea auto-resize smooth */
+textarea {
+  transition: height 0.1s ease;
+}
+
+/* Remove mobile tap highlight */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Safe area for mobile */
+@supports (padding: env(safe-area-inset-bottom)) {
+  footer {
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+}
