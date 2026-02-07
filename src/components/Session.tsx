@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
-import { getThemeSummaries, addSession } from "@/lib/storage";
+import { getThemeSummaries, addSession, addTheme } from "@/lib/storage";
 import ClarityPrompt from "./ClarityPrompt";
+import RelationshipTag from "./RelationshipTag";
 
 interface SessionProps {
   mode: SessionMode;
@@ -38,6 +39,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
   const [isComplete, setIsComplete] = useState(false);
   const [showClarity, setShowClarity] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [relationshipTag, setRelationshipTag] = useState<string | null>(null);
+  const [isExtracting, setIsExtracting] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -110,17 +113,52 @@ export default function Session({ mode, onEnd }: SessionProps) {
     }
   };
 
-  const handleEndSession = () => {
+  const extractThemes = async () => {
+    setIsExtracting(true);
+    try {
+      const response = await fetch("/api/extract", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: messages.map(m => ({ role: m.role, content: m.content })),
+          mode,
+          relationshipContext: relationshipTag,
+        }),
+      });
+
+      if (response.ok) {
+        const extracted = await response.json();
+        if (!extracted.crisis_adjacent && !extracted.error) {
+          addTheme({
+            emotion: extracted.emotion || "unspecified",
+            context: extracted.context || relationshipTag || "general",
+            theme: extracted.theme || "Reflection completed",
+            mode,
+          });
+        }
+      }
+    } catch (err) {
+      console.error("Theme extraction failed:", err);
+    } finally {
+      setIsExtracting(false);
+    }
+  };
+
+  const handleEndSession = async () => {
     addSession({
       mode,
       exchanges: exchangeCount,
       summary: messages[messages.length - 1]?.content || "",
     });
+
+    if (mode !== "ground") {
+      await extractThemes();
+    }
+
     setShowClarity(true);
   };
 
   const handleClarityResponse = (response: "yes" | "no" | "skip") => {
-    // Update the last session with clarity response
     onEnd();
   };
 
@@ -149,9 +187,14 @@ export default function Session({ mode, onEnd }: SessionProps) {
               {exchangeCount} of {maxExchanges}
             </p>
           </div>
-          <div className="w-7" />
+          <div className="w-7 flex justify-end">
+            {relationshipTag && (
+              <span className="w-5 h-5 rounded-full bg-mind-100 flex items-center justify-center text-[9px] text-mind-600">
+                {relationshipTag.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
         </div>
-        {/* Progress bar */}
         <div className="h-0.5 bg-calm-border">
           <div
             className="h-full bg-mind-500 transition-all duration-500 ease-out"
@@ -163,13 +206,21 @@ export default function Session({ mode, onEnd }: SessionProps) {
       {/* Messages */}
       <main className="flex-1 overflow-y-auto">
         <div className="max-w-lg mx-auto px-4 py-6 space-y-5">
+          {/* Relationship tagging — shown before first user message */}
+          {exchangeCount === 0 && mode !== "ground" && (
+            <div className="px-1 mb-2">
+              <RelationshipTag
+                selected={relationshipTag}
+                onSelect={setRelationshipTag}
+              />
+            </div>
+          )}
+
           {messages.map((msg, i) => (
             <div
               key={i}
               className={`animate-slide-up ${
-                msg.role === "assistant"
-                  ? "pr-8"
-                  : "pl-8"
+                msg.role === "assistant" ? "pr-8" : "pl-8"
               }`}
             >
               {msg.role === "assistant" ? (
@@ -226,10 +277,12 @@ export default function Session({ mode, onEnd }: SessionProps) {
           {isComplete ? (
             <button
               onClick={handleEndSession}
+              disabled={isExtracting}
               className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-sm font-medium
-                         hover:bg-mind-700 transition-colors duration-200"
+                         hover:bg-mind-700 transition-colors duration-200
+                         disabled:opacity-70"
             >
-              End session
+              {isExtracting ? "Saving reflection..." : "End session"}
             </button>
           ) : (
             <div className="flex gap-2 items-end">
