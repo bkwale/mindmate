@@ -101,8 +101,8 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                 </span>
               </div>
               <div>
-                <p className="text-base font-medium text-calm-text">{name || "MindMate User"}</p>
-                <p className="text-xs text-calm-muted">Using MindMate since {joinedDate}</p>
+                <p className="text-base font-medium text-calm-text">{name || "MindM8 User"}</p>
+                <p className="text-xs text-calm-muted">Using MindM8 since {joinedDate}</p>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                   <span className="text-calm-text">Set up PIN lock</span>
                 </div>
                 <p className="text-[10px] text-calm-muted mt-0.5 ml-6">
-                  Requires a 4-digit PIN each time you open MindMate.
+                  Requires a 4-digit PIN each time you open MindM8.
                 </p>
               </button>
             )}
@@ -192,7 +192,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
               About you
             </p>
             <p className="text-xs text-calm-muted mb-3 leading-relaxed">
-              Help MindMate understand you better. This context shapes how it asks questions.
+              Help MindM8 understand you better. This context shapes how it asks questions.
             </p>
             <textarea
               value={aboutMe}
@@ -324,10 +324,10 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
           {/* About */}
           <div className="bg-white rounded-xl p-5 border border-calm-border">
             <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
-              About MindMate
+              About MindM8
             </p>
             <p className="text-xs text-calm-muted leading-relaxed">
-              MindMate is a space for emotional clarity. It helps you think through what you&apos;re
+              MindM8 is a space for emotional clarity. It helps you think through what you&apos;re
               feeling — not by giving advice, but by listening well and reflecting patterns back to you.
             </p>
             <p className="text-xs text-calm-muted leading-relaxed mt-2">

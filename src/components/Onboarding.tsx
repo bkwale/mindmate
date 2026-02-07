@@ -40,12 +40,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div className="text-center space-y-8">
             <div className="space-y-3">
               <h1 className="text-3xl font-serif text-calm-text tracking-tight">
-                MindMate
+                MindM8
               </h1>
               <div className="w-12 h-0.5 bg-mind-400 mx-auto rounded-full" />
             </div>
             <p className="text-calm-muted text-lg leading-relaxed">
-              MindMate helps you think more clearly about your emotions and
+              MindM8 helps you think more clearly about your emotions and
               relationships. It&apos;s not therapy. It&apos;s not a chatbot.
               It&apos;s a space to reflect.
             </p>
@@ -71,7 +71,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </div>
             <div className="space-y-4 text-left">
               <p className="text-calm-muted leading-relaxed">
-                MindMate is <strong className="text-calm-text">not</strong> a therapist or
+                MindM8 is <strong className="text-calm-text">not</strong> a therapist or
                 crisis service. It&apos;s a reflection tool — it asks questions, it
                 doesn&apos;t give answers.
               </p>
@@ -100,10 +100,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <h2 className="text-xl font-serif text-calm-text">
-                Help MindMate understand you
+                Help MindM8 understand you
               </h2>
               <p className="text-calm-muted text-sm leading-relaxed">
-                What should MindMate know about you? This helps it ask
+                What should MindM8 know about you? This helps it ask
                 better questions from the start.
               </p>
             </div>

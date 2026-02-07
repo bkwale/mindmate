@@ -13,7 +13,7 @@ import PINLock from "@/components/PINLock";
 
 type AppState = "loading" | "locked" | "onboarding" | "home" | "session" | "insights" | "settings";
 
-export default function MindMate() {
+export default function MindM8() {
   const [appState, setAppState] = useState<AppState>("loading");
   const [activeMode, setActiveMode] = useState<SessionMode | null>(null);
 
@@ -74,7 +74,7 @@ export default function MindMate() {
           <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center mx-auto">
             <div className="w-3 h-3 rounded-full bg-mind-500 animate-breathe" />
           </div>
-          <p className="text-sm text-calm-muted">MindMate</p>
+          <p className="text-sm text-calm-muted">MindM8</p>
         </div>
       </div>
     );

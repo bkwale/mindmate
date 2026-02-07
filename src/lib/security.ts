@@ -1,4 +1,4 @@
-// MindMate — Security Module (PIN Lock)
+// MindM8 — Security Module (PIN Lock)
 // Uses Web Crypto API for hashing. No external dependencies.
 
 const SECURITY_KEY = "mindmate_security";
