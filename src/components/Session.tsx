@@ -21,6 +21,24 @@ const modeLabels: Record<SessionMode, string> = {
   ground: "Grounding",
 };
 
+const modeIntros: Record<SessionMode, { heading: string; description: string; tip: string }> = {
+  reflect: {
+    heading: "Guided Reflection",
+    description: "You\u2019ll explore an emotion, an event, or something you can\u2019t quite name yet. MindM8 will ask questions to help you see it more clearly.",
+    tip: "There are no right answers. Say what\u2019s true, not what sounds good.",
+  },
+  prepare: {
+    heading: "Conversation Prep",
+    description: "You\u2019ll work through a difficult conversation before it happens. MindM8 will help you clarify what you need to say and how you want to feel after.",
+    tip: "Think about one specific person and one specific conversation.",
+  },
+  ground: {
+    heading: "Grounding",
+    description: "This is a short, quiet check-in. You\u2019ll slow down, name how you feel, and sit with it for a moment.",
+    tip: "Keep it simple. One word is enough.",
+  },
+};
+
 const firstPrompts: Record<SessionMode, string> = {
   reflect: "What's been on your mind lately that you haven't said out loud?",
   prepare: "What conversation have you been thinking about? Who is it with, and what do you need them to hear?",
@@ -29,6 +47,7 @@ const firstPrompts: Record<SessionMode, string> = {
 
 export default function Session({ mode, onEnd }: SessionProps) {
   const maxExchanges = SESSION_LIMITS[mode];
+  const [showIntro, setShowIntro] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: firstPrompts[mode] },
   ]);
@@ -163,6 +182,51 @@ export default function Session({ mode, onEnd }: SessionProps) {
     onEnd();
   };
 
+  // Mode intro screen
+  if (showIntro) {
+    const intro = modeIntros[mode];
+    return (
+      <div className="min-h-screen bg-calm-bg flex items-center justify-center p-6">
+        <div className="max-w-md w-full animate-fade-in">
+          <div className="text-center space-y-6">
+            <div className="space-y-2">
+              <p className="text-xs text-mind-500 uppercase tracking-wider font-medium">
+                {modeLabels[mode]}
+              </p>
+              <h2 className="text-xl font-serif text-calm-text">
+                {intro.heading}
+              </h2>
+            </div>
+            <p className="text-calm-muted text-sm leading-relaxed">
+              {intro.description}
+            </p>
+            <div className="bg-mind-50 border border-mind-100 rounded-xl px-4 py-3">
+              <p className="text-xs text-mind-700 leading-relaxed">
+                {intro.tip}
+              </p>
+            </div>
+            <p className="text-xs text-calm-muted">
+              {maxExchanges} exchanges · be honest to get the most from this
+            </p>
+            <button
+              onClick={() => setShowIntro(false)}
+              className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
+                         hover:bg-mind-700 transition-colors duration-200"
+            >
+              Begin
+            </button>
+            <button
+              onClick={onEnd}
+              className="w-full py-2 text-calm-muted text-xs hover:text-calm-text transition-colors"
+            >
+              Go back
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-calm-bg flex flex-col">
       {/* Header */}
@@ -271,6 +335,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
       {/* Footer — input or soft landing */}
       <footer className="sticky bottom-0 bg-calm-bg/95 backdrop-blur-sm border-t border-calm-border">
         <div className="max-w-lg mx-auto px-4 py-3">
+          {/* Sticky last question — so user never loses what was asked */}
+          {!isComplete && !isLoading && messages.length > 0 && messages[messages.length - 1].role === "assistant" && exchangeCount > 0 && (
+            <div className="mb-2 px-1">
+              <p className="text-xs text-calm-muted leading-relaxed line-clamp-2">
+                <span className="text-mind-500 font-medium">Q: </span>
+                {messages[messages.length - 1].content}
+              </p>
+            </div>
+          )}
           {isComplete ? (
             isSaving ? (
               <div className="text-center py-4 animate-fade-in">
