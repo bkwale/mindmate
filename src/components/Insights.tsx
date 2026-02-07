@@ -215,7 +215,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
               ) : (
                 <>
                   <p className="text-xs text-calm-muted">
-                    What MindMate has noticed across your reflections.
+                    What MindM8 has noticed across your reflections.
                   </p>
                   {recentThemes.map(theme => (
                     <div

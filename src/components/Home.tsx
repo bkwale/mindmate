@@ -75,7 +75,7 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           <div className="w-8" />
           <div className="text-center">
             <h1 className="text-2xl font-serif text-calm-text tracking-tight">
-              MindMate
+              MindM8
             </h1>
             <p className="text-calm-muted text-sm mt-2">
               What brings you here?

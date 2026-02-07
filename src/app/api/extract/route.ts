@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     const { messages, mode, relationshipContext } = await req.json();
 
-    const extractionPrompt = `You are a theme extraction system for MindMate, an emotional clarity tool.
+    const extractionPrompt = `You are a theme extraction system for MindM8, an emotional clarity tool.
 
 Analyze the following reflection session and extract structured theme data.
 

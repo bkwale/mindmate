@@ -4,9 +4,9 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MindMate — A space to reflect",
+  title: "MindM8 — A space to reflect",
   description:
-    "MindMate helps you think more clearly about your emotions and relationships. Not therapy. Not a chatbot. A space to reflect.",
+    "MindM8 helps you think more clearly about your emotions and relationships. Not therapy. Not a chatbot. A space to reflect.",
   icons: {
     icon: [
       {

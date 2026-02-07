@@ -1,4 +1,4 @@
-// MindMate — Local Storage Helper (MVP)
+// MindM8 — Local Storage Helper (MVP)
 // This will be replaced with a proper backend in production.
 
 export interface UserProfile {
