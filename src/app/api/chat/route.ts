@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
+import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, getPersonalContextLayer, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -14,22 +14,31 @@ export async function POST(req: NextRequest) {
       mode,
       exchangeCount,
       themes,
+      aboutMe,
     }: {
       messages: { role: "user" | "assistant"; content: string }[];
       mode: SessionMode;
       exchangeCount: number;
       themes: string[] | null;
+      aboutMe: string | null;
     } = body;
 
     const maxExchanges = SESSION_LIMITS[mode];
 
     // Build the layered system prompt
-    const systemPrompt = [
+    const layers = [
       BASE_LAYER,
       SAFETY_LAYER,
       getSessionLayer(mode, exchangeCount, maxExchanges),
       getThemeLayer(themes),
-    ].join("\n\n---\n\n");
+    ];
+
+    const personalContext = getPersonalContextLayer(aboutMe);
+    if (personalContext) {
+      layers.push(personalContext);
+    }
+
+    const systemPrompt = layers.join("\n\n---\n\n");
 
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",

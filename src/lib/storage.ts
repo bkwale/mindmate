@@ -4,12 +4,28 @@
 export interface UserProfile {
   name: string;
   onboarded: boolean;
+  aboutMe?: string;
   seedAnswers: {
     relationship?: string;
     feeling?: string;
     conversation?: string;
   };
   createdAt: string;
+}
+
+// Get "about me" context for prompt injection
+export function getAboutMe(): string | null {
+  const profile = getProfile();
+  if (!profile?.aboutMe || profile.aboutMe.trim().length === 0) return null;
+  return profile.aboutMe.trim();
+}
+
+// Update just the aboutMe field
+export function updateAboutMe(text: string): void {
+  const profile = getProfile();
+  if (!profile) return;
+  profile.aboutMe = text;
+  saveProfile(profile);
 }
 
 export interface ThemeEntry {
