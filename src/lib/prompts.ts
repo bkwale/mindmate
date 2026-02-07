@@ -101,14 +101,13 @@ SESSION STATE:
   if (remaining <= 1) {
     sessionState += `
 
-THIS IS THE FINAL EXCHANGE. Provide a brief closing summary (2-3 sentences) reflecting the themes of this session. Then ask one optional closing question: "Is there anything you want to carry forward from this?"
-Do not invite the user to continue. Do not say "we can talk more about this."`;
+THIS IS THE FINAL EXCHANGE. Give a brief closing reflection (2-3 sentences) that names what the user explored in this session. End with one concrete, specific observation — something they said or recognised that they can sit with. Do not ask any questions. Do not invite further conversation. Close warmly and cleanly.`;
   }
 
   if (remaining === 0) {
     sessionState += `
 
-THE SESSION HAS ENDED. Provide only the closing summary. Do not ask any new questions except the carry-forward question.`;
+THE SESSION HAS ENDED. Provide only the closing reflection. Do not ask any questions.`;
   }
 
   return sessionState;
@@ -119,9 +118,9 @@ export function getThemeLayer(themes: string[] | null) {
     return "CONTEXT: This is a new user with no reflection history yet. Focus on the present moment.";
   }
 
-  return `CONTEXT FROM PREVIOUS REFLECTIONS (abstracted themes only — never quote raw text):
+  return `CONTEXT FROM PREVIOUS REFLECTIONS (abstracted patterns — never quote the user):
 ${themes.map(t => `- ${t}`).join("\n")}
-Use this context subtly. Do not reference it unless directly relevant. Never quote the user's past words.`;
+If any of these patterns connect to what the user brings today, you may acknowledge it gently — for example: "This seems to connect to something you've reflected on before." But only if it genuinely fits. Do not force connections. Do not list their history.`;
 }
 
 export const SESSION_LIMITS = {

@@ -1,7 +1,7 @@
 "use client";
 
 import { SessionMode } from "@/lib/prompts";
-import { recentSessionCount } from "@/lib/storage";
+import { recentSessionCount, getLastSession, getLastTheme } from "@/lib/storage";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
@@ -50,6 +50,22 @@ const doors = [
 export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   const recentCount = recentSessionCount();
   const showPauseMessage = recentCount >= 3;
+  const lastSession = getLastSession();
+  const lastTheme = getLastTheme();
+
+  // Format how long ago the last session was
+  const getTimeAgo = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    if (hours < 1) return "just now";
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    if (days === 1) return "yesterday";
+    if (days < 7) return `${days} days ago`;
+    const weeks = Math.floor(days / 7);
+    if (weeks === 1) return "last week";
+    return `${weeks} weeks ago`;
+  };
 
   return (
     <div className="min-h-screen bg-calm-bg flex flex-col">
@@ -86,6 +102,23 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
               You&apos;ve reflected a lot today. It might help to step away and come
               back to this later.
             </p>
+          </div>
+        )}
+
+        {/* Last reflection — connective tissue */}
+        {lastTheme && lastSession && !showPauseMessage && (
+          <div className="mb-5 bg-white rounded-xl p-4 border border-calm-border animate-fade-in">
+            <p className="text-[10px] text-calm-muted uppercase tracking-wider mb-2">
+              Last time you were here · {getTimeAgo(lastSession.completedAt)}
+            </p>
+            <p className="text-sm text-calm-text leading-relaxed">
+              {lastTheme.theme}
+            </p>
+            {lastSession.takeaway && (
+              <p className="text-xs text-calm-muted mt-2 italic leading-relaxed">
+                &ldquo;{lastSession.takeaway}&rdquo;
+              </p>
+            )}
           </div>
         )}
 
