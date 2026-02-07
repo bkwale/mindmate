@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 import { getThemeSummaries, addSession, addTheme } from "@/lib/storage";
-import ClarityPrompt from "./ClarityPrompt";
 import RelationshipTag from "./RelationshipTag";
 
 interface SessionProps {
@@ -37,16 +36,16 @@ export default function Session({ mode, onEnd }: SessionProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [exchangeCount, setExchangeCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [showClarity, setShowClarity] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [relationshipTag, setRelationshipTag] = useState<string | null>(null);
-  const [isExtracting, setIsExtracting] = useState(false);
+  const [takeaway, setTakeaway] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isComplete]);
 
   useEffect(() => {
     if (!isLoading && !isComplete) {
@@ -114,7 +113,6 @@ export default function Session({ mode, onEnd }: SessionProps) {
   };
 
   const extractThemes = async () => {
-    setIsExtracting(true);
     try {
       const response = await fetch("/api/extract", {
         method: "POST",
@@ -139,32 +137,29 @@ export default function Session({ mode, onEnd }: SessionProps) {
       }
     } catch (err) {
       console.error("Theme extraction failed:", err);
-    } finally {
-      setIsExtracting(false);
     }
   };
 
-  const handleEndSession = async () => {
+  const handleSoftEnd = async (clarity: "yes" | "no" | "skip") => {
+    setIsSaving(true);
+
+    // Save session with all data at once
     addSession({
       mode,
       exchanges: exchangeCount,
+      clarityResponse: clarity,
+      takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
     });
 
+    // Extract themes (skip for grounding — minimal data)
     if (mode !== "ground") {
       await extractThemes();
     }
 
-    setShowClarity(true);
-  };
-
-  const handleClarityResponse = (response: "yes" | "no" | "skip") => {
+    setIsSaving(false);
     onEnd();
   };
-
-  if (showClarity) {
-    return <ClarityPrompt onRespond={handleClarityResponse} />;
-  }
 
   return (
     <div className="min-h-screen bg-calm-bg flex flex-col">
@@ -271,19 +266,60 @@ export default function Session({ mode, onEnd }: SessionProps) {
         </div>
       </main>
 
-      {/* Input */}
+      {/* Footer — input or soft landing */}
       <footer className="sticky bottom-0 bg-calm-bg/95 backdrop-blur-sm border-t border-calm-border">
         <div className="max-w-lg mx-auto px-4 py-3">
           {isComplete ? (
-            <button
-              onClick={handleEndSession}
-              disabled={isExtracting}
-              className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-sm font-medium
-                         hover:bg-mind-700 transition-colors duration-200
-                         disabled:opacity-70"
-            >
-              {isExtracting ? "Saving reflection..." : "End session"}
-            </button>
+            isSaving ? (
+              <div className="text-center py-4 animate-fade-in">
+                <div className="w-8 h-8 rounded-full bg-mind-100 flex items-center justify-center mx-auto mb-2">
+                  <div className="w-2 h-2 rounded-full bg-mind-500 animate-breathe" />
+                </div>
+                <p className="text-sm text-calm-muted">Saving your reflection...</p>
+              </div>
+            ) : (
+              <div className="space-y-3 animate-fade-in">
+                {/* Takeaway — the user gets the last word */}
+                <div>
+                  <label className="text-xs text-calm-muted block mb-1.5">
+                    Anything you want to hold onto from this?
+                  </label>
+                  <textarea
+                    value={takeaway}
+                    onChange={e => setTakeaway(e.target.value)}
+                    placeholder="Optional — just for you"
+                    rows={2}
+                    className="w-full px-3 py-2.5 rounded-xl border border-calm-border bg-white
+                               text-sm text-calm-text placeholder:text-calm-muted/40
+                               focus:outline-none focus:border-mind-400 transition-colors resize-none"
+                  />
+                </div>
+
+                {/* Clarity + close */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleSoftEnd("yes")}
+                    className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
+                               hover:bg-mind-700 transition-colors duration-200"
+                  >
+                    That helped
+                  </button>
+                  <button
+                    onClick={() => handleSoftEnd("no")}
+                    className="flex-1 py-3 border border-calm-border text-calm-text rounded-xl text-sm
+                               hover:bg-warm-50 transition-colors duration-200"
+                  >
+                    Not really
+                  </button>
+                </div>
+                <button
+                  onClick={() => handleSoftEnd("skip")}
+                  className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                >
+                  Just close
+                </button>
+              </div>
+            )
           ) : (
             <div className="flex gap-2 items-end">
               <textarea

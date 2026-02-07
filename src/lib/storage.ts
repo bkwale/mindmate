@@ -27,6 +27,7 @@ export interface SessionRecord {
   exchanges: number;
   completedAt: string;
   clarityResponse?: "yes" | "no" | "skip";
+  takeaway?: string;
   summary?: string;
 }
 
@@ -119,6 +120,20 @@ function mode(arr: string[]): string {
   const freq: Record<string, number> = {};
   arr.forEach(v => { freq[v] = (freq[v] || 0) + 1; });
   return Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0] || "mixed";
+}
+
+// Get last session (for home screen context)
+export function getLastSession(): SessionRecord | null {
+  const sessions = getSessions();
+  if (sessions.length === 0) return null;
+  return sessions[sessions.length - 1];
+}
+
+// Get last theme (for home screen context)
+export function getLastTheme(): ThemeEntry | null {
+  const themes = getThemes();
+  if (themes.length === 0) return null;
+  return themes[themes.length - 1];
 }
 
 // Clear all data
