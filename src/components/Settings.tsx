@@ -1,7 +1,7 @@
 "use client";
 
 import { getProfile, getThemes, getSessions, clearAllData, updateAboutMe } from "@/lib/storage";
-import { isPINEnabled, removePIN } from "@/lib/security";
+import { isPINEnabled, removePIN, getAutoLockTimeout, setAutoLockTimeout, LockTimeout } from "@/lib/security";
 import { useState, useEffect } from "react";
 import PINSetup from "./PINSetup";
 
@@ -20,6 +20,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
   const [showPINSetup, setShowPINSetup] = useState(false);
   const [aboutMe, setAboutMe] = useState("");
   const [aboutMeSaved, setAboutMeSaved] = useState(false);
+  const [lockTimeout, setLockTimeout] = useState<LockTimeout>(3);
   const [feedback, setFeedback] = useState("");
   const [feedbackSent, setFeedbackSent] = useState(false);
 
@@ -39,6 +40,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
     setThemeCount(getThemes().length);
     setSessionCount(getSessions().length);
     setPinEnabled(isPINEnabled());
+    setLockTimeout(getAutoLockTimeout());
   }, []);
 
   const handleClearThemes = () => {
@@ -129,6 +131,42 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                     <span className="text-sm text-calm-text">PIN lock is on</span>
                   </div>
                   <span className="text-[10px] text-green-600 bg-green-50 px-2 py-0.5 rounded-full">Active</span>
+                </div>
+
+                {/* Auto-lock timeout */}
+                <div className="pt-2 border-t border-calm-border/50">
+                  <p className="text-xs text-calm-muted mb-2">Auto-lock after</p>
+                  <div className="flex gap-1.5 flex-wrap">
+                    {([
+                      { value: 0 as LockTimeout, label: "Immediately" },
+                      { value: 1 as LockTimeout, label: "1 min" },
+                      { value: 3 as LockTimeout, label: "3 min" },
+                      { value: 5 as LockTimeout, label: "5 min" },
+                      { value: -1 as LockTimeout, label: "Never" },
+                    ]).map(opt => (
+                      <button
+                        key={opt.value}
+                        onClick={() => {
+                          setLockTimeout(opt.value);
+                          setAutoLockTimeout(opt.value);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                          lockTimeout === opt.value
+                            ? "bg-mind-600 text-white"
+                            : "bg-white border border-calm-border text-calm-text hover:border-mind-300"
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-calm-muted mt-2">
+                    {lockTimeout === 0
+                      ? "Locks the moment you leave the app or switch tabs."
+                      : lockTimeout === -1
+                      ? "Only locks when you close or refresh MindM8."
+                      : `Locks after ${lockTimeout} ${lockTimeout === 1 ? "minute" : "minutes"} of inactivity or when you leave the app.`}
+                  </p>
                 </div>
 
                 <div className="flex gap-2">

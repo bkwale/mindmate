@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { isOnboarded } from "@/lib/storage";
-import { isPINEnabled } from "@/lib/security";
+import { isPINEnabled, shouldAutoLock, updateLastActivity, getAutoLockTimeout } from "@/lib/security";
 import { SessionMode } from "@/lib/prompts";
 import { registerServiceWorker } from "@/lib/notifications";
 import { trackEvent } from "@/lib/cohort";
@@ -18,6 +18,13 @@ type AppState = "loading" | "locked" | "onboarding" | "home" | "session" | "insi
 export default function MindM8() {
   const [appState, setAppState] = useState<AppState>("loading");
   const [activeMode, setActiveMode] = useState<SessionMode | null>(null);
+
+  // Auto-lock: re-engage PIN when tab goes to background or user is idle
+  const triggerLock = useCallback(() => {
+    if (isPINEnabled() && appState !== "locked" && appState !== "loading" && appState !== "onboarding") {
+      setAppState("locked");
+    }
+  }, [appState]);
 
   useEffect(() => {
     const onboarded = isOnboarded();
@@ -40,11 +47,76 @@ export default function MindM8() {
     trackEvent("app_open");
   }, []);
 
+  // Visibility change listener — lock when tab goes to background
+  useEffect(() => {
+    if (appState === "loading" || appState === "onboarding" || appState === "locked") return;
+    if (!isPINEnabled()) return;
+
+    let hiddenAt: number | null = null;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab went to background — record when
+        hiddenAt = Date.now();
+        const timeout = getAutoLockTimeout();
+        if (timeout === 0) {
+          // Immediate lock on background
+          triggerLock();
+        }
+      } else {
+        // Tab came back — check if we should lock
+        if (hiddenAt !== null) {
+          const timeout = getAutoLockTimeout();
+          if (timeout === -1) {
+            // Never auto-lock
+            hiddenAt = null;
+            return;
+          }
+          const elapsed = Date.now() - hiddenAt;
+          if (elapsed > timeout * 60 * 1000) {
+            triggerLock();
+          }
+          hiddenAt = null;
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [appState, triggerLock]);
+
+  // Idle timer — check every 30s if user has been inactive past their timeout
+  useEffect(() => {
+    if (appState === "loading" || appState === "onboarding" || appState === "locked") return;
+    if (!isPINEnabled()) return;
+    const timeout = getAutoLockTimeout();
+    if (timeout === -1 || timeout === 0) return; // skip for "never" and "immediate on background"
+
+    // Track user activity
+    const activityEvents = ["mousedown", "keydown", "touchstart", "scroll"];
+    const handleActivity = () => updateLastActivity();
+    activityEvents.forEach(evt => window.addEventListener(evt, handleActivity, { passive: true }));
+    updateLastActivity(); // mark now as active
+
+    // Periodic idle check
+    const interval = setInterval(() => {
+      if (shouldAutoLock()) {
+        triggerLock();
+      }
+    }, 30000); // check every 30 seconds
+
+    return () => {
+      activityEvents.forEach(evt => window.removeEventListener(evt, handleActivity));
+      clearInterval(interval);
+    };
+  }, [appState, triggerLock]);
+
   const handleOnboardingComplete = () => {
     setAppState("home");
   };
 
   const handleUnlock = () => {
+    updateLastActivity(); // reset idle timer on unlock
     setAppState("home");
   };
 
