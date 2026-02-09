@@ -283,9 +283,66 @@ export function dismissFollowUp(id: string): void {
   }
 }
 
+// ============================================================
+// Open Loops — seeds planted at session end, shown on next visit
+// ============================================================
+
+export interface OpenLoop {
+  text: string;
+  date: string;
+  mode: string;
+  context?: string;
+}
+
+export function saveOpenLoop(loop: OpenLoop): void {
+  localStorage.setItem("mindmate_openloop", JSON.stringify(loop));
+}
+
+export function getOpenLoop(): OpenLoop | null {
+  if (typeof window === "undefined") return null;
+  const data = localStorage.getItem("mindmate_openloop");
+  return data ? JSON.parse(data) : null;
+}
+
+export function clearOpenLoop(): void {
+  localStorage.removeItem("mindmate_openloop");
+}
+
+// ============================================================
+// Smart Check-in Helpers — pattern detection for contextual responses
+// ============================================================
+
+export function getCheckInPattern(): { word: string; count: number; total: number } | null {
+  const recent = getRecentCheckIns(7);
+  if (recent.length < 2) return null;
+
+  const freq: Record<string, number> = {};
+  recent.forEach(c => {
+    freq[c.word] = (freq[c.word] || 0) + 1;
+  });
+
+  const top = Object.entries(freq).sort((a, b) => b[1] - a[1])[0];
+  if (!top || top[1] < 2) return null;
+
+  return { word: top[0], count: top[1], total: recent.length };
+}
+
+export function getRelatedTheme(word: string): ThemeEntry | null {
+  const themes = getThemes();
+  if (themes.length === 0) return null;
+  // Find a theme whose emotion loosely matches the check-in word
+  const match = [...themes].reverse().find(t =>
+    t.emotion.toLowerCase().includes(word.toLowerCase()) ||
+    word.toLowerCase().includes(t.emotion.toLowerCase())
+  );
+  return match || null;
+}
+
 // Clear all data
 export function clearAllData(): void {
   Object.values(KEYS).forEach(key => localStorage.removeItem(key));
+  localStorage.removeItem("mindmate_openloop");
+  localStorage.removeItem("mindmate_cohort");
 }
 
 // ============================================================

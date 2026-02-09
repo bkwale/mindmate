@@ -16,6 +16,12 @@ export const metadata: Metadata = {
     ],
     apple: "/logo.svg",
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "MindM8",
+  },
 };
 
 export const viewport: Viewport = {

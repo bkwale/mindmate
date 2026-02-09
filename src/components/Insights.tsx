@@ -1,6 +1,7 @@
 "use client";
 
 import { getThemes, getSessions, getProfile, getUsageMetrics, ThemeEntry, SessionRecord, UsageMetrics } from "@/lib/storage";
+import { getCohortMetrics, CohortMetrics } from "@/lib/cohort";
 import { useState, useEffect } from "react";
 
 interface InsightsProps {
@@ -12,6 +13,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
   const [themes, setThemes] = useState<ThemeEntry[]>([]);
   const [sessions, setSessions] = useState<SessionRecord[]>([]);
   const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
+  const [cohort, setCohort] = useState<CohortMetrics | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "journey" | "themes" | "history" | "metrics">("overview");
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
 
@@ -19,6 +21,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
     setThemes(getThemes());
     setSessions(getSessions());
     setMetrics(getUsageMetrics());
+    setCohort(getCohortMetrics());
   }, []);
 
   const totalSessions = sessions.length;
@@ -560,6 +563,43 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Cohort / Retention */}
+              {cohort && (
+                <div className="bg-white rounded-xl p-4 border border-calm-border">
+                  <p className="text-xs text-calm-muted mb-3">Retention</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Current streak</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.streakDays} {cohort.streakDays === 1 ? "day" : "days"}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Active days</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.uniqueActiveDays}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Check-in rate</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.checkInRate}%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Session completion</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.sessionCompletionRate}%</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Weekly sessions</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.weeklySessionCount}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Returned within 7 days</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.returnedWithin7Days ? "Yes" : "Not yet"}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-calm-text">Days since first use</span>
+                      <span className="text-sm font-medium text-calm-text">{cohort.daysSinceFirstUse}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
