@@ -34,15 +34,18 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   }
 
   return (
-    <div className="min-h-screen bg-calm-bg flex items-center justify-center p-6">
+    <div className="min-h-screen bg-alpine flex items-center justify-center p-6 relative overflow-hidden">
       <div className="max-w-md w-full animate-fade-in">
         {screen === 0 && (
           <div className="text-center space-y-8">
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.svg" alt="MindM8" width={64} height={64} />
+              </div>
               <h1 className="text-3xl font-serif text-calm-text tracking-tight">
                 MindM8
               </h1>
-              <div className="w-12 h-0.5 bg-mind-400 mx-auto rounded-full" />
             </div>
             <p className="text-calm-muted text-lg leading-relaxed">
               MindM8 helps you think more clearly about your emotions and

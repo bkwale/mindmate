@@ -69,12 +69,13 @@ export default function MindM8() {
   // Loading state
   if (appState === "loading") {
     return (
-      <div className="min-h-screen bg-calm-bg flex items-center justify-center">
-        <div className="text-center space-y-4 animate-fade-in">
-          <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center mx-auto">
-            <div className="w-3 h-3 rounded-full bg-mind-500 animate-breathe" />
+      <div className="min-h-screen bg-thermal flex items-center justify-center relative overflow-hidden">
+        <div className="mist-layer" style={{ top: "30%", left: "20%" }} />
+        <div className="text-center space-y-4 animate-fade-in relative z-10">
+          <div className="flex justify-center">
+            <div className="meditation-circle" />
           </div>
-          <p className="text-sm text-calm-muted">MindM8</p>
+          <p className="text-sm text-calm-muted font-light tracking-wide">MindM8</p>
         </div>
       </div>
     );
