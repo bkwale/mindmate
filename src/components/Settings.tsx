@@ -347,13 +347,23 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                   rows={3}
                 />
                 <button
-                  onClick={() => {
+                  onClick={async () => {
                     if (!feedback.trim()) return;
-                    const subject = encodeURIComponent("MindM8 Feedback");
-                    const body = encodeURIComponent(feedback.trim());
-                    window.open(`mailto:w.koleosho@googlemail.com?subject=${subject}&body=${body}`, "_blank");
-                    setFeedbackSent(true);
-                    setFeedback("");
+                    try {
+                      const res = await fetch("/api/feedback", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ feedback: feedback.trim() }),
+                      });
+                      if (res.ok) {
+                        setFeedbackSent(true);
+                        setFeedback("");
+                      }
+                    } catch {
+                      // Silent fail — still show thank you
+                      setFeedbackSent(true);
+                      setFeedback("");
+                    }
                   }}
                   disabled={!feedback.trim()}
                   className="mt-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-all
