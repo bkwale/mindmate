@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { isOnboarded } from "@/lib/storage";
 import { isPINEnabled } from "@/lib/security";
 import { SessionMode } from "@/lib/prompts";
+import { registerServiceWorker } from "@/lib/notifications";
+import { trackEvent } from "@/lib/cohort";
 import Onboarding from "@/components/Onboarding";
 import Home from "@/components/Home";
 import Session from "@/components/Session";
@@ -30,6 +32,12 @@ export default function MindM8() {
     } else {
       setAppState("home");
     }
+
+    // Register service worker for PWA
+    registerServiceWorker();
+
+    // Track app open
+    trackEvent("app_open");
   }, []);
 
   const handleOnboardingComplete = () => {

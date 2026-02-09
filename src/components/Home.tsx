@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { SessionMode } from "@/lib/prompts";
-import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp } from "@/lib/storage";
+import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme } from "@/lib/storage";
+import { trackEvent } from "@/lib/cohort";
+import { shouldPromptInstall, dismissInstallPrompt, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
@@ -57,13 +59,27 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   // Check-in feature state
   const [checkInInput, setCheckInInput] = useState("");
   const [checkInError, setCheckInError] = useState(false);
+  const [checkInSubmitted, setCheckInSubmitted] = useState(false);
   const todayCheckIn = getTodayCheckIn();
   const recentCheckIns = getRecentCheckIns();
+  const checkInPattern = checkInSubmitted ? getCheckInPattern() : null;
+  const relatedTheme = todayCheckIn ? getRelatedTheme(todayCheckIn.word) : null;
 
   // Before & after follow-up feature state
   const [followUpResponse, setFollowUpResponse] = useState("");
   const [followUpExpanded, setFollowUpExpanded] = useState(false);
   const unresolved = getUnresolvedFollowUp();
+
+  // Open loop state
+  const openLoop = getOpenLoop();
+
+  // Install prompt state
+  const [showInstallPrompt, setShowInstallPrompt] = useState(shouldPromptInstall);
+
+  // Notification prompt state
+  const [showNotificationPrompt, setShowNotificationPrompt] = useState(
+    todayCheckIn && !hasSeenNotificationPrompt() && getNotificationPermission() === "default"
+  );
 
   const handleCheckInSubmit = () => {
     const trimmed = checkInInput.trim();
@@ -78,6 +94,8 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
     addCheckIn(trimmed);
     setCheckInInput("");
     setCheckInError(false);
+    setCheckInSubmitted(true);
+    trackEvent("checkin_complete");
   };
 
   const handleFollowUpResolution = (status: "yes" | "not-yet" | "changed-mind") => {
@@ -96,6 +114,27 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
       setFollowUpResponse("");
       setFollowUpExpanded(false);
     }
+  };
+
+  const handleSelectModeWithCleanup = (mode: SessionMode) => {
+    clearOpenLoop();
+    onSelectMode(mode);
+  };
+
+  const handleNotificationYes = () => {
+    requestNotificationPermission();
+    markNotificationPromptSeen();
+    setShowNotificationPrompt(false);
+  };
+
+  const handleNotificationNo = () => {
+    markNotificationPromptSeen();
+    setShowNotificationPrompt(false);
+  };
+
+  const handleRevisitOpenLoop = () => {
+    clearOpenLoop();
+    onSelectMode("reflect");
   };
 
   const getTimeAgo = (dateStr: string) => {
@@ -225,6 +264,53 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           </div>
         )}
 
+        {/* Smart check-in response card */}
+        {!showPauseMessage && todayCheckIn && checkInSubmitted && (
+          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-200/50">
+            <div className="space-y-3">
+              {checkInPattern && (
+                <div>
+                  <p className="text-sm text-calm-text">
+                    <span className="text-mind-600 font-semibold">{checkInPattern.count}</span> of your last <span className="text-mind-600 font-semibold">{checkInPattern.total}</span> check-ins were <span className="text-mind-600 font-semibold">{checkInPattern.word}</span>
+                  </p>
+                </div>
+              )}
+              {relatedTheme && (
+                <div className="pt-2 border-t border-mind-100">
+                  <p className="text-xs text-calm-muted mb-2">Last time, it was connected to:</p>
+                  <p className="text-sm text-calm-text italic">{relatedTheme.theme}</p>
+                </div>
+              )}
+              <div className="pt-2">
+                <button
+                  onClick={() => handleSelectModeWithCleanup("reflect")}
+                  className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
+                >
+                  Sit with this?
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Open loop card */}
+        {!showPauseMessage && openLoop && (
+          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-200/50">
+            <p className="text-xs text-calm-muted uppercase tracking-wider mb-3 font-medium">
+              Something from last time...
+            </p>
+            <p className="text-sm text-calm-text italic mb-4 leading-relaxed">
+              {openLoop.text}
+            </p>
+            <button
+              onClick={handleRevisitOpenLoop}
+              className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
+            >
+              Revisit this
+            </button>
+          </div>
+        )}
+
         {/* Before & after follow-up card */}
         {!showPauseMessage && unresolved && (
           <div className="mb-5 card-serene p-5 animate-fade-in">
@@ -235,19 +321,28 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                 </p>
                 <div className="flex flex-col gap-2">
                   <button
-                    onClick={() => handleFollowUpResolution("yes")}
+                    onClick={() => {
+                      clearOpenLoop();
+                      handleFollowUpResolution("yes");
+                    }}
                     className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium text-left"
                   >
                     Yes, it happened
                   </button>
                   <button
-                    onClick={() => handleFollowUpResolution("not-yet")}
+                    onClick={() => {
+                      clearOpenLoop();
+                      handleFollowUpResolution("not-yet");
+                    }}
                     className="w-full px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium text-left"
                   >
                     Not yet
                   </button>
                   <button
-                    onClick={() => handleFollowUpResolution("changed-mind")}
+                    onClick={() => {
+                      clearOpenLoop();
+                      handleFollowUpResolution("changed-mind");
+                    }}
                     className="w-full px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium text-left"
                   >
                     I changed my mind
@@ -292,11 +387,61 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           </div>
         )}
 
+        {/* Add to homescreen banner */}
+        {!showPauseMessage && showInstallPrompt && (
+          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/50 flex items-start gap-3">
+            <div className="flex-1">
+              <p className="text-sm text-calm-text leading-relaxed">
+                Add MindM8 to your home screen for easy access
+              </p>
+              <p className="text-xs text-calm-muted mt-2">
+                Use your browser&apos;s menu and select &ldquo;Add to Home Screen&rdquo;
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                dismissInstallPrompt();
+                setShowInstallPrompt(false);
+              }}
+              className="text-calm-muted hover:text-warm-600 transition-colors flex-shrink-0 mt-1"
+              aria-label="Dismiss"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          </div>
+        )}
+
+        {/* Notification permission prompt */}
+        {!showPauseMessage && showNotificationPrompt && (
+          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/50">
+            <p className="text-sm text-calm-text mb-3">
+              Want a daily reminder to check in?
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleNotificationYes}
+                className="flex-1 px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
+              >
+                Yes
+              </button>
+              <button
+                onClick={handleNotificationNo}
+                className="flex-1 px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium"
+              >
+                Not now
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           {doors.map((door) => (
             <button
               key={door.mode}
-              onClick={() => onSelectMode(door.mode)}
+              onClick={() => handleSelectModeWithCleanup(door.mode)}
               className="w-full text-left card-serene p-5 group"
             >
               <div className="flex items-start gap-4">

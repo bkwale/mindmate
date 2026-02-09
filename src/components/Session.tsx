@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
-import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp } from "@/lib/storage";
+import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop } from "@/lib/storage";
+import { trackEvent } from "@/lib/cohort";
 import RelationshipTag from "./RelationshipTag";
 
 interface SessionProps {
@@ -89,6 +90,11 @@ export default function Session({ mode, onEnd }: SessionProps) {
     ];
     setMessages(newMessages);
     setIsLoading(true);
+
+    // Track session start on first message
+    if (exchangeCount === 0) {
+      trackEvent("session_start", { mode });
+    }
 
     try {
       const themes = getThemeSummaries();
@@ -188,6 +194,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
       await extractThemes();
     }
 
+    // Save open loop from user's most substantive message
+    const seed = extractSeed();
+    if (seed) {
+      saveOpenLoop({ text: seed, date: new Date().toISOString(), mode, context: relationshipTag || undefined });
+    }
+
+    // Track session completion
+    trackEvent("session_complete", { mode });
+
     setIsSaving(false);
     onEnd();
   };
@@ -220,6 +235,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
       addFollowUp(relationshipTag);
     }
 
+    // Save open loop from user's most substantive message
+    const seed = extractSeed();
+    if (seed) {
+      saveOpenLoop({ text: seed, date: new Date().toISOString(), mode, context: relationshipTag || undefined });
+    }
+
+    // Track session completion
+    trackEvent("session_complete", { mode });
+
     setIsSaving(false);
     onEnd();
   };
@@ -246,6 +270,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
       addFollowUp(relationshipTag);
     }
 
+    // Save open loop from user's most substantive message
+    const seed = extractSeed();
+    if (seed) {
+      saveOpenLoop({ text: seed, date: new Date().toISOString(), mode, context: relationshipTag || undefined });
+    }
+
+    // Track session completion
+    trackEvent("session_complete", { mode });
+
     setIsSaving(false);
     onEnd();
   };
@@ -269,6 +302,19 @@ export default function Session({ mode, onEnd }: SessionProps) {
     } catch (err) {
       console.error("Share failed:", err);
     }
+  };
+
+  const extractSeed = (): string | null => {
+    const userMessages = messages.filter(m => m.role === "user");
+    if (userMessages.length === 0) return null;
+    // Pick the longest substantive message
+    const sorted = [...userMessages].sort((a, b) => b.content.length - a.content.length);
+    const best = sorted[0];
+    if (best.content.split(/\s+/).length < 5) return null;
+    // Truncate if too long
+    const words = best.content.split(/\s+/);
+    if (words.length > 25) return words.slice(0, 25).join(" ") + "...";
+    return best.content;
   };
 
   // Mode intro screen
