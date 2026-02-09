@@ -5,6 +5,7 @@ import { SessionMode } from "@/lib/prompts";
 import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import { shouldPromptInstall, dismissInstallPrompt, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
+import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
@@ -80,6 +81,10 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(
     todayCheckIn && !hasSeenNotificationPrompt() && getNotificationPermission() === "default"
   );
+
+  // What's New state
+  const [showWhatsNew, setShowWhatsNew] = useState(shouldShowWhatsNew);
+  const latestChangelog = getLatestChangelog();
 
   const handleCheckInSubmit = () => {
     const trimmed = checkInInput.trim();
@@ -261,6 +266,46 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                 )}
               </>
             )}
+          </div>
+        )}
+
+        {/* What's New card */}
+        {!showPauseMessage && showWhatsNew && (
+          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/80 to-white">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2 mb-3">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-500">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+                <p className="text-xs text-mind-600 font-semibold uppercase tracking-wider">
+                  What&apos;s new
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  markVersionSeen();
+                  setShowWhatsNew(false);
+                }}
+                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0"
+                aria-label="Dismiss"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
+            <p className="text-sm font-medium text-calm-text mb-2">
+              {latestChangelog.title}
+            </p>
+            <ul className="space-y-1.5">
+              {latestChangelog.highlights.map((h, i) => (
+                <li key={i} className="text-xs text-calm-muted leading-relaxed flex gap-2">
+                  <span className="text-mind-400 mt-0.5 flex-shrink-0">&middot;</span>
+                  <span>{h}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
