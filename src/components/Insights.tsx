@@ -12,7 +12,8 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
   const [themes, setThemes] = useState<ThemeEntry[]>([]);
   const [sessions, setSessions] = useState<SessionRecord[]>([]);
   const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "themes" | "history" | "metrics">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "journey" | "themes" | "history" | "metrics">("overview");
+  const [selectedContext, setSelectedContext] = useState<string | null>(null);
 
   useEffect(() => {
     setThemes(getThemes());
@@ -86,6 +87,42 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
     return emotionColors[emotion.toLowerCase()] || "bg-mind-100 text-mind-700";
   };
 
+  // Journey data — group themes by relationship context for timeline
+  const journeyContexts = (() => {
+    const grouped: Record<string, ThemeEntry[]> = {};
+    themes.forEach(t => {
+      if (!grouped[t.context]) grouped[t.context] = [];
+      grouped[t.context].push(t);
+    });
+
+    return Object.entries(grouped)
+      .map(([context, contextThemes]) => {
+        const sorted = [...contextThemes].sort((a, b) =>
+          new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        const emotionFreq: Record<string, number> = {};
+        contextThemes.forEach(t => {
+          emotionFreq[t.emotion] = (emotionFreq[t.emotion] || 0) + 1;
+        });
+        const topEmotion = Object.entries(emotionFreq)
+          .sort((a, b) => b[1] - a[1])[0]?.[0] || "";
+
+        return {
+          context,
+          label: contextLabels[context] || context,
+          count: contextThemes.length,
+          topEmotion,
+          latestDate: sorted[0]?.date || "",
+          themes: sorted,
+        };
+      })
+      .sort((a, b) => b.count - a.count);
+  })();
+
+  const selectedJourney = selectedContext
+    ? journeyContexts.find(j => j.context === selectedContext)
+    : null;
+
   return (
     <div className="min-h-screen bg-calm-bg flex flex-col">
       {/* Header */}
@@ -115,10 +152,10 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
       {/* Tabs */}
       <div className="px-6 mb-4">
         <div className="max-w-md mx-auto flex gap-1 bg-white rounded-xl p-1 border border-calm-border">
-          {(["overview", "themes", "history", "metrics"] as const).map(tab => (
+          {(["overview", "journey", "themes", "history", "metrics"] as const).map(tab => (
             <button
               key={tab}
-              onClick={() => setActiveTab(tab)}
+              onClick={() => { setActiveTab(tab); if (tab !== "journey") setSelectedContext(null); }}
               className={`flex-1 py-2 rounded-lg text-xs font-medium transition-all duration-200
                 ${activeTab === tab
                   ? "bg-mind-600 text-white"
@@ -200,6 +237,155 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                   )}
                 </>
               )}
+            </div>
+          )}
+
+          {/* JOURNEY TAB */}
+          {activeTab === "journey" && (
+            <div className="space-y-3 animate-fade-in">
+              {!selectedContext ? (
+                <>
+                  {journeyContexts.length === 0 ? (
+                    <div className="text-center py-12">
+                      <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center mx-auto mb-4">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-500">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </div>
+                      <p className="text-calm-muted text-sm">
+                        Your emotional journey will unfold here as you reflect.
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-xs text-calm-muted">
+                        Tap a relationship to see your emotional journey over time.
+                      </p>
+                      {journeyContexts.map(j => (
+                        <button
+                          key={j.context}
+                          onClick={() => setSelectedContext(j.context)}
+                          className="w-full text-left bg-white rounded-xl p-4 border border-calm-border
+                                     hover:border-mind-300 hover:bg-mind-50/30 transition-all group"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-mind-100 flex items-center justify-center">
+                                <span className="text-mind-600 font-medium text-sm">
+                                  {j.label.charAt(0)}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-calm-text group-hover:text-mind-700 transition-colors">
+                                  {j.label}
+                                </p>
+                                <p className="text-[10px] text-calm-muted mt-0.5">
+                                  {j.count} {j.count === 1 ? "reflection" : "reflections"} · {j.topEmotion}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] text-calm-muted">
+                                {formatDate(j.latestDate)}
+                              </span>
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-calm-border group-hover:text-mind-400 transition-colors">
+                                <path d="M9 18l6-6-6-6" />
+                              </svg>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </>
+                  )}
+                </>
+              ) : selectedJourney ? (
+                <>
+                  <button
+                    onClick={() => setSelectedContext(null)}
+                    className="flex items-center gap-2 text-calm-muted hover:text-calm-text transition-colors mb-1"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                    <span className="text-xs">All relationships</span>
+                  </button>
+
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center">
+                      <span className="text-mind-600 font-medium text-lg">
+                        {selectedJourney.label.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <h2 className="text-base font-serif text-calm-text">{selectedJourney.label}</h2>
+                      <p className="text-xs text-calm-muted">
+                        {selectedJourney.count} {selectedJourney.count === 1 ? "reflection" : "reflections"} over time
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Emotion summary for this relationship */}
+                  <div className="flex flex-wrap gap-1.5 mb-4">
+                    {(() => {
+                      const freq: Record<string, number> = {};
+                      selectedJourney.themes.forEach(t => {
+                        freq[t.emotion] = (freq[t.emotion] || 0) + 1;
+                      });
+                      return Object.entries(freq)
+                        .sort((a, b) => b[1] - a[1])
+                        .slice(0, 4)
+                        .map(([emotion, count]) => (
+                          <span
+                            key={emotion}
+                            className={`px-2.5 py-1 rounded-full text-[10px] ${getEmotionColor(emotion)}`}
+                          >
+                            {emotion} ({count})
+                          </span>
+                        ));
+                    })()}
+                  </div>
+
+                  {/* Timeline */}
+                  <div className="relative">
+                    {/* Vertical line */}
+                    <div className="absolute left-[7px] top-3 bottom-3 w-[2px] bg-mind-200 rounded-full" />
+
+                    <div className="space-y-4">
+                      {selectedJourney.themes.map((theme, idx) => (
+                        <div key={theme.id} className="relative flex gap-4">
+                          {/* Timeline dot */}
+                          <div className="relative z-10 mt-1.5 flex-shrink-0">
+                            <div className={`w-4 h-4 rounded-full border-2 border-white ${
+                              idx === 0 ? "bg-mind-500" : "bg-mind-300"
+                            }`} style={{ boxShadow: "0 0 0 2px rgba(77,144,138,0.2)" }} />
+                          </div>
+
+                          {/* Content card */}
+                          <div className="flex-1 bg-white rounded-xl p-4 border border-calm-border">
+                            <div className="flex items-center justify-between mb-2">
+                              <span className={`px-2 py-0.5 rounded-full text-[10px] ${getEmotionColor(theme.emotion)}`}>
+                                {theme.emotion}
+                              </span>
+                              <span className="text-[10px] text-calm-muted">
+                                {formatDate(theme.date)}
+                              </span>
+                            </div>
+                            <p className="text-sm text-calm-text leading-relaxed">
+                              {theme.theme}
+                            </p>
+                            <p className="text-[10px] text-calm-muted mt-2 capitalize">
+                              {theme.mode === "reflect" ? "Reflection" :
+                               theme.mode === "prepare" ? "Preparation" :
+                               "Grounding"} session
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : null}
             </div>
           )}
 
