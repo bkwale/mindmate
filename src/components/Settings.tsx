@@ -426,7 +426,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
             <p className="text-xs text-calm-muted leading-relaxed mt-2">
               Not therapy. Not a chatbot. A place to reflect.
             </p>
-            <p className="text-[10px] text-calm-muted/50 mt-3">v1.2 — MVP</p>
+            <p className="text-[10px] text-calm-muted/50 mt-3">v1.3 — Arrival</p>
           </div>
         </div>
       </main>
