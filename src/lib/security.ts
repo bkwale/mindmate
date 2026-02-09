@@ -74,3 +74,52 @@ export async function changePIN(
   await setPIN(newPin);
   return true;
 }
+
+// ============================================================
+// Auto-lock — idle timeout and visibility-based re-locking
+// ============================================================
+
+const LOCK_TIMEOUT_KEY = "mindmate_lock_timeout";
+const LAST_ACTIVITY_KEY = "mindmate_last_activity";
+
+export type LockTimeout = 0 | 1 | 3 | 5 | -1; // 0 = immediate on background, -1 = never
+
+const DEFAULT_TIMEOUT: LockTimeout = 3; // 3 minutes
+
+// Get the user's preferred auto-lock timeout (in minutes)
+export function getAutoLockTimeout(): LockTimeout {
+  if (typeof window === "undefined") return DEFAULT_TIMEOUT;
+  const stored = localStorage.getItem(LOCK_TIMEOUT_KEY);
+  if (stored === null) return DEFAULT_TIMEOUT;
+  const parsed = parseInt(stored, 10);
+  if ([0, 1, 3, 5, -1].includes(parsed)) return parsed as LockTimeout;
+  return DEFAULT_TIMEOUT;
+}
+
+// Set the auto-lock timeout preference
+export function setAutoLockTimeout(minutes: LockTimeout): void {
+  localStorage.setItem(LOCK_TIMEOUT_KEY, minutes.toString());
+}
+
+// Record user activity (called on interactions)
+export function updateLastActivity(): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(LAST_ACTIVITY_KEY, Date.now().toString());
+}
+
+// Get the timestamp of last activity
+export function getLastActivity(): number {
+  if (typeof window === "undefined") return Date.now();
+  const stored = localStorage.getItem(LAST_ACTIVITY_KEY);
+  return stored ? parseInt(stored, 10) : Date.now();
+}
+
+// Check if the app should auto-lock based on idle time
+export function shouldAutoLock(): boolean {
+  if (!isPINEnabled()) return false;
+  const timeout = getAutoLockTimeout();
+  if (timeout === -1) return false; // never auto-lock
+  if (timeout === 0) return true; // always lock on check (immediate)
+  const elapsed = Date.now() - getLastActivity();
+  return elapsed > timeout * 60 * 1000;
+}
