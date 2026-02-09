@@ -11,13 +11,120 @@ html {
 
 body {
   font-family: 'DM Sans', system-ui, sans-serif;
-  background-color: #f7f6f3;
-  color: #2d3436;
+  background-color: #f5f3ef;
+  color: #2a2f2e;
 }
 
-/* Scrollbar */
+/* Thermal mist background — subtle gradient like steam rising */
+.bg-thermal {
+  background: linear-gradient(
+    180deg,
+    #f5f3ef 0%,
+    #f0f2f1 40%,
+    #edf1f0 70%,
+    #e8edec 100%
+  );
+}
+
+/* Alpine morning — warm light gradient */
+.bg-alpine {
+  background: linear-gradient(
+    160deg,
+    #f5f3ef 0%,
+    #f7f5f0 30%,
+    #f3efe8 60%,
+    #f0f2f1 100%
+  );
+}
+
+/* Still water — for session screens */
+.bg-stillwater {
+  background: linear-gradient(
+    180deg,
+    #f5f3ef 0%,
+    #f0f4f3 50%,
+    #eaf0ef 100%
+  );
+}
+
+/* Meditation circle — breathing indicator */
+.meditation-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #b0d8d3, #6aada5, #4d908a);
+  opacity: 0.7;
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.meditation-circle-sm {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 40%, #b0d8d3, #4d908a);
+  animation: breathe 6s ease-in-out infinite;
+}
+
+/* Mist layer — decorative floating element */
+.mist-layer {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(176, 216, 211, 0.15), transparent 70%);
+  filter: blur(40px);
+  animation: mist 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Warm glow — subtle ambient light */
+.warm-glow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(214, 201, 181, 0.12), transparent 70%);
+  filter: blur(50px);
+  animation: warmglow 10s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes mist {
+  0%, 100% { opacity: 0.3; transform: translateY(0) scale(1); }
+  50% { opacity: 0.6; transform: translateY(-8px) scale(1.05); }
+}
+
+@keyframes warmglow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.12); opacity: 0.85; }
+}
+
+/* Smooth, intentional transitions for all interactive elements */
+button, a, input, textarea {
+  transition: all 0.3s ease;
+}
+
+/* Cards — subtle elevation instead of heavy borders */
+.card-serene {
+  background: #fdfcfa;
+  border: 1px solid rgba(229, 226, 220, 0.6);
+  box-shadow: 0 1px 3px rgba(42, 47, 46, 0.04), 0 4px 12px rgba(42, 47, 46, 0.02);
+  border-radius: 16px;
+}
+
+.card-serene:hover {
+  border-color: rgba(176, 216, 211, 0.5);
+  box-shadow: 0 2px 6px rgba(77, 144, 138, 0.06), 0 8px 24px rgba(42, 47, 46, 0.03);
+}
+
+/* Scrollbar — barely there */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 3px;
 }
 
 ::-webkit-scrollbar-track {
@@ -25,13 +132,17 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #dfe6e9;
-  border-radius: 4px;
+  background: rgba(122, 131, 130, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(122, 131, 130, 0.35);
 }
 
 /* Textarea auto-resize smooth */
 textarea {
-  transition: height 0.1s ease;
+  transition: height 0.15s ease, border-color 0.3s ease;
 }
 
 /* Remove mobile tap highlight */
@@ -44,4 +155,12 @@ textarea {
   footer {
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
   }
+}
+
+/* Line clamp utility */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

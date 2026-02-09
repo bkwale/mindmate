@@ -186,32 +186,38 @@ export default function Session({ mode, onEnd }: SessionProps) {
   if (showIntro) {
     const intro = modeIntros[mode];
     return (
-      <div className="min-h-screen bg-calm-bg flex items-center justify-center p-6">
-        <div className="max-w-md w-full animate-fade-in">
+      <div className="min-h-screen bg-thermal flex items-center justify-center p-6 relative overflow-hidden">
+        <div className="mist-layer" style={{ top: "10%", right: "-60px" }} />
+        <div className="warm-glow" style={{ bottom: "5%", left: "-80px" }} />
+        <div className="max-w-md w-full animate-fade-in relative z-10">
           <div className="text-center space-y-6">
+            {/* Breathing meditation circle */}
+            <div className="flex justify-center mb-2">
+              <div className="meditation-circle" />
+            </div>
             <div className="space-y-2">
-              <p className="text-xs text-mind-500 uppercase tracking-wider font-medium">
+              <p className="text-xs text-mind-400 uppercase tracking-widest font-medium">
                 {modeLabels[mode]}
               </p>
               <h2 className="text-xl font-serif text-calm-text">
                 {intro.heading}
               </h2>
             </div>
-            <p className="text-calm-muted text-sm leading-relaxed">
+            <p className="text-calm-muted text-sm leading-relaxed font-light">
               {intro.description}
             </p>
-            <div className="bg-mind-50 border border-mind-100 rounded-xl px-4 py-3">
+            <div className="bg-mind-50/60 border border-mind-100/50 rounded-2xl px-4 py-3 backdrop-blur-sm">
               <p className="text-xs text-mind-700 leading-relaxed">
                 {intro.tip}
               </p>
             </div>
-            <p className="text-xs text-calm-muted">
-              {maxExchanges} exchanges · be honest to get the most from this
+            <p className="text-xs text-calm-muted font-light">
+              {maxExchanges} exchanges &middot; be honest to get the most from this
             </p>
             <button
               onClick={() => setShowIntro(false)}
-              className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
-                         hover:bg-mind-700 transition-colors duration-200"
+              className="w-full py-3.5 bg-mind-600 text-white rounded-2xl text-base font-medium
+                         hover:bg-mind-700 transition-all duration-300"
             >
               Begin
             </button>
@@ -228,9 +234,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
   }
 
   return (
-    <div className="min-h-screen bg-calm-bg flex flex-col">
+    <div className="min-h-screen bg-stillwater flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 bg-calm-bg/95 backdrop-blur-sm border-b border-calm-border z-10">
+      <header className="sticky top-0 bg-calm-bg/80 backdrop-blur-md border-b border-calm-border/50 z-10">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
           <button
             onClick={onEnd}
@@ -286,10 +292,10 @@ export default function Session({ mode, onEnd }: SessionProps) {
             >
               {msg.role === "assistant" ? (
                 <div className="flex gap-3">
-                  <div className="w-7 h-7 rounded-full bg-mind-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <div className="w-2 h-2 rounded-full bg-mind-500" />
+                  <div className="w-7 h-7 rounded-full bg-mind-100/70 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <div className="meditation-circle-sm" />
                   </div>
-                  <div className="bg-white rounded-2xl rounded-tl-md px-4 py-3 border border-calm-border">
+                  <div className="bg-calm-card rounded-2xl rounded-tl-md px-4 py-3 border border-calm-border/50 shadow-sm">
                     <p className="text-sm text-calm-text leading-relaxed whitespace-pre-wrap">
                       {msg.content}
                     </p>
@@ -333,7 +339,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
       </main>
 
       {/* Footer — input or soft landing */}
-      <footer className="sticky bottom-0 bg-calm-bg/95 backdrop-blur-sm border-t border-calm-border">
+      <footer className="sticky bottom-0 bg-calm-bg/80 backdrop-blur-md border-t border-calm-border/50">
         <div className="max-w-lg mx-auto px-4 py-3">
           {/* Sticky last question — so user never loses what was asked */}
           {!isComplete && !isLoading && messages.length > 0 && messages[messages.length - 1].role === "assistant" && exchangeCount > 0 && (

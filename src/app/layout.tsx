@@ -10,10 +10,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='%23507b74'/><circle cx='50' cy='50' r='15' fill='%23dbe8e5'/></svg>",
+        url: "/logo.svg",
         type: "image/svg+xml",
       },
     ],
+    apple: "/logo.svg",
   },
 };
 
@@ -22,7 +23,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#f7f6f3",
+  themeColor: "#f5f3ef",
 };
 
 export default function RootLayout({
