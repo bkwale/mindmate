@@ -36,28 +36,56 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   return (
     <div className="min-h-screen bg-alpine flex items-center justify-center p-6 relative overflow-hidden">
       <div className="max-w-md w-full animate-fade-in">
+        {/* Screen 0 — Landing: the emotional hook */}
         {screen === 0 && (
           <div className="text-center space-y-8 animate-fade-in">
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.svg" alt="MindM8" width={64} height={64} />
-              </div>
+            <div className="flex justify-center">
+              <div className="meditation-circle" />
+            </div>
+
+            <div className="space-y-3">
               <h1 className="text-3xl font-serif text-calm-text tracking-tight">
                 MindM8
               </h1>
+              <p className="text-lg text-calm-text/80 font-light leading-relaxed">
+                A quiet space for the thoughts<br />
+                you carry alone
+              </p>
+            </div>
+
+            <p className="text-calm-muted leading-relaxed">
+              MindM8 helps you think more clearly about your emotions and
+              relationships. It&apos;s not therapy. It&apos;s not a chatbot.
+              It&apos;s a space to reflect.
+            </p>
+
+            <button
+              onClick={() => setScreen(1)}
+              className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
+                         hover:bg-mind-700 transition-colors duration-200"
+            >
+              Begin
+            </button>
+          </div>
+        )}
+
+        {/* Screen 1 — Age gate: after they know what MindM8 is */}
+        {screen === 1 && (
+          <div className="text-center space-y-8 animate-fade-in">
+            <div className="flex justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/logo.svg" alt="MindM8" width={48} height={48} />
             </div>
             <p className="text-calm-muted leading-relaxed">
-              MindM8 is designed for adults. It explores emotions, relationships,
-              and difficult conversations — topics that require maturity to engage
-              with safely.
+              MindM8 explores emotions, relationships, and difficult
+              conversations — topics that need maturity to engage with safely.
             </p>
             <p className="text-calm-text text-sm font-medium">
               Are you 18 or older?
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => setScreen(1)}
+                onClick={() => setScreen(2)}
                 className="flex-1 py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
                            hover:bg-mind-700 transition-colors duration-200"
               >
@@ -73,32 +101,6 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 No
               </button>
             </div>
-          </div>
-        )}
-
-        {screen === 1 && (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.svg" alt="MindM8" width={64} height={64} />
-              </div>
-              <h1 className="text-3xl font-serif text-calm-text tracking-tight">
-                MindM8
-              </h1>
-            </div>
-            <p className="text-calm-muted text-lg leading-relaxed">
-              MindM8 helps you think more clearly about your emotions and
-              relationships. It&apos;s not therapy. It&apos;s not a chatbot.
-              It&apos;s a space to reflect.
-            </p>
-            <button
-              onClick={() => setScreen(2)}
-              className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
-                         hover:bg-mind-700 transition-colors duration-200"
-            >
-              Continue
-            </button>
           </div>
         )}
 
