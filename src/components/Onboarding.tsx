@@ -24,11 +24,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   // PIN setup gets its own full-screen layout
-  if (screen === 2) {
+  if (screen === 3) {
     return (
       <PINSetup
-        onComplete={() => setScreen(3)}
-        onSkip={() => setScreen(3)}
+        onComplete={() => setScreen(4)}
+        onSkip={() => setScreen(4)}
       />
     );
   }
@@ -37,7 +37,47 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     <div className="min-h-screen bg-alpine flex items-center justify-center p-6 relative overflow-hidden">
       <div className="max-w-md w-full animate-fade-in">
         {screen === 0 && (
-          <div className="text-center space-y-8">
+          <div className="text-center space-y-8 animate-fade-in">
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/logo.svg" alt="MindM8" width={64} height={64} />
+              </div>
+              <h1 className="text-3xl font-serif text-calm-text tracking-tight">
+                MindM8
+              </h1>
+            </div>
+            <p className="text-calm-muted leading-relaxed">
+              MindM8 is designed for adults. It explores emotions, relationships,
+              and difficult conversations — topics that require maturity to engage
+              with safely.
+            </p>
+            <p className="text-calm-text text-sm font-medium">
+              Are you 18 or older?
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setScreen(1)}
+                className="flex-1 py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
+                           hover:bg-mind-700 transition-colors duration-200"
+              >
+                Yes, I&apos;m 18+
+              </button>
+              <button
+                onClick={() => {
+                  alert("MindM8 is only available to users aged 18 and above. Please come back when you\u2019re old enough.");
+                }}
+                className="flex-1 py-3.5 border border-calm-border text-calm-muted rounded-xl text-base
+                           hover:bg-warm-50 transition-colors duration-200"
+              >
+                No
+              </button>
+            </div>
+          </div>
+        )}
+
+        {screen === 1 && (
+          <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-4">
               <div className="flex justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -53,7 +93,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               It&apos;s a space to reflect.
             </p>
             <button
-              onClick={() => setScreen(1)}
+              onClick={() => setScreen(2)}
               className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
                          hover:bg-mind-700 transition-colors duration-200"
             >
@@ -62,7 +102,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           </div>
         )}
 
-        {screen === 1 && (
+        {screen === 2 && (
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <div className="w-10 h-10 rounded-full bg-warm-100 flex items-center justify-center mx-auto">
@@ -90,7 +130,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </div>
             </div>
             <button
-              onClick={() => setScreen(2)}
+              onClick={() => setScreen(3)}
               className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
                          hover:bg-mind-700 transition-colors duration-200"
             >
@@ -99,7 +139,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           </div>
         )}
 
-        {screen === 3 && (
+        {screen === 4 && (
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <h2 className="text-xl font-serif text-calm-text">
