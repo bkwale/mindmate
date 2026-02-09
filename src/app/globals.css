@@ -15,46 +15,46 @@ body {
   color: #2a2f2e;
 }
 
-/* Thermal mist background — subtle gradient like steam rising */
+/* === ATMOSPHERIC BACKGROUNDS === */
+
 .bg-thermal {
   background: linear-gradient(
-    180deg,
+    175deg,
     #f5f3ef 0%,
-    #f0f2f1 40%,
-    #edf1f0 70%,
-    #e8edec 100%
+    #eef2f1 35%,
+    #e6edeb 65%,
+    #dfe8e6 100%
   );
 }
 
-/* Alpine morning — warm light gradient */
 .bg-alpine {
   background: linear-gradient(
     160deg,
     #f5f3ef 0%,
-    #f7f5f0 30%,
-    #f3efe8 60%,
-    #f0f2f1 100%
+    #f3efe8 35%,
+    #eeebe4 65%,
+    #eaefed 100%
   );
 }
 
-/* Still water — for session screens */
 .bg-stillwater {
   background: linear-gradient(
     180deg,
     #f5f3ef 0%,
-    #f0f4f3 50%,
-    #eaf0ef 100%
+    #ecf1f0 45%,
+    #e4eceb 100%
   );
 }
 
-/* Meditation circle — breathing indicator */
+/* === MEDITATION ELEMENTS === */
+
 .meditation-circle {
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 40%, #b0d8d3, #6aada5, #4d908a);
-  opacity: 0.7;
+  background: radial-gradient(circle at 40% 40%, #b0d8d3, #6aada5, #3d736e);
   animation: breathe 6s ease-in-out infinite;
+  box-shadow: 0 0 30px rgba(106, 173, 165, 0.2), 0 0 60px rgba(106, 173, 165, 0.08);
 }
 
 .meditation-circle-sm {
@@ -65,64 +65,81 @@ body {
   animation: breathe 6s ease-in-out infinite;
 }
 
-/* Mist layer — decorative floating element */
+/* === AMBIENT EFFECTS === */
+
 .mist-layer {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: 250px;
+  height: 250px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(176, 216, 211, 0.15), transparent 70%);
-  filter: blur(40px);
+  background: radial-gradient(circle, rgba(106, 173, 165, 0.12), transparent 70%);
+  filter: blur(30px);
   animation: mist 8s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Warm glow — subtle ambient light */
 .warm-glow {
   position: absolute;
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(214, 201, 181, 0.12), transparent 70%);
-  filter: blur(50px);
+  background: radial-gradient(circle, rgba(214, 201, 181, 0.1), transparent 70%);
+  filter: blur(40px);
   animation: warmglow 10s ease-in-out infinite;
   pointer-events: none;
 }
 
+/* === CARDS === */
+
+.card-serene {
+  background: #fdfcfa;
+  border: 1px solid rgba(229, 226, 220, 0.7);
+  box-shadow: 0 1px 4px rgba(42, 47, 46, 0.04), 0 4px 16px rgba(42, 47, 46, 0.02);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.card-serene:hover {
+  border-color: rgba(135, 192, 185, 0.4);
+  box-shadow: 0 2px 8px rgba(77, 144, 138, 0.08), 0 8px 24px rgba(42, 47, 46, 0.03);
+  transform: translateY(-1px);
+}
+
+/* === PAGE TRANSITIONS === */
+
+.page-enter {
+  animation: pageEnter 0.4s ease-out forwards;
+}
+
+@keyframes pageEnter {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* === ANIMATIONS === */
+
 @keyframes mist {
-  0%, 100% { opacity: 0.3; transform: translateY(0) scale(1); }
-  50% { opacity: 0.6; transform: translateY(-8px) scale(1.05); }
+  0%, 100% { opacity: 0.4; transform: translateY(0) scale(1); }
+  50% { opacity: 0.7; transform: translateY(-6px) scale(1.04); }
 }
 
 @keyframes warmglow {
   0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+  50% { opacity: 0.55; }
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.12); opacity: 0.85; }
+  0%, 100% { transform: scale(1); opacity: 0.55; }
+  50% { transform: scale(1.1); opacity: 0.9; }
 }
 
-/* Smooth, intentional transitions for all interactive elements */
+/* Smooth transitions for interactive elements */
 button, a, input, textarea {
   transition: all 0.3s ease;
 }
 
-/* Cards — subtle elevation instead of heavy borders */
-.card-serene {
-  background: #fdfcfa;
-  border: 1px solid rgba(229, 226, 220, 0.6);
-  box-shadow: 0 1px 3px rgba(42, 47, 46, 0.04), 0 4px 12px rgba(42, 47, 46, 0.02);
-  border-radius: 16px;
-}
+/* === SCROLLBAR === */
 
-.card-serene:hover {
-  border-color: rgba(176, 216, 211, 0.5);
-  box-shadow: 0 2px 6px rgba(77, 144, 138, 0.06), 0 8px 24px rgba(42, 47, 46, 0.03);
-}
-
-/* Scrollbar — barely there */
 ::-webkit-scrollbar {
   width: 3px;
 }
@@ -136,28 +153,22 @@ button, a, input, textarea {
   border-radius: 3px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(122, 131, 130, 0.35);
-}
+/* === UTILITIES === */
 
-/* Textarea auto-resize smooth */
 textarea {
   transition: height 0.15s ease, border-color 0.3s ease;
 }
 
-/* Remove mobile tap highlight */
 * {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Safe area for mobile */
 @supports (padding: env(safe-area-inset-bottom)) {
   footer {
     padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
   }
 }
 
-/* Line clamp utility */
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;

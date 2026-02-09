@@ -47,10 +47,46 @@ export interface SessionRecord {
   summary?: string;
 }
 
+// ============================================================
+// Check-ins — one-word daily mood
+// ============================================================
+
+export interface CheckIn {
+  word: string;
+  timestamp: string;
+}
+
+// ============================================================
+// Letters — letters you'll never send
+// ============================================================
+
+export interface Letter {
+  id: string;
+  to: string;
+  content: string;
+  createdAt: string;
+}
+
+// ============================================================
+// Follow-ups — before & after for prepare sessions
+// ============================================================
+
+export interface FollowUp {
+  id: string;
+  person: string;
+  createdAt: string;
+  resolved: boolean;
+  resolution?: string;
+  resolvedAt?: string;
+}
+
 const KEYS = {
   profile: "mindmate_profile",
   themes: "mindmate_themes",
   sessions: "mindmate_sessions",
+  checkins: "mindmate_checkins",
+  letters: "mindmate_letters",
+  followups: "mindmate_followups",
 };
 
 // Profile
@@ -150,6 +186,101 @@ export function getLastTheme(): ThemeEntry | null {
   const themes = getThemes();
   if (themes.length === 0) return null;
   return themes[themes.length - 1];
+}
+
+// ============================================================
+// Check-ins
+// ============================================================
+
+export function getCheckIns(): CheckIn[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(KEYS.checkins);
+  return data ? JSON.parse(data) : [];
+}
+
+export function addCheckIn(word: string): void {
+  const checkins = getCheckIns();
+  checkins.push({ word: word.trim().toLowerCase(), timestamp: new Date().toISOString() });
+  // Keep last 30 days only
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+  const filtered = checkins.filter(c => new Date(c.timestamp).getTime() > thirtyDaysAgo);
+  localStorage.setItem(KEYS.checkins, JSON.stringify(filtered));
+}
+
+export function getTodayCheckIn(): CheckIn | null {
+  const checkins = getCheckIns();
+  const today = new Date().toISOString().slice(0, 10);
+  return checkins.find(c => c.timestamp.slice(0, 10) === today) || null;
+}
+
+export function getRecentCheckIns(days: number = 7): CheckIn[] {
+  const checkins = getCheckIns();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  return checkins.filter(c => new Date(c.timestamp).getTime() > cutoff);
+}
+
+// ============================================================
+// Letters
+// ============================================================
+
+export function getLetters(): Letter[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(KEYS.letters);
+  return data ? JSON.parse(data) : [];
+}
+
+export function addLetter(to: string, content: string): void {
+  const letters = getLetters();
+  letters.push({ id: crypto.randomUUID(), to, content, createdAt: new Date().toISOString() });
+  localStorage.setItem(KEYS.letters, JSON.stringify(letters));
+}
+
+// ============================================================
+// Follow-ups
+// ============================================================
+
+export function getFollowUps(): FollowUp[] {
+  if (typeof window === "undefined") return [];
+  const data = localStorage.getItem(KEYS.followups);
+  return data ? JSON.parse(data) : [];
+}
+
+export function addFollowUp(person: string): void {
+  const followups = getFollowUps();
+  followups.push({
+    id: crypto.randomUUID(),
+    person,
+    createdAt: new Date().toISOString(),
+    resolved: false,
+  });
+  localStorage.setItem(KEYS.followups, JSON.stringify(followups));
+}
+
+export function getUnresolvedFollowUp(): FollowUp | null {
+  const followups = getFollowUps();
+  return followups.find(f => !f.resolved) || null;
+}
+
+export function resolveFollowUp(id: string, resolution: string): void {
+  const followups = getFollowUps();
+  const idx = followups.findIndex(f => f.id === id);
+  if (idx >= 0) {
+    followups[idx].resolved = true;
+    followups[idx].resolution = resolution;
+    followups[idx].resolvedAt = new Date().toISOString();
+    localStorage.setItem(KEYS.followups, JSON.stringify(followups));
+  }
+}
+
+export function dismissFollowUp(id: string): void {
+  const followups = getFollowUps();
+  const idx = followups.findIndex(f => f.id === id);
+  if (idx >= 0) {
+    followups[idx].resolved = true;
+    followups[idx].resolution = "dismissed";
+    followups[idx].resolvedAt = new Date().toISOString();
+    localStorage.setItem(KEYS.followups, JSON.stringify(followups));
+  }
 }
 
 // Clear all data
