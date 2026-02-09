@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { SessionMode } from "@/lib/prompts";
-import { recentSessionCount, getLastSession, getLastTheme } from "@/lib/storage";
+import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp } from "@/lib/storage";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
@@ -53,6 +54,50 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   const lastSession = getLastSession();
   const lastTheme = getLastTheme();
 
+  // Check-in feature state
+  const [checkInInput, setCheckInInput] = useState("");
+  const [checkInError, setCheckInError] = useState(false);
+  const todayCheckIn = getTodayCheckIn();
+  const recentCheckIns = getRecentCheckIns();
+
+  // Before & after follow-up feature state
+  const [followUpResponse, setFollowUpResponse] = useState("");
+  const [followUpExpanded, setFollowUpExpanded] = useState(false);
+  const unresolved = getUnresolvedFollowUp();
+
+  const handleCheckInSubmit = () => {
+    const trimmed = checkInInput.trim();
+    if (!trimmed) {
+      setCheckInError(true);
+      return;
+    }
+    if (trimmed.split(/\s+/).length > 1) {
+      setCheckInError(true);
+      return;
+    }
+    addCheckIn(trimmed);
+    setCheckInInput("");
+    setCheckInError(false);
+  };
+
+  const handleFollowUpResolution = (status: "yes" | "not-yet" | "changed-mind") => {
+    if (status === "yes") {
+      setFollowUpExpanded(true);
+    } else if (status === "not-yet") {
+      dismissFollowUp(unresolved!.id);
+    } else if (status === "changed-mind") {
+      dismissFollowUp(unresolved!.id);
+    }
+  };
+
+  const handleFollowUpSave = () => {
+    if (unresolved) {
+      resolveFollowUp(unresolved.id, followUpResponse);
+      setFollowUpResponse("");
+      setFollowUpExpanded(false);
+    }
+  };
+
   const getTimeAgo = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
@@ -64,6 +109,13 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
     const weeks = Math.floor(days / 7);
     if (weeks === 1) return "last week";
     return `${weeks} weeks ago`;
+  };
+
+  const getDayLabel = (index: number) => {
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - index));
+    return days[date.getDay()];
   };
 
   return (
@@ -102,13 +154,124 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
       </header>
 
       {/* Content */}
-      <main className="flex-1 px-6 pb-8 max-w-md mx-auto w-full relative z-10">
+      <main className="flex-1 px-6 pb-8 max-w-md mx-auto w-full relative z-10 page-enter">
         {showPauseMessage && (
           <div className="mb-6 bg-warm-100/60 border border-warm-200/50 rounded-2xl p-4 animate-fade-in backdrop-blur-sm">
             <p className="text-sm text-warm-700 leading-relaxed">
               You&apos;ve reflected a lot today. It might help to step away and come
               back to this later.
             </p>
+          </div>
+        )}
+
+        {/* One-word check-in card */}
+        {!showPauseMessage && (
+          <div className="mb-5 card-serene p-5 animate-fade-in">
+            {todayCheckIn ? (
+              <>
+                <div className="flex items-center gap-2 mb-3">
+                  <p className="text-sm text-calm-text font-medium">Today: <span className="text-mind-600 font-semibold">{todayCheckIn.word}</span></p>
+                  <div className="w-1.5 h-1.5 rounded-full bg-mind-300" />
+                </div>
+                {recentCheckIns && recentCheckIns.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {recentCheckIns.map((checkIn, idx) => (
+                      <div key={idx} className="text-xs bg-mind-50 text-mind-600 rounded-full px-3 py-1">
+                        <span className="text-calm-muted">{getDayLabel(idx)}</span>: {checkIn.word}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <label className="text-sm text-calm-text font-medium block mb-3">
+                  How are you feeling?
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={checkInInput}
+                    onChange={(e) => {
+                      setCheckInInput(e.target.value);
+                      setCheckInError(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        handleCheckInSubmit();
+                      }
+                    }}
+                    placeholder="One word..."
+                    className={`flex-1 bg-mind-50 border rounded-lg px-3 py-2 text-sm text-calm-text placeholder-calm-muted focus:outline-none transition-colors ${
+                      checkInError
+                        ? "border-warm-300 focus:border-warm-400"
+                        : "border-mind-200 focus:border-mind-400"
+                    }`}
+                  />
+                  <button
+                    onClick={handleCheckInSubmit}
+                    className="px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-600 rounded-lg transition-colors text-sm font-medium"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  </button>
+                </div>
+                {checkInError && (
+                  <p className="text-xs text-warm-600 mt-2">Please enter a single word</p>
+                )}
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Before & after follow-up card */}
+        {!showPauseMessage && unresolved && (
+          <div className="mb-5 card-serene p-5 animate-fade-in">
+            {!followUpExpanded ? (
+              <>
+                <p className="text-sm text-calm-text mb-4">
+                  You were preparing for a conversation with <span className="font-semibold text-mind-600">{unresolved.person}</span>. Did it happen?
+                </p>
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => handleFollowUpResolution("yes")}
+                    className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium text-left"
+                  >
+                    Yes, it happened
+                  </button>
+                  <button
+                    onClick={() => handleFollowUpResolution("not-yet")}
+                    className="w-full px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium text-left"
+                  >
+                    Not yet
+                  </button>
+                  <button
+                    onClick={() => handleFollowUpResolution("changed-mind")}
+                    className="w-full px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium text-left"
+                  >
+                    I changed my mind
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-sm text-calm-text mb-3 font-medium">How did it go?</p>
+                <textarea
+                  value={followUpResponse}
+                  onChange={(e) => setFollowUpResponse(e.target.value)}
+                  placeholder="Share how the conversation went..."
+                  className="w-full bg-mind-50 border border-mind-200 rounded-lg px-3 py-2 text-sm text-calm-text placeholder-calm-muted focus:outline-none focus:border-mind-400 transition-colors resize-none"
+                  rows={4}
+                />
+                <button
+                  onClick={handleFollowUpSave}
+                  className="w-full mt-3 px-3 py-2 bg-mind-500 hover:bg-mind-600 text-white rounded-lg transition-colors text-sm font-medium"
+                >
+                  Save
+                </button>
+              </>
+            )}
           </div>
         )}
 

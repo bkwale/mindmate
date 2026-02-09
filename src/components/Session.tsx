@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
-import { getThemeSummaries, getAboutMe, addSession, addTheme } from "@/lib/storage";
+import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp } from "@/lib/storage";
 import RelationshipTag from "./RelationshipTag";
 
 interface SessionProps {
@@ -59,6 +59,10 @@ export default function Session({ mode, onEnd }: SessionProps) {
   const [relationshipTag, setRelationshipTag] = useState<string | null>(null);
   const [takeaway, setTakeaway] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [shared, setShared] = useState(false);
+  const [showLetter, setShowLetter] = useState(false);
+  const [letterContent, setLetterContent] = useState("");
+  const [letterSaved, setLetterSaved] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -162,6 +166,12 @@ export default function Session({ mode, onEnd }: SessionProps) {
   };
 
   const handleSoftEnd = async (clarity: "yes" | "no" | "skip") => {
+    // For prepare mode, show letter writing instead of immediately ending
+    if (mode === "prepare") {
+      setShowLetter(true);
+      return;
+    }
+
     setIsSaving(true);
 
     // Save session with all data at once
@@ -180,6 +190,85 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
     setIsSaving(false);
     onEnd();
+  };
+
+  const handleLetterSave = async () => {
+    setLetterSaved(true);
+    setIsSaving(true);
+
+    // Save the letter
+    if (letterContent.trim()) {
+      addLetter(relationshipTag || "someone", letterContent);
+    }
+
+    // Save session
+    addSession({
+      mode,
+      exchanges: exchangeCount,
+      clarityResponse: "yes",
+      takeaway: takeaway.trim() || undefined,
+      summary: messages[messages.length - 1]?.content || "",
+    });
+
+    // Extract themes
+    if (mode !== "ground") {
+      await extractThemes();
+    }
+
+    // Add follow-up if there's a relationship tag
+    if (relationshipTag) {
+      addFollowUp(relationshipTag);
+    }
+
+    setIsSaving(false);
+    onEnd();
+  };
+
+  const handleLetterSkip = async () => {
+    setIsSaving(true);
+
+    // Save session without letter
+    addSession({
+      mode,
+      exchanges: exchangeCount,
+      clarityResponse: "yes",
+      takeaway: takeaway.trim() || undefined,
+      summary: messages[messages.length - 1]?.content || "",
+    });
+
+    // Extract themes
+    if (mode !== "ground") {
+      await extractThemes();
+    }
+
+    // Add follow-up if there's a relationship tag
+    if (relationshipTag) {
+      addFollowUp(relationshipTag);
+    }
+
+    setIsSaving(false);
+    onEnd();
+  };
+
+  const handleShare = async () => {
+    if (!takeaway.trim()) return;
+
+    const shareText = `Something I sat with today: ${takeaway.trim()}`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({ text: shareText });
+        setShared(true);
+      } else {
+        // Fallback: copy to clipboard
+        await navigator.clipboard.writeText(shareText);
+        setShared(true);
+        // Reset after 2 seconds
+        setTimeout(() => setShared(false), 2000);
+      }
+    } catch (err) {
+      console.error("Share failed:", err);
+    }
   };
 
   // Mode intro screen
@@ -338,103 +427,162 @@ export default function Session({ mode, onEnd }: SessionProps) {
         </div>
       </main>
 
-      {/* Footer — input or soft landing */}
+      {/* Footer — input, soft landing, or letter writing */}
       <footer className="sticky bottom-0 bg-calm-bg/80 backdrop-blur-md border-t border-calm-border/50">
         <div className="max-w-lg mx-auto px-4 py-3">
-          {/* Sticky last question — so user never loses what was asked */}
-          {!isComplete && !isLoading && messages.length > 0 && messages[messages.length - 1].role === "assistant" && exchangeCount > 0 && (
-            <div className="mb-2 px-1">
-              <p className="text-xs text-calm-muted leading-relaxed line-clamp-2">
-                <span className="text-mind-500 font-medium">Q: </span>
-                {messages[messages.length - 1].content}
-              </p>
-            </div>
-          )}
-          {isComplete ? (
-            isSaving ? (
-              <div className="text-center py-4 animate-fade-in">
-                <div className="w-8 h-8 rounded-full bg-mind-100 flex items-center justify-center mx-auto mb-2">
-                  <div className="w-2 h-2 rounded-full bg-mind-500 animate-breathe" />
-                </div>
-                <p className="text-sm text-calm-muted">Saving your reflection...</p>
+          {/* Letter writing phase (prepare mode only) */}
+          {showLetter && !isSaving ? (
+            <div className="space-y-4 animate-fade-in">
+              <div className="bg-thermal rounded-2xl p-6 card-serene">
+                <h3 className="font-serif text-lg text-calm-text mb-1">
+                  Write them a letter
+                </h3>
+                <p className="text-xs text-calm-muted font-light mb-4">
+                  Get the words out. This is just for you — it will never be sent.
+                </p>
+                <textarea
+                  value={letterContent}
+                  onChange={e => setLetterContent(e.target.value)}
+                  placeholder="Write freely..."
+                  rows={6}
+                  className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
+                             text-sm text-calm-text placeholder:text-calm-muted/40
+                             focus:outline-none focus:border-mind-400 transition-colors resize-none"
+                />
               </div>
-            ) : (
-              <div className="space-y-3 animate-fade-in">
-                {/* Takeaway — the user gets the last word */}
-                <div>
-                  <label className="text-xs text-calm-muted block mb-1.5">
-                    Anything you want to hold onto from this?
-                  </label>
-                  <textarea
-                    value={takeaway}
-                    onChange={e => setTakeaway(e.target.value)}
-                    placeholder="Optional — just for you"
-                    rows={2}
-                    className="w-full px-3 py-2.5 rounded-xl border border-calm-border bg-white
-                               text-sm text-calm-text placeholder:text-calm-muted/40
-                               focus:outline-none focus:border-mind-400 transition-colors resize-none"
-                  />
-                </div>
-
-                {/* Clarity + close */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleSoftEnd("yes")}
-                    className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
-                               hover:bg-mind-700 transition-colors duration-200"
-                  >
-                    That helped
-                  </button>
-                  <button
-                    onClick={() => handleSoftEnd("no")}
-                    className="flex-1 py-3 border border-calm-border text-calm-text rounded-xl text-sm
-                               hover:bg-warm-50 transition-colors duration-200"
-                  >
-                    Not really
-                  </button>
-                </div>
+              <div className="flex gap-2">
                 <button
-                  onClick={() => handleSoftEnd("skip")}
-                  className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                  onClick={handleLetterSave}
+                  className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
+                             hover:bg-mind-700 transition-colors duration-200"
                 >
-                  Just close
+                  Save letter
+                </button>
+                <button
+                  onClick={handleLetterSkip}
+                  className="flex-1 py-2 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                >
+                  Skip
                 </button>
               </div>
-            )
-          ) : (
-            <div className="flex gap-2 items-end">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={e => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Type your thoughts..."
-                rows={1}
-                disabled={isLoading}
-                className="flex-1 px-4 py-3 rounded-xl border border-calm-border bg-white
-                           text-sm text-calm-text placeholder:text-calm-muted/50
-                           focus:outline-none focus:border-mind-400 transition-colors
-                           resize-none disabled:opacity-50"
-                style={{ maxHeight: "120px" }}
-                onInput={e => {
-                  const target = e.target as HTMLTextAreaElement;
-                  target.style.height = "auto";
-                  target.style.height = Math.min(target.scrollHeight, 120) + "px";
-                }}
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!input.trim() || isLoading}
-                className="p-3 bg-mind-600 text-white rounded-xl
-                           hover:bg-mind-700 transition-colors duration-200
-                           disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 2L11 13" />
-                  <path d="M22 2L15 22L11 13L2 9L22 2Z" />
-                </svg>
-              </button>
             </div>
+          ) : showLetter && isSaving ? (
+            <div className="text-center py-4 animate-fade-in">
+              <div className="w-8 h-8 rounded-full bg-mind-100 flex items-center justify-center mx-auto mb-2">
+                <div className="w-2 h-2 rounded-full bg-mind-500 animate-breathe" />
+              </div>
+              <p className="text-sm text-calm-muted">Saving your reflection...</p>
+            </div>
+          ) : (
+            <>
+              {/* Sticky last question — so user never loses what was asked */}
+              {!isComplete && !isLoading && messages.length > 0 && messages[messages.length - 1].role === "assistant" && exchangeCount > 0 && (
+                <div className="mb-2 px-1">
+                  <p className="text-xs text-calm-muted leading-relaxed line-clamp-2">
+                    <span className="text-mind-500 font-medium">Q: </span>
+                    {messages[messages.length - 1].content}
+                  </p>
+                </div>
+              )}
+              {isComplete ? (
+                isSaving ? (
+                  <div className="text-center py-4 animate-fade-in">
+                    <div className="w-8 h-8 rounded-full bg-mind-100 flex items-center justify-center mx-auto mb-2">
+                      <div className="w-2 h-2 rounded-full bg-mind-500 animate-breathe" />
+                    </div>
+                    <p className="text-sm text-calm-muted">Saving your reflection...</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 animate-fade-in">
+                    {/* Takeaway — the user gets the last word */}
+                    <div>
+                      <label className="text-xs text-calm-muted block mb-1.5">
+                        Anything you want to hold onto from this?
+                      </label>
+                      <textarea
+                        value={takeaway}
+                        onChange={e => setTakeaway(e.target.value)}
+                        placeholder="Optional — just for you"
+                        rows={2}
+                        className="w-full px-3 py-2.5 rounded-xl border border-calm-border bg-white
+                                   text-sm text-calm-text placeholder:text-calm-muted/40
+                                   focus:outline-none focus:border-mind-400 transition-colors resize-none"
+                      />
+                    </div>
+
+                    {/* Share button — only show if takeaway exists */}
+                    {takeaway.trim() && (
+                      <button
+                        onClick={handleShare}
+                        disabled={shared}
+                        className="w-full py-2 text-xs text-mind-500 hover:text-mind-600 transition-colors
+                                   disabled:text-mind-400"
+                      >
+                        {shared ? "Shared ✓" : "Share this"}
+                      </button>
+                    )}
+
+                    {/* Clarity + close */}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleSoftEnd("yes")}
+                        className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
+                                   hover:bg-mind-700 transition-colors duration-200"
+                      >
+                        That helped
+                      </button>
+                      <button
+                        onClick={() => handleSoftEnd("no")}
+                        className="flex-1 py-3 border border-calm-border text-calm-text rounded-xl text-sm
+                                   hover:bg-warm-50 transition-colors duration-200"
+                      >
+                        Not really
+                      </button>
+                    </div>
+                    <button
+                      onClick={() => handleSoftEnd("skip")}
+                      className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                    >
+                      Just close
+                    </button>
+                  </div>
+                )
+              ) : (
+                <div className="flex gap-2 items-end">
+                  <textarea
+                    ref={inputRef}
+                    value={input}
+                    onChange={e => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Type your thoughts..."
+                    rows={1}
+                    disabled={isLoading}
+                    className="flex-1 px-4 py-3 rounded-xl border border-calm-border bg-white
+                               text-sm text-calm-text placeholder:text-calm-muted/50
+                               focus:outline-none focus:border-mind-400 transition-colors
+                               resize-none disabled:opacity-50"
+                    style={{ maxHeight: "120px" }}
+                    onInput={e => {
+                      const target = e.target as HTMLTextAreaElement;
+                      target.style.height = "auto";
+                      target.style.height = Math.min(target.scrollHeight, 120) + "px";
+                    }}
+                  />
+                  <button
+                    onClick={sendMessage}
+                    disabled={!input.trim() || isLoading}
+                    className="p-3 bg-mind-600 text-white rounded-xl
+                               hover:bg-mind-700 transition-colors duration-200
+                               disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M22 2L11 13" />
+                      <path d="M22 2L15 22L11 13L2 9L22 2Z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </footer>

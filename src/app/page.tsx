@@ -91,21 +91,18 @@ export default function MindM8() {
     return <Onboarding onComplete={handleOnboardingComplete} />;
   }
 
-  // Active session
-  if (appState === "session" && activeMode) {
-    return <Session mode={activeMode} onEnd={handleSessionEnd} />;
-  }
-
-  // Insights
-  if (appState === "insights") {
-    return <Insights onBack={handleBackToHome} onSettings={handleOpenSettings} />;
-  }
-
-  // Settings
-  if (appState === "settings") {
-    return <Settings onBack={handleBackToHome} onResetApp={handleResetApp} />;
-  }
-
-  // Home (three doors)
-  return <Home onSelectMode={handleSelectMode} onOpenInsights={handleOpenInsights} />;
+  // Wrap all pages in a transition container
+  return (
+    <div key={appState} className="page-enter">
+      {appState === "session" && activeMode ? (
+        <Session mode={activeMode} onEnd={handleSessionEnd} />
+      ) : appState === "insights" ? (
+        <Insights onBack={handleBackToHome} onSettings={handleOpenSettings} />
+      ) : appState === "settings" ? (
+        <Settings onBack={handleBackToHome} onResetApp={handleResetApp} />
+      ) : (
+        <Home onSelectMode={handleSelectMode} onOpenInsights={handleOpenInsights} />
+      )}
+    </div>
+  );
 }
