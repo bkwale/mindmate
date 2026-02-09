@@ -20,6 +20,8 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
   const [showPINSetup, setShowPINSetup] = useState(false);
   const [aboutMe, setAboutMe] = useState("");
   const [aboutMeSaved, setAboutMeSaved] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [feedbackSent, setFeedbackSent] = useState(false);
 
   useEffect(() => {
     const profile = getProfile();
@@ -321,6 +323,49 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
             </div>
           </div>
 
+          {/* Feedback */}
+          <div className="bg-white rounded-xl p-5 border border-calm-border">
+            <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
+              Feedback
+            </p>
+            <p className="text-xs text-calm-muted mb-3 leading-relaxed">
+              Something you&apos;d change? Something that helped? I&apos;d love to hear it.
+            </p>
+            {feedbackSent ? (
+              <div className="bg-mind-50 border border-mind-100 rounded-xl p-4 text-center">
+                <p className="text-sm text-mind-700">Thank you for your feedback</p>
+              </div>
+            ) : (
+              <>
+                <textarea
+                  value={feedback}
+                  onChange={e => setFeedback(e.target.value)}
+                  placeholder="What would make MindM8 better for you?"
+                  className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                             placeholder:text-calm-muted/50 focus:outline-none focus:border-mind-300
+                             resize-none leading-relaxed"
+                  rows={3}
+                />
+                <button
+                  onClick={() => {
+                    if (!feedback.trim()) return;
+                    const subject = encodeURIComponent("MindM8 Feedback");
+                    const body = encodeURIComponent(feedback.trim());
+                    window.open(`mailto:w.koleosho@googlemail.com?subject=${subject}&body=${body}`, "_blank");
+                    setFeedbackSent(true);
+                    setFeedback("");
+                  }}
+                  disabled={!feedback.trim()}
+                  className="mt-3 px-4 py-2.5 rounded-xl text-xs font-medium transition-all
+                             bg-mind-50 text-mind-600 border border-mind-200 hover:bg-mind-100
+                             disabled:opacity-40 disabled:hover:bg-mind-50"
+                >
+                  Send feedback
+                </button>
+              </>
+            )}
+          </div>
+
           {/* About */}
           <div className="bg-white rounded-xl p-5 border border-calm-border">
             <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
@@ -333,7 +378,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
             <p className="text-xs text-calm-muted leading-relaxed mt-2">
               Not therapy. Not a chatbot. A place to reflect.
             </p>
-            <p className="text-[10px] text-calm-muted/50 mt-3">v1.1 — MVP</p>
+            <p className="text-[10px] text-calm-muted/50 mt-3">v1.2 — MVP</p>
           </div>
         </div>
       </main>
