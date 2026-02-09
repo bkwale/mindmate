@@ -1,6 +1,6 @@
 "use client";
 
-import { getThemes, getSessions, getProfile, getUsageMetrics, ThemeEntry, SessionRecord, UsageMetrics } from "@/lib/storage";
+import { getThemes, getSessions, getProfile, getUsageMetrics, getReadinessData, ThemeEntry, SessionRecord, UsageMetrics, ReadinessData } from "@/lib/storage";
 import { getCohortMetrics, CohortMetrics } from "@/lib/cohort";
 import { useState, useEffect } from "react";
 
@@ -14,6 +14,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
   const [sessions, setSessions] = useState<SessionRecord[]>([]);
   const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
   const [cohort, setCohort] = useState<CohortMetrics | null>(null);
+  const [readiness, setReadiness] = useState<ReadinessData | null>(null);
   const [activeTab, setActiveTab] = useState<"overview" | "journey" | "themes" | "history" | "metrics">("overview");
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
 
@@ -22,6 +23,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
     setSessions(getSessions());
     setMetrics(getUsageMetrics());
     setCohort(getCohortMetrics());
+    setReadiness(getReadinessData());
   }, []);
 
   const totalSessions = sessions.length;
@@ -563,6 +565,45 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                   </div>
                 </div>
               </div>
+
+              {/* Readiness — post-session clarity signals */}
+              {readiness && readiness.total > 0 && (
+                <div className="bg-white rounded-xl p-4 border border-calm-border">
+                  <p className="text-xs text-calm-muted mb-3">Readiness (last 14 days)</p>
+                  <div className="space-y-2.5">
+                    {([
+                      { label: "Yes", value: readiness.yes, color: "bg-mind-500" },
+                      { label: "A little", value: readiness.aLittle, color: "bg-mind-300" },
+                      { label: "Not yet", value: readiness.notYet, color: "bg-warm-400" },
+                    ] as const).map(row => {
+                      const pct = readiness.total > 0
+                        ? Math.round((row.value / readiness.total) * 100)
+                        : 0;
+                      return (
+                        <div key={row.label} className="flex items-center gap-3">
+                          <span className="text-xs text-calm-text w-14">{row.label}</span>
+                          <div className="flex-1 h-2 bg-calm-border rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-500 ${row.color}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="text-[10px] text-calm-muted w-8 text-right">{row.value}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  <p className="text-[10px] text-calm-muted mt-3">
+                    {readiness.total} {readiness.total === 1 ? "response" : "responses"} &middot; {
+                      readiness.yes > readiness.aLittle && readiness.yes > readiness.notYet
+                        ? "Mostly arriving clearer"
+                        : readiness.aLittle >= readiness.yes && readiness.aLittle >= readiness.notYet
+                        ? "Getting there, gradually"
+                        : "Still finding the way"
+                    }
+                  </p>
+                </div>
+              )}
 
               {/* Cohort / Retention */}
               {cohort && (

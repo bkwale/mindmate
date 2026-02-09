@@ -14,7 +14,7 @@ interface HomeProps {
 const doors = [
   {
     mode: "reflect" as SessionMode,
-    title: "I need to think",
+    title: "Arrive clearer",
     description: "Process an emotion, an event, or something you can\u2019t name yet.",
     exchanges: "5 reflections",
     icon: (
@@ -26,7 +26,7 @@ const doors = [
   },
   {
     mode: "prepare" as SessionMode,
-    title: "I need to prepare",
+    title: "Arrive ready",
     description: "Clarify what you want to say before a difficult conversation.",
     exchanges: "7 reflections",
     icon: (
@@ -37,7 +37,7 @@ const doors = [
   },
   {
     mode: "ground" as SessionMode,
-    title: "I just need a moment",
+    title: "Arrive present",
     description: "Slow down. Breathe. Name one feeling.",
     exchanges: "3 reflections",
     icon: (
@@ -225,7 +225,7 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
             ) : (
               <>
                 <label className="text-sm text-calm-text font-medium block mb-3">
-                  How are you feeling?
+                  How are you arriving today?
                 </label>
                 <div className="flex gap-2">
                   <input

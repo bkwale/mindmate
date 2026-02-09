@@ -45,6 +45,8 @@ export interface SessionRecord {
   clarityResponse?: "yes" | "no" | "skip";
   takeaway?: string;
   summary?: string;
+  readinessLevel?: "yes" | "a-little" | "not-yet";
+  readinessNote?: string;
 }
 
 // ============================================================
@@ -336,6 +338,32 @@ export function getRelatedTheme(word: string): ThemeEntry | null {
     word.toLowerCase().includes(t.emotion.toLowerCase())
   );
   return match || null;
+}
+
+// ============================================================
+// Readiness Data — aggregated readiness signals from sessions
+// ============================================================
+
+export interface ReadinessData {
+  yes: number;
+  aLittle: number;
+  notYet: number;
+  total: number;
+}
+
+export function getReadinessData(days: number = 14): ReadinessData {
+  const sessions = getSessions();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = sessions.filter(
+    s => new Date(s.completedAt).getTime() > cutoff && s.readinessLevel
+  );
+
+  return {
+    yes: recent.filter(s => s.readinessLevel === "yes").length,
+    aLittle: recent.filter(s => s.readinessLevel === "a-little").length,
+    notYet: recent.filter(s => s.readinessLevel === "not-yet").length,
+    total: recent.length,
+  };
 }
 
 // Clear all data

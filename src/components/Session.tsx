@@ -17,25 +17,25 @@ interface Message {
 }
 
 const modeLabels: Record<SessionMode, string> = {
-  reflect: "Reflecting",
-  prepare: "Preparing",
-  ground: "Grounding",
+  reflect: "Arriving clearer",
+  prepare: "Arriving ready",
+  ground: "Arriving present",
 };
 
 const modeIntros: Record<SessionMode, { heading: string; description: string; tip: string }> = {
   reflect: {
-    heading: "Guided Reflection",
-    description: "You\u2019ll explore an emotion, an event, or something you can\u2019t quite name yet. MindM8 will ask questions to help you see it more clearly.",
+    heading: "Arrive Clearer",
+    description: "You\u2019ve arrived carrying something \u2014 an emotion, an event, or something you can\u2019t quite name. MindM8 will help you set it down and see it more clearly.",
     tip: "There are no right answers. Say what\u2019s true, not what sounds good.",
   },
   prepare: {
-    heading: "Conversation Prep",
-    description: "You\u2019ll work through a difficult conversation before it happens. MindM8 will help you clarify what you need to say and how you want to feel after.",
+    heading: "Arrive Ready",
+    description: "You\u2019ve arrived with a conversation ahead of you. MindM8 will help you clarify what you need to say so you can walk in ready.",
     tip: "Think about one specific person and one specific conversation.",
   },
   ground: {
-    heading: "Grounding",
-    description: "This is a short, quiet check-in. You\u2019ll slow down, name how you feel, and sit with it for a moment.",
+    heading: "Arrive Present",
+    description: "You\u2019ve arrived overwhelmed. This is a short, quiet moment to slow down, name one feeling, and land here.",
     tip: "Keep it simple. One word is enough.",
   },
 };
@@ -64,6 +64,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
   const [showLetter, setShowLetter] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [letterSaved, setLetterSaved] = useState(false);
+  const [showReadiness, setShowReadiness] = useState(false);
+  const [readinessLevel, setReadinessLevel] = useState<"yes" | "a-little" | "not-yet" | null>(null);
+  const [readinessNote, setReadinessNote] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -128,6 +131,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
       if (data.isComplete || newCount >= maxExchanges) {
         setIsComplete(true);
+        setShowReadiness(true);
       }
     } catch (err: any) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -171,6 +175,14 @@ export default function Session({ mode, onEnd }: SessionProps) {
     }
   };
 
+  const handleReadinessSelect = (level: "yes" | "a-little" | "not-yet") => {
+    setReadinessLevel(level);
+  };
+
+  const handleReadinessContinue = () => {
+    setShowReadiness(false);
+  };
+
   const handleSoftEnd = async (clarity: "yes" | "no" | "skip") => {
     // For prepare mode, show letter writing instead of immediately ending
     if (mode === "prepare") {
@@ -187,6 +199,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
       clarityResponse: clarity,
       takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
+      readinessLevel: readinessLevel || undefined,
+      readinessNote: readinessNote.trim() || undefined,
     });
 
     // Extract themes (skip for grounding — minimal data)
@@ -223,6 +237,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
       clarityResponse: "yes",
       takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
+      readinessLevel: readinessLevel || undefined,
+      readinessNote: readinessNote.trim() || undefined,
     });
 
     // Extract themes
@@ -258,6 +274,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
       clarityResponse: "yes",
       takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
+      readinessLevel: readinessLevel || undefined,
+      readinessNote: readinessNote.trim() || undefined,
     });
 
     // Extract themes
@@ -537,6 +555,83 @@ export default function Session({ mode, onEnd }: SessionProps) {
                       <div className="w-2 h-2 rounded-full bg-mind-500 animate-breathe" />
                     </div>
                     <p className="text-sm text-calm-muted">Saving your reflection...</p>
+                  </div>
+                ) : showReadiness ? (
+                  /* Readiness Moment — shown right after session completes */
+                  <div className="space-y-4 animate-fade-in">
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-calm-text mb-1">
+                        Do you feel clearer than before?
+                      </p>
+                      <p className="text-xs text-calm-muted">
+                        No right answer. Just notice.
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleReadinessSelect("yes")}
+                        className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          readinessLevel === "yes"
+                            ? "bg-mind-600 text-white"
+                            : "border border-calm-border text-calm-text hover:bg-mind-50"
+                        }`}
+                      >
+                        Yes
+                      </button>
+                      <button
+                        onClick={() => handleReadinessSelect("a-little")}
+                        className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          readinessLevel === "a-little"
+                            ? "bg-mind-600 text-white"
+                            : "border border-calm-border text-calm-text hover:bg-mind-50"
+                        }`}
+                      >
+                        A little
+                      </button>
+                      <button
+                        onClick={() => handleReadinessSelect("not-yet")}
+                        className={`flex-1 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                          readinessLevel === "not-yet"
+                            ? "bg-mind-600 text-white"
+                            : "border border-calm-border text-calm-text hover:bg-mind-50"
+                        }`}
+                      >
+                        Not yet
+                      </button>
+                    </div>
+                    {readinessLevel && (
+                      <div className="animate-fade-in">
+                        <label className="text-xs text-calm-muted block mb-1.5">
+                          What feels more possible now?
+                        </label>
+                        <textarea
+                          value={readinessNote}
+                          onChange={e => setReadinessNote(e.target.value)}
+                          placeholder="Optional — a word or a sentence"
+                          rows={2}
+                          className="w-full px-3 py-2.5 rounded-xl border border-calm-border bg-white
+                                     text-sm text-calm-text placeholder:text-calm-muted/40
+                                     focus:outline-none focus:border-mind-400 transition-colors resize-none"
+                        />
+                      </div>
+                    )}
+                    <button
+                      onClick={handleReadinessContinue}
+                      className={`w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200 ${
+                        readinessLevel
+                          ? "bg-mind-600 text-white hover:bg-mind-700"
+                          : "bg-calm-border/50 text-calm-muted"
+                      }`}
+                      disabled={!readinessLevel}
+                    >
+                      Continue
+                    </button>
+                    <button
+                      onClick={() => { setShowReadiness(false); }}
+                      className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                    >
+                      Skip
+                    </button>
                   </div>
                 ) : (
                   <div className="space-y-3 animate-fade-in">
