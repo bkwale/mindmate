@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { setPIN } from "@/lib/security";
+import { setPIN, setRecoveryWords } from "@/lib/security";
 
 interface PINSetupProps {
   onComplete: () => void;
@@ -9,18 +9,24 @@ interface PINSetupProps {
   isChange?: boolean; // true when changing PIN from Settings
 }
 
-type Step = "create" | "confirm";
+type Step = "create" | "confirm" | "recovery";
 
 export default function PINSetup({ onComplete, onSkip, isChange }: PINSetupProps) {
   const [step, setStep] = useState<Step>("create");
   const [pin, setPin] = useState("");
   const [confirmPin, setConfirmPin] = useState("");
   const [error, setError] = useState("");
+  const [recoveryWords, setRecoveryWords] = useState(["", "", ""]);
+  const [isSaving, setIsSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const wordRefs = [useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null), useRef<HTMLInputElement>(null)];
 
   useEffect(() => {
-    // Small delay to ensure DOM is ready
-    setTimeout(() => inputRef.current?.focus(), 100);
+    if (step === "create" || step === "confirm") {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    } else if (step === "recovery") {
+      setTimeout(() => wordRefs[0].current?.focus(), 100);
+    }
   }, [step]);
 
   const handleInput = (value: string) => {
@@ -35,12 +41,14 @@ export default function PINSetup({ onComplete, onSkip, isChange }: PINSetupProps
           setConfirmPin("");
         }, 200);
       }
-    } else {
+    } else if (step === "confirm") {
       setConfirmPin(digits);
       if (digits.length === 4) {
         if (digits === pin) {
-          // PINs match — save and continue
-          setPIN(digits).then(() => onComplete());
+          // PINs match — save PIN, then move to recovery words
+          setPIN(digits).then(() => {
+            setStep("recovery");
+          });
         } else {
           setError("PINs didn\u2019t match. Try again.");
           setTimeout(() => {
@@ -53,7 +61,103 @@ export default function PINSetup({ onComplete, onSkip, isChange }: PINSetupProps
     }
   };
 
+  const updateRecoveryWord = (index: number, value: string) => {
+    const updated = [...recoveryWords];
+    updated[index] = value;
+    setRecoveryWords(updated);
+  };
+
+  const handleRecoveryWordKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      if (index < 2) {
+        wordRefs[index + 1].current?.focus();
+      }
+    }
+  };
+
+  const recoveryComplete = recoveryWords.every(w => w.trim().length >= 2);
+
+  const handleSaveRecovery = async () => {
+    if (!recoveryComplete) return;
+    setIsSaving(true);
+    await setRecoveryWords(
+      recoveryWords.map(w => w.trim()) as [string, string, string]
+    );
+    setIsSaving(false);
+    onComplete();
+  };
+
   const currentValue = step === "create" ? pin : confirmPin;
+
+  // Recovery words screen — shown after PIN is confirmed
+  if (step === "recovery") {
+    return (
+      <div className="min-h-screen bg-calm-bg flex items-center justify-center p-6">
+        <div className="max-w-sm w-full text-center space-y-6 animate-fade-in">
+          <div className="space-y-3">
+            <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center mx-auto">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-serif text-calm-text">
+              3 words that feel like yours
+            </h2>
+            <p className="text-calm-muted text-sm leading-relaxed">
+              If you ever forget your PIN, these words will help you get back in. Choose feelings or words only you would know.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {[0, 1, 2].map(i => (
+              <input
+                key={i}
+                ref={wordRefs[i]}
+                type="text"
+                value={recoveryWords[i]}
+                onChange={e => updateRecoveryWord(i, e.target.value)}
+                onKeyDown={e => handleRecoveryWordKeyDown(i, e)}
+                placeholder={
+                  i === 0 ? "First word" : i === 1 ? "Second word" : "Third word"
+                }
+                className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white text-center
+                           text-sm text-calm-text placeholder:text-calm-muted/30
+                           focus:outline-none focus:border-mind-400 transition-colors"
+                autoComplete="off"
+                autoCapitalize="off"
+              />
+            ))}
+          </div>
+
+          <div className="bg-mind-50/60 border border-mind-100/50 rounded-2xl px-4 py-3">
+            <p className="text-xs text-mind-700 leading-relaxed">
+              These are hashed and can&rsquo;t be read — not even by the app. You&rsquo;ll need to remember at least 2 of 3 to recover your account.
+            </p>
+          </div>
+
+          <button
+            onClick={handleSaveRecovery}
+            disabled={!recoveryComplete || isSaving}
+            className="w-full py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
+                       hover:bg-mind-700 transition-colors duration-200
+                       disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            {isSaving ? "Saving..." : "Save and continue"}
+          </button>
+
+          {!isChange && (
+            <button
+              onClick={onComplete}
+              className="w-full py-2 text-calm-muted text-xs hover:text-calm-text transition-colors"
+            >
+              Skip — I&rsquo;ll remember my PIN
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-calm-bg flex items-center justify-center p-6">
