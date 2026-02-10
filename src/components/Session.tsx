@@ -183,7 +183,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
     setShowReadiness(false);
   };
 
-  const handleSoftEnd = async (clarity: "yes" | "no" | "skip") => {
+  // Derive clarity from readiness level — no need to ask twice
+  const derivedClarity = (): "yes" | "no" | "skip" => {
+    if (!readinessLevel) return "skip";
+    if (readinessLevel === "yes") return "yes";
+    if (readinessLevel === "a-little") return "yes";
+    return "no";
+  };
+
+  const handleSoftEnd = async () => {
     // For prepare mode, show letter writing instead of immediately ending
     if (mode === "prepare") {
       setShowLetter(true);
@@ -196,7 +204,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
     addSession({
       mode,
       exchanges: exchangeCount,
-      clarityResponse: clarity,
+      clarityResponse: derivedClarity(),
       takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
       readinessLevel: readinessLevel || undefined,
@@ -234,7 +242,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
     addSession({
       mode,
       exchanges: exchangeCount,
-      clarityResponse: "yes",
+      clarityResponse: derivedClarity(),
       takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
       readinessLevel: readinessLevel || undefined,
@@ -271,7 +279,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
     addSession({
       mode,
       exchanges: exchangeCount,
-      clarityResponse: "yes",
+      clarityResponse: derivedClarity(),
       takeaway: takeaway.trim() || undefined,
       summary: messages[messages.length - 1]?.content || "",
       readinessLevel: readinessLevel || undefined,
@@ -635,6 +643,19 @@ export default function Session({ mode, onEnd }: SessionProps) {
                   </div>
                 ) : (
                   <div className="space-y-3 animate-fade-in">
+                    {/* Arrival acknowledgment — presence, not validation */}
+                    <div className="text-center py-1">
+                      <p className="text-sm text-calm-text font-light italic">
+                        {readinessLevel === "yes"
+                          ? "That\u2019s a good place to land."
+                          : readinessLevel === "a-little"
+                          ? "A little is enough. You showed up."
+                          : readinessLevel === "not-yet"
+                          ? "Not every session shifts something. You still showed up."
+                          : "You showed up. That\u2019s what this is for."}
+                      </p>
+                    </div>
+
                     {/* Takeaway — the user gets the last word */}
                     <div>
                       <label className="text-xs text-calm-muted block mb-1.5">
@@ -663,25 +684,16 @@ export default function Session({ mode, onEnd }: SessionProps) {
                       </button>
                     )}
 
-                    {/* Clarity + close */}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleSoftEnd("yes")}
-                        className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
-                                   hover:bg-mind-700 transition-colors duration-200"
-                      >
-                        That helped
-                      </button>
-                      <button
-                        onClick={() => handleSoftEnd("no")}
-                        className="flex-1 py-3 border border-calm-border text-calm-text rounded-xl text-sm
-                                   hover:bg-warm-50 transition-colors duration-200"
-                      >
-                        Not really
-                      </button>
-                    </div>
+                    {/* Done — single close button */}
                     <button
-                      onClick={() => handleSoftEnd("skip")}
+                      onClick={() => handleSoftEnd()}
+                      className="w-full py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
+                                 hover:bg-mind-700 transition-colors duration-200"
+                    >
+                      Done
+                    </button>
+                    <button
+                      onClick={() => handleSoftEnd()}
                       className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
                     >
                       Just close

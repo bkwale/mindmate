@@ -76,6 +76,72 @@ export async function changePIN(
 }
 
 // ============================================================
+// Recovery Words — emotional self-recognition as identity proof
+// ============================================================
+// During PIN setup, the user chooses 3 words that "feel like theirs."
+// These are hashed individually — can't be read from localStorage.
+// On recovery: if 2 of 3 match, reset PIN but keep all data.
+
+const RECOVERY_KEY = "mindmate_recovery";
+
+interface RecoveryData {
+  wordHashes: string[];  // 3 hashed words
+  salt: string;
+}
+
+// Normalise a word for consistent hashing (lowercase, trimmed, no extra spaces)
+function normaliseWord(word: string): string {
+  return word.toLowerCase().trim().replace(/\s+/g, " ");
+}
+
+// Save 3 recovery words (hashed)
+export async function setRecoveryWords(words: [string, string, string]): Promise<void> {
+  const salt = generateSalt();
+  const wordHashes = await Promise.all(
+    words.map(w => hashPIN(normaliseWord(w), salt))
+  );
+  const recovery: RecoveryData = { wordHashes, salt };
+  localStorage.setItem(RECOVERY_KEY, JSON.stringify(recovery));
+}
+
+// Check if recovery words have been set
+export function hasRecoveryWords(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(RECOVERY_KEY) !== null;
+}
+
+// Verify recovery words — returns true if at least 2 of 3 match (any order)
+export async function verifyRecoveryWords(attempts: string[]): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const raw = localStorage.getItem(RECOVERY_KEY);
+  if (!raw) return false;
+
+  const recovery: RecoveryData = JSON.parse(raw);
+  const attemptHashes = await Promise.all(
+    attempts.map(w => hashPIN(normaliseWord(w), recovery.salt))
+  );
+
+  // Count how many stored hashes are matched by any attempt
+  let matches = 0;
+  for (const storedHash of recovery.wordHashes) {
+    if (attemptHashes.includes(storedHash)) matches++;
+  }
+  return matches >= 2;
+}
+
+// Reset only the PIN (keep all session data, themes, recovery words)
+export async function resetPINOnly(newPin: string): Promise<void> {
+  await setPIN(newPin);
+}
+
+// Full reset — clears ALL user data (PIN, sessions, themes, everything)
+// Last resort when user can't remember PIN or recovery words.
+export function resetAllData(): void {
+  if (typeof window === "undefined") return;
+  localStorage.clear();
+}
+
+// ============================================================
 // Auto-lock — idle timeout and visibility-based re-locking
 // ============================================================
 
