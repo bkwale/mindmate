@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SessionMode } from "@/lib/prompts";
 import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
-import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, isIOS, isAppInstalled, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
+import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
 import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
 
 interface HomeProps {
@@ -76,7 +76,19 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
 
   // Install prompt state — persists until user actually installs
   const [showInstallPrompt, setShowInstallPrompt] = useState(shouldPromptInstall);
-  const [installExpanded, setInstallExpanded] = useState(false);
+  const [promptReady, setPromptReady] = useState(hasNativeInstallPrompt);
+
+  // Listen for the native install prompt to become available (fires async)
+  useEffect(() => {
+    const onReady = () => setPromptReady(true);
+    const onInstalled = () => setShowInstallPrompt(false);
+    window.addEventListener("pwa-prompt-ready", onReady);
+    window.addEventListener("pwa-installed", onInstalled);
+    return () => {
+      window.removeEventListener("pwa-prompt-ready", onReady);
+      window.removeEventListener("pwa-installed", onInstalled);
+    };
+  }, []);
 
   // Notification prompt state
   const [showNotificationPrompt, setShowNotificationPrompt] = useState(
@@ -433,99 +445,44 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           </div>
         )}
 
-        {/* Install app banner — persists until user installs */}
-        {!showPauseMessage && showInstallPrompt && (
-          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/60 to-white">
-            <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600">
+        {/* Install app banner — simple drop-down, persists until installed */}
+        {!showPauseMessage && showInstallPrompt && promptReady && (
+          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/60 to-white">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
               </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-calm-text">
-                  Install MindM8
-                </p>
-                <p className="text-xs text-calm-muted mt-1 leading-relaxed">
-                  Add to your home screen for a faster, app-like experience
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2">
-              {/* Native install button — Chrome, Edge, Samsung Internet */}
-              {hasNativeInstallPrompt() ? (
-                <button
-                  onClick={async () => {
-                    const accepted = await triggerInstallPrompt();
-                    if (accepted) {
-                      setShowInstallPrompt(false);
-                    }
-                  }}
-                  className="w-full py-2.5 bg-mind-600 text-white rounded-xl text-sm font-medium
-                             hover:bg-mind-700 transition-colors duration-200"
-                >
-                  Install now
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => setInstallExpanded(!installExpanded)}
-                    className="w-full py-2.5 bg-mind-600 text-white rounded-xl text-sm font-medium
-                               hover:bg-mind-700 transition-colors duration-200"
-                  >
-                    How to install
-                  </button>
-                  {installExpanded && (
-                    <div className="mt-3 bg-mind-50/80 rounded-xl p-4 text-xs text-calm-text leading-relaxed space-y-2 animate-fade-in">
-                      {isIOS() ? (
-                        <>
-                          <p className="font-medium text-mind-700">On iPhone / iPad:</p>
-                          <div className="flex items-start gap-2">
-                            <span className="text-mind-500 font-semibold">1.</span>
-                            <p>Tap the <span className="inline-flex items-center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600 inline"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" /></svg></span> <strong>Share</strong> button at the bottom of Safari</p>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-mind-500 font-semibold">2.</span>
-                            <p>Scroll down and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong></p>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-mind-500 font-semibold">3.</span>
-                            <p>Tap <strong>&ldquo;Add&rdquo;</strong></p>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <p className="font-medium text-mind-700">In your browser:</p>
-                          <div className="flex items-start gap-2">
-                            <span className="text-mind-500 font-semibold">1.</span>
-                            <p>Tap the <strong>menu</strong> button (three dots)</p>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-mind-500 font-semibold">2.</span>
-                            <p>Select <strong>&ldquo;Add to Home Screen&rdquo;</strong> or <strong>&ldquo;Install app&rdquo;</strong></p>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <span className="text-mind-500 font-semibold">3.</span>
-                            <p>Tap <strong>&ldquo;Install&rdquo;</strong> or <strong>&ldquo;Add&rdquo;</strong></p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-
+              <p className="text-sm text-calm-text flex-1">
+                Install MindM8 for quick access
+              </p>
+              <button
+                onClick={async () => {
+                  const accepted = await triggerInstallPrompt();
+                  if (accepted) {
+                    setShowInstallPrompt(false);
+                  }
+                }}
+                className="px-4 py-2 bg-mind-600 text-white rounded-xl text-sm font-medium
+                           hover:bg-mind-700 transition-colors duration-200 flex-shrink-0"
+              >
+                Install
+              </button>
               <button
                 onClick={() => {
                   snoozeInstallPrompt();
                   setShowInstallPrompt(false);
                 }}
-                className="w-full py-2 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0"
+                aria-label="Dismiss"
               >
-                Remind me later
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               </button>
             </div>
           </div>
