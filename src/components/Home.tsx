@@ -445,8 +445,8 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           </div>
         )}
 
-        {/* Install app banner — simple drop-down, persists until installed */}
-        {!showPauseMessage && showInstallPrompt && promptReady && (
+        {/* Install app banner — shows for all non-installed visitors, persists until installed */}
+        {!showPauseMessage && showInstallPrompt && (
           <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/60 to-white">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0">
