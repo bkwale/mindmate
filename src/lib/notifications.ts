@@ -74,20 +74,22 @@ export function isAndroid(): boolean {
 }
 
 // Initialise the install prompt listener — call this once on app load
-export function initInstallPrompt(onPromptAvailable?: () => void): void {
+export function initInstallPrompt(): void {
   if (typeof window === "undefined") return;
 
   window.addEventListener("beforeinstallprompt", (e: Event) => {
-    // Prevent the default mini-infobar on Chrome Android
+    // Prevent the default mini-infobar — we show our own banner
     e.preventDefault();
     deferredPrompt = e;
-    onPromptAvailable?.();
+    // Let any listening components know the prompt is ready
+    window.dispatchEvent(new Event("pwa-prompt-ready"));
   });
 
   // Detect when user actually installs
   window.addEventListener("appinstalled", () => {
     deferredPrompt = null;
     localStorage.setItem("mindmate_app_installed", "true");
+    window.dispatchEvent(new Event("pwa-installed"));
   });
 }
 
