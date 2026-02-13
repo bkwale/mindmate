@@ -456,21 +456,30 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
               </div>
-              <p className="text-sm text-calm-text flex-1">
-                Install MindM8 for quick access
-              </p>
-              <button
-                onClick={async () => {
-                  const accepted = await triggerInstallPrompt();
-                  if (accepted) {
-                    setShowInstallPrompt(false);
-                  }
-                }}
-                className="px-4 py-2 bg-mind-600 text-white rounded-xl text-sm font-medium
-                           hover:bg-mind-700 transition-colors duration-200 flex-shrink-0"
-              >
-                Install
-              </button>
+              <div className="flex-1">
+                <p className="text-sm text-calm-text">
+                  Install MindM8 for quick access
+                </p>
+                {!promptReady && (
+                  <p className="text-xs text-calm-muted mt-1">
+                    Tap <strong>Share</strong> then <strong>&ldquo;Add to Home Screen&rdquo;</strong>
+                  </p>
+                )}
+              </div>
+              {promptReady && (
+                <button
+                  onClick={async () => {
+                    const accepted = await triggerInstallPrompt();
+                    if (accepted) {
+                      setShowInstallPrompt(false);
+                    }
+                  }}
+                  className="px-4 py-2 bg-mind-600 text-white rounded-xl text-sm font-medium
+                             hover:bg-mind-700 transition-colors duration-200 flex-shrink-0"
+                >
+                  Install
+                </button>
+              )}
               <button
                 onClick={() => {
                   snoozeInstallPrompt();
