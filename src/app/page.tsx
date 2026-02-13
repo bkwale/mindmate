@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { isOnboarded } from "@/lib/storage";
 import { isPINEnabled, shouldAutoLock, updateLastActivity, getAutoLockTimeout } from "@/lib/security";
 import { SessionMode } from "@/lib/prompts";
-import { registerServiceWorker } from "@/lib/notifications";
+import { registerServiceWorker, initInstallPrompt } from "@/lib/notifications";
 import { trackEvent } from "@/lib/cohort";
 import Onboarding from "@/components/Onboarding";
 import Home from "@/components/Home";
@@ -42,6 +42,9 @@ export default function MindM8() {
 
     // Register service worker for PWA
     registerServiceWorker();
+
+    // Capture the beforeinstallprompt event for native install
+    initInstallPrompt();
 
     // Track app open
     trackEvent("app_open");
