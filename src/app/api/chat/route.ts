@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
     });
 
     const textContent = response.content.find(c => c.type === "text");
-    const text = textContent ? textContent.text : "I'm here when you're ready to reflect.";
+    let text = textContent ? textContent.text : "I'm here when you're ready to reflect.";
+
+    // Strip any leaked session notes or internal metadata
+    text = text.replace(/\*?\*?\[.*?(?:session note|internal|note to self|instruction).*?\]\*?\*?/gi, "").trim();
 
     return NextResponse.json({
       message: text,
