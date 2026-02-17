@@ -35,6 +35,11 @@ export interface ThemeEntry {
   theme: string;
   date: string;
   mode: string;
+  // ND-aware signals (inferred, never asked)
+  energy?: "high" | "low" | "crashed" | "wired" | "neutral";
+  regulation?: "regulated" | "dysregulated" | "shutdown" | "flooding";
+  trigger?: string | null;
+  loop?: boolean;
 }
 
 export interface SessionRecord {
@@ -47,6 +52,9 @@ export interface SessionRecord {
   summary?: string;
   readinessLevel?: "yes" | "a-little" | "not-yet";
   readinessNote?: string;
+  // Timing metadata for pattern detection
+  timeOfDay?: "morning" | "afternoon" | "evening" | "night";
+  dayOfWeek?: number; // 0 (Sun) – 6 (Sat)
 }
 
 // ============================================================
@@ -311,6 +319,59 @@ export function clearOpenLoop(): void {
 }
 
 // ============================================================
+// Check-in Word Clustering — groups similar emotional words
+// ============================================================
+
+const EMOTION_CLUSTERS: Record<string, string[]> = {
+  anxiety: ["anxious", "worried", "nervous", "stressed", "tense", "uneasy", "restless", "panicky", "overwhelmed", "overthinking"],
+  sadness: ["sad", "down", "low", "heavy", "empty", "numb", "flat", "hopeless", "tearful", "depressed", "miserable", "blue"],
+  anger: ["angry", "frustrated", "irritated", "annoyed", "furious", "resentful", "bitter", "rageful", "pissed", "livid"],
+  fear: ["scared", "afraid", "frightened", "terrified", "fearful", "dreading", "panicked"],
+  exhaustion: ["tired", "exhausted", "drained", "burnt", "depleted", "fatigued", "shattered", "spent", "wiped"],
+  confusion: ["confused", "lost", "unsure", "uncertain", "torn", "stuck", "foggy", "scattered", "unfocused"],
+  loneliness: ["lonely", "isolated", "alone", "disconnected", "invisible", "forgotten", "abandoned"],
+  shame: ["ashamed", "embarrassed", "guilty", "worthless", "inadequate", "pathetic", "stupid", "useless"],
+  calm: ["calm", "peaceful", "relaxed", "settled", "grounded", "centred", "still", "quiet", "okay", "fine", "alright"],
+  hope: ["hopeful", "optimistic", "better", "lighter", "grateful", "happy", "excited", "motivated", "energised", "good", "great"],
+};
+
+export function getWordCluster(word: string): { cluster: string; relatedWords: string[] } | null {
+  const lower = word.toLowerCase();
+  for (const [cluster, words] of Object.entries(EMOTION_CLUSTERS)) {
+    if (words.includes(lower)) {
+      return { cluster, relatedWords: words.filter(w => w !== lower) };
+    }
+  }
+  return null;
+}
+
+export function getCheckInClusters(days: number = 14): { cluster: string; count: number; words: string[] }[] {
+  const checkins = getRecentCheckIns(days);
+  if (checkins.length < 3) return [];
+
+  const clusterCounts: Record<string, { count: number; words: Set<string> }> = {};
+  checkins.forEach(c => {
+    const match = getWordCluster(c.word);
+    if (match) {
+      if (!clusterCounts[match.cluster]) {
+        clusterCounts[match.cluster] = { count: 0, words: new Set() };
+      }
+      clusterCounts[match.cluster].count++;
+      clusterCounts[match.cluster].words.add(c.word);
+    }
+  });
+
+  return Object.entries(clusterCounts)
+    .filter(([, data]) => data.count >= 2)
+    .map(([cluster, data]) => ({
+      cluster,
+      count: data.count,
+      words: Array.from(data.words),
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// ============================================================
 // Smart Check-in Helpers — pattern detection for contextual responses
 // ============================================================
 
@@ -366,6 +427,221 @@ export function getReadinessData(days: number = 14): ReadinessData {
   };
 }
 
+// ============================================================
+// ND-Aware Pattern Detectors — inferred, never labelled
+// Each returns a human-friendly insight or null
+// ============================================================
+
+export interface PatternSignal {
+  type: string;
+  label: string;        // Friendly name shown to user (never clinical)
+  description: string;  // What we noticed
+  strength: number;     // 0-1 confidence
+  suggestion?: string;  // Gentle nudge
+}
+
+// 1. Overwhelm Cycles — high energy → crash pattern
+export function detectOverwhelmCycle(days: number = 14): PatternSignal | null {
+  const themes = getThemes();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = themes.filter(t => new Date(t.date).getTime() > cutoff && t.energy);
+
+  if (recent.length < 3) return null;
+
+  // Look for high/wired followed by crashed/low within 48 hours
+  let cycles = 0;
+  for (let i = 0; i < recent.length - 1; i++) {
+    const curr = recent[i];
+    const next = recent[i + 1];
+    if (!curr.energy || !next.energy) continue;
+
+    const timeDiff = new Date(next.date).getTime() - new Date(curr.date).getTime();
+    if (timeDiff > 48 * 60 * 60 * 1000) continue;
+
+    if ((curr.energy === "high" || curr.energy === "wired") &&
+        (next.energy === "crashed" || next.energy === "low")) {
+      cycles++;
+    }
+  }
+
+  if (cycles === 0) return null;
+
+  return {
+    type: "overwhelm_cycle",
+    label: "Energy swings",
+    description: `You've had ${cycles} high-to-low energy shift${cycles > 1 ? "s" : ""} recently. Your energy seems to spike then drop.`,
+    strength: Math.min(cycles / 3, 1),
+    suggestion: "The breathing space might help on high-energy days.",
+  };
+}
+
+// 2. Shutdown Gaps — sessions with shutdown regulation or very few exchanges
+export function detectShutdownPattern(days: number = 14): PatternSignal | null {
+  const themes = getThemes();
+  const sessions = getSessions();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+
+  const shutdownThemes = themes.filter(
+    t => new Date(t.date).getTime() > cutoff && t.regulation === "shutdown"
+  );
+  const shortSessions = sessions.filter(
+    s => new Date(s.completedAt).getTime() > cutoff && s.exchanges <= 1 && s.mode !== "breathe"
+  );
+
+  const total = shutdownThemes.length + shortSessions.length;
+  if (total < 2) return null;
+
+  return {
+    type: "shutdown",
+    label: "Going quiet",
+    description: `You've had ${total} session${total > 1 ? "s" : ""} recently where words felt harder to find.`,
+    strength: Math.min(total / 4, 1),
+    suggestion: "That's okay. 'Just be here' is there when words aren't.",
+  };
+}
+
+// 3. Fixation Loops — same theme or trigger repeating
+export function detectFixationLoop(days: number = 14): PatternSignal | null {
+  const themes = getThemes();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = themes.filter(t => new Date(t.date).getTime() > cutoff);
+
+  if (recent.length < 3) return null;
+
+  // Count loops flagged by extraction
+  const loopCount = recent.filter(t => t.loop).length;
+  if (loopCount < 2) return null;
+
+  // Find the most common trigger
+  const triggerFreq: Record<string, number> = {};
+  recent.filter(t => t.trigger).forEach(t => {
+    triggerFreq[t.trigger!] = (triggerFreq[t.trigger!] || 0) + 1;
+  });
+  const topTrigger = Object.entries(triggerFreq).sort((a, b) => b[1] - a[1])[0];
+
+  return {
+    type: "fixation_loop",
+    label: "Coming back to this",
+    description: topTrigger
+      ? `You keep returning to something around "${topTrigger[0]}". It's come up ${topTrigger[1]} times.`
+      : `You've circled back to the same theme ${loopCount} times recently.`,
+    strength: Math.min(loopCount / 4, 1),
+    suggestion: "Sometimes revisiting means there's something still to untangle.",
+  };
+}
+
+// 4. Time-of-Day Patterns — when do they tend to process
+export function detectTimePattern(days: number = 30): PatternSignal | null {
+  const sessions = getSessions();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = sessions.filter(
+    s => new Date(s.completedAt).getTime() > cutoff && s.timeOfDay
+  );
+
+  if (recent.length < 4) return null;
+
+  const timeFreq: Record<string, number> = {};
+  recent.forEach(s => {
+    if (s.timeOfDay) {
+      timeFreq[s.timeOfDay] = (timeFreq[s.timeOfDay] || 0) + 1;
+    }
+  });
+
+  const sorted = Object.entries(timeFreq).sort((a, b) => b[1] - a[1]);
+  if (sorted.length === 0) return null;
+
+  const [topTime, topCount] = sorted[0];
+  const percentage = Math.round((topCount / recent.length) * 100);
+
+  if (percentage < 50) return null; // Not dominant enough
+
+  const timeLabels: Record<string, string> = {
+    morning: "in the morning",
+    afternoon: "in the afternoon",
+    evening: "in the evening",
+    night: "late at night",
+  };
+
+  return {
+    type: "time_pattern",
+    label: "Your rhythm",
+    description: `${percentage}% of your reflections happen ${timeLabels[topTime] || topTime}.`,
+    strength: percentage / 100,
+    suggestion: topTime === "night"
+      ? "Late-night processing can feel different. Notice if that's when things feel heaviest."
+      : undefined,
+  };
+}
+
+// 5. Rejection Sensitivity — recurring triggers around criticism, rejection, exclusion
+export function detectRejectionSensitivity(days: number = 30): PatternSignal | null {
+  const themes = getThemes();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = themes.filter(t => new Date(t.date).getTime() > cutoff);
+
+  if (recent.length < 3) return null;
+
+  const rejectionWords = [
+    "criticism", "criticised", "rejected", "rejection", "excluded", "ignored",
+    "left out", "not good enough", "disappointing", "dismissed", "abandoned",
+    "unwanted", "not valued", "overlooked",
+  ];
+
+  const matches = recent.filter(t => {
+    const text = `${t.trigger || ""} ${t.theme}`.toLowerCase();
+    return rejectionWords.some(word => text.includes(word));
+  });
+
+  if (matches.length < 2) return null;
+
+  return {
+    type: "rejection_sensitivity",
+    label: "Stung by others",
+    description: `${matches.length} of your recent reflections touch on feeling criticised, excluded, or dismissed.`,
+    strength: Math.min(matches.length / 4, 1),
+    suggestion: "You notice when people pull away. That awareness is a strength, even when it hurts.",
+  };
+}
+
+// 6. Energy Crash — multiple low/crashed states
+export function detectEnergyCrash(days: number = 7): PatternSignal | null {
+  const themes = getThemes();
+  const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+  const recent = themes.filter(t => new Date(t.date).getTime() > cutoff && t.energy);
+
+  if (recent.length < 2) return null;
+
+  const lowCount = recent.filter(t => t.energy === "low" || t.energy === "crashed").length;
+  if (lowCount < 2) return null;
+
+  const percentage = Math.round((lowCount / recent.length) * 100);
+
+  return {
+    type: "energy_crash",
+    label: "Running on empty",
+    description: `${lowCount} of your last ${recent.length} sessions show low energy. You might be running on fumes.`,
+    strength: Math.min(percentage / 80, 1),
+    suggestion: "When everything feels heavy, 'just be here' asks nothing of you.",
+  };
+}
+
+// Master function — returns all active patterns
+export function getAllPatterns(): PatternSignal[] {
+  const detectors = [
+    detectOverwhelmCycle,
+    detectShutdownPattern,
+    detectFixationLoop,
+    detectTimePattern,
+    detectRejectionSensitivity,
+    detectEnergyCrash,
+  ];
+
+  return detectors
+    .map(fn => fn())
+    .filter((p): p is PatternSignal => p !== null)
+    .sort((a, b) => b.strength - a.strength);
+}
+
 // Clear all data
 export function clearAllData(): void {
   Object.values(KEYS).forEach(key => localStorage.removeItem(key));
@@ -379,7 +655,7 @@ export function clearAllData(): void {
 
 export interface UsageMetrics {
   totalSessions: number;
-  sessionsByMode: { reflect: number; prepare: number; ground: number };
+  sessionsByMode: { reflect: number; prepare: number; ground: number; breathe: number };
   completionRate: number; // % who finish all exchanges
   clarityRate: number; // % who said "that helped"
   avgExchangesPerSession: number;
@@ -399,7 +675,7 @@ export function getUsageMetrics(): UsageMetrics {
   const totalSessions = sessions.length;
 
   // Sessions by mode
-  const sessionsByMode = { reflect: 0, prepare: 0, ground: 0 };
+  const sessionsByMode = { reflect: 0, prepare: 0, ground: 0, breathe: 0 };
   sessions.forEach(s => {
     if (s.mode in sessionsByMode) {
       sessionsByMode[s.mode as keyof typeof sessionsByMode]++;

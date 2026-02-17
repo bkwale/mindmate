@@ -9,6 +9,7 @@ import { trackEvent } from "@/lib/cohort";
 import Onboarding from "@/components/Onboarding";
 import Home from "@/components/Home";
 import Session from "@/components/Session";
+import Breathe from "@/components/Breathe";
 import Insights from "@/components/Insights";
 import Settings from "@/components/Settings";
 import PINLock from "@/components/PINLock";
@@ -177,7 +178,9 @@ export default function MindM8() {
   // Wrap all pages in a transition container
   return (
     <div key={appState} className="page-enter">
-      {appState === "session" && activeMode ? (
+      {appState === "session" && activeMode === "breathe" ? (
+        <Breathe onEnd={handleSessionEnd} />
+      ) : appState === "session" && activeMode ? (
         <Session mode={activeMode} onEnd={handleSessionEnd} />
       ) : appState === "insights" ? (
         <Insights onBack={handleBackToHome} onSettings={handleOpenSettings} />
