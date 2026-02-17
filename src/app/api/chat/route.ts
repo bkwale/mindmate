@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, getPersonalContextLayer, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
+import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, getPersonalContextLayer, getRegulationLayer, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -15,12 +15,16 @@ export async function POST(req: NextRequest) {
       exchangeCount,
       themes,
       aboutMe,
+      recentEnergy,
+      recentRegulation,
     }: {
       messages: { role: "user" | "assistant"; content: string }[];
       mode: SessionMode;
       exchangeCount: number;
       themes: string[] | null;
       aboutMe: string | null;
+      recentEnergy?: string;
+      recentRegulation?: string;
     } = body;
 
     const maxExchanges = SESSION_LIMITS[mode];
@@ -36,6 +40,11 @@ export async function POST(req: NextRequest) {
     const personalContext = getPersonalContextLayer(aboutMe);
     if (personalContext) {
       layers.push(personalContext);
+    }
+
+    const regulationContext = getRegulationLayer(recentEnergy, recentRegulation);
+    if (regulationContext) {
+      layers.push(regulationContext);
     }
 
     const systemPrompt = layers.join("\n\n---\n\n");

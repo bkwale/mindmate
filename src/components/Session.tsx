@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
-import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop } from "@/lib/storage";
+import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop, getLastTheme } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import RelationshipTag from "./RelationshipTag";
 
@@ -16,13 +16,15 @@ interface Message {
   content: string;
 }
 
-const modeLabels: Record<SessionMode, string> = {
+type AISessionMode = "reflect" | "prepare" | "ground";
+
+const modeLabels: Record<AISessionMode, string> = {
   reflect: "Arriving clearer",
   prepare: "Arriving ready",
   ground: "Arriving present",
 };
 
-const modeIntros: Record<SessionMode, { heading: string; description: string; tip: string }> = {
+const modeIntros: Record<AISessionMode, { heading: string; description: string; tip: string }> = {
   reflect: {
     heading: "Arrive Clearer",
     description: "You\u2019ve arrived carrying something \u2014 an emotion, an event, or something you can\u2019t quite name. MindM8 will help you set it down and see it more clearly.",
@@ -40,17 +42,27 @@ const modeIntros: Record<SessionMode, { heading: string; description: string; ti
   },
 };
 
-const firstPrompts: Record<SessionMode, string> = {
+const firstPrompts: Record<AISessionMode, string> = {
   reflect: "What's been on your mind lately that you haven't said out loud?",
   prepare: "What conversation have you been thinking about? Who is it with, and what do you need them to hear?",
   ground: "Take a breath. What's one word for how you feel right now?",
 };
 
+function getTimeOfDay(): "morning" | "afternoon" | "evening" | "night" {
+  const h = new Date().getHours();
+  if (h < 6) return "night";
+  if (h < 12) return "morning";
+  if (h < 18) return "afternoon";
+  if (h < 22) return "evening";
+  return "night";
+}
+
 export default function Session({ mode, onEnd }: SessionProps) {
+  const aiMode = mode as AISessionMode;
   const maxExchanges = SESSION_LIMITS[mode];
   const [showIntro, setShowIntro] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: firstPrompts[mode] },
+    { role: "assistant", content: firstPrompts[aiMode] },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -102,6 +114,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
     try {
       const themes = getThemeSummaries();
       const aboutMe = getAboutMe();
+      const lastTheme = getLastTheme();
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -111,6 +124,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
           exchangeCount,
           themes: themes.length > 0 ? themes : null,
           aboutMe,
+          recentEnergy: lastTheme?.energy || undefined,
+          recentRegulation: lastTheme?.regulation || undefined,
         }),
       });
 
@@ -167,6 +182,10 @@ export default function Session({ mode, onEnd }: SessionProps) {
             context: extracted.context || relationshipTag || "general",
             theme: extracted.theme || "Reflection completed",
             mode,
+            energy: extracted.energy || undefined,
+            regulation: extracted.regulation || undefined,
+            trigger: extracted.trigger || undefined,
+            loop: extracted.loop || false,
           });
         }
       }
@@ -209,6 +228,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
       summary: messages[messages.length - 1]?.content || "",
       readinessLevel: readinessLevel || undefined,
       readinessNote: readinessNote.trim() || undefined,
+      timeOfDay: getTimeOfDay(),
+      dayOfWeek: new Date().getDay(),
     });
 
     // Extract themes (skip for grounding — minimal data)
@@ -247,6 +268,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
       summary: messages[messages.length - 1]?.content || "",
       readinessLevel: readinessLevel || undefined,
       readinessNote: readinessNote.trim() || undefined,
+      timeOfDay: getTimeOfDay(),
+      dayOfWeek: new Date().getDay(),
     });
 
     // Extract themes
@@ -284,6 +307,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
       summary: messages[messages.length - 1]?.content || "",
       readinessLevel: readinessLevel || undefined,
       readinessNote: readinessNote.trim() || undefined,
+      timeOfDay: getTimeOfDay(),
+      dayOfWeek: new Date().getDay(),
     });
 
     // Extract themes
@@ -345,7 +370,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
   // Mode intro screen
   if (showIntro) {
-    const intro = modeIntros[mode];
+    const intro = modeIntros[aiMode];
     return (
       <div className="min-h-screen bg-thermal flex items-center justify-center p-6 relative overflow-hidden">
         <div className="mist-layer" style={{ top: "10%", right: "-60px" }} />
@@ -358,7 +383,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
             </div>
             <div className="space-y-2">
               <p className="text-xs text-mind-400 uppercase tracking-widest font-medium">
-                {modeLabels[mode]}
+                {modeLabels[aiMode]}
               </p>
               <h2 className="text-xl font-serif text-calm-text">
                 {intro.heading}
@@ -409,7 +434,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
           </button>
           <div className="text-center">
             <p className="text-sm font-medium text-calm-text">
-              {modeLabels[mode]}
+              {modeLabels[aiMode]}
             </p>
             <p className="text-xs text-calm-muted">
               {exchangeCount} of {maxExchanges}

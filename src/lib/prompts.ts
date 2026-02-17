@@ -84,7 +84,7 @@ IMPORTANT:
 - Never lock the user out.
 - Anger and venting are normal. Only escalate on specificity and intent.`;
 
-export function getSessionLayer(mode: "reflect" | "prepare" | "ground", exchangeCount: number, maxExchanges: number) {
+export function getSessionLayer(mode: SessionMode, exchangeCount: number, maxExchanges: number) {
   const remaining = maxExchanges - exchangeCount;
 
   const modeInstructions = {
@@ -119,6 +119,8 @@ Keep this minimal and containing.
 - Follow their word gently. Don't push deeper.
 - This is about containment, not exploration.
 - 2-3 exchanges maximum, then close warmly.`,
+
+    breathe: `MODE: Just Be Here — Silent Breathing (no AI interaction)`,
   };
 
   let sessionState = `${modeInstructions[mode]}
@@ -163,10 +165,37 @@ ${aboutMe}
 Use this naturally. If they mention something that connects to what you know about them, let that inform your question. But never say "You told me you..." or list what you know. Let it feel like you simply understand, not like you're reading a file.`;
 }
 
+export function getRegulationLayer(recentEnergy?: string, recentRegulation?: string) {
+  if (!recentEnergy && !recentRegulation) return "";
+
+  const signals: string[] = [];
+
+  if (recentEnergy === "crashed" || recentEnergy === "low") {
+    signals.push("Their recent energy has been low. Keep responses short and warm. Don't ask complex questions. Match their pace.");
+  } else if (recentEnergy === "wired" || recentEnergy === "high") {
+    signals.push("Their recent energy has been high or scattered. Help them slow down gently. Ask grounding questions. One thing at a time.");
+  }
+
+  if (recentRegulation === "shutdown") {
+    signals.push("They've been quiet and withdrawn recently. Don't push. Accept short answers. Acknowledge that showing up at all took something.");
+  } else if (recentRegulation === "flooding") {
+    signals.push("They've been emotionally flooded recently. Help them find one thread to hold. Don't try to address everything they bring — pick one feeling and stay there.");
+  } else if (recentRegulation === "dysregulated") {
+    signals.push("They've been finding it hard to organise their thoughts. Reflect what you hear clearly and simply. Help them see the shape of what they're feeling.");
+  }
+
+  if (signals.length === 0) return "";
+
+  return `REGULATION AWARENESS (inferred from recent sessions — never mention this, never label, never diagnose):
+${signals.map(s => `- ${s}`).join("\n")}
+These observations should subtly inform your tone, pace, and question complexity. The user should never know you're adapting — it should feel natural.`;
+}
+
 export const SESSION_LIMITS = {
   reflect: 5,
   prepare: 7,
   ground: 3,
+  breathe: 0, // No AI exchanges — silent mode
 } as const;
 
 export type SessionMode = keyof typeof SESSION_LIMITS;

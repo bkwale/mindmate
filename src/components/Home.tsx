@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SessionMode } from "@/lib/prompts";
-import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme } from "@/lib/storage";
+import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme, getAllPatterns, PatternSignal } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
 import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
@@ -49,6 +49,18 @@ const doors = [
       </svg>
     ),
   },
+  {
+    mode: "breathe" as SessionMode,
+    title: "Just be here",
+    description: "No words. No AI. Just guided breathing.",
+    exchanges: "2 minutes",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="4" />
+      </svg>
+    ),
+  },
 ];
 
 export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
@@ -73,6 +85,15 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
 
   // Open loop state
   const openLoop = getOpenLoop();
+
+  // Pattern nudge — show top pattern signal on home
+  const [topPattern, setTopPattern] = useState<PatternSignal | null>(null);
+  useEffect(() => {
+    const patterns = getAllPatterns();
+    if (patterns.length > 0) {
+      setTopPattern(patterns[0]);
+    }
+  }, []);
 
   // Install prompt state — persists until user actually installs
   const [showInstallPrompt, setShowInstallPrompt] = useState(shouldPromptInstall);
@@ -425,6 +446,34 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                 </button>
               </>
             )}
+          </div>
+        )}
+
+        {/* Pattern nudge — top detected pattern */}
+        {!showPauseMessage && topPattern && (
+          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/30">
+            <div className="flex items-start gap-3">
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                topPattern.strength > 0.6 ? "bg-amber-50" : "bg-mind-50"
+              }`}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={topPattern.strength > 0.6 ? "text-amber-500" : "text-mind-500"}>
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-xs text-calm-muted uppercase tracking-wider font-medium mb-1">
+                  {topPattern.label}
+                </p>
+                <p className="text-sm text-calm-text leading-relaxed">
+                  {topPattern.description}
+                </p>
+                {topPattern.suggestion && (
+                  <p className="text-xs text-mind-600 mt-2 font-light italic">
+                    {topPattern.suggestion}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 

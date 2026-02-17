@@ -1,6 +1,6 @@
 "use client";
 
-import { getThemes, getSessions, getProfile, getUsageMetrics, getReadinessData, ThemeEntry, SessionRecord, UsageMetrics, ReadinessData } from "@/lib/storage";
+import { getThemes, getSessions, getProfile, getUsageMetrics, getReadinessData, getAllPatterns, getCheckInClusters, ThemeEntry, SessionRecord, UsageMetrics, ReadinessData, PatternSignal } from "@/lib/storage";
 import { getCohortMetrics, CohortMetrics } from "@/lib/cohort";
 import { useState, useEffect } from "react";
 
@@ -15,7 +15,9 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
   const [metrics, setMetrics] = useState<UsageMetrics | null>(null);
   const [cohort, setCohort] = useState<CohortMetrics | null>(null);
   const [readiness, setReadiness] = useState<ReadinessData | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "journey" | "themes" | "history" | "metrics">("overview");
+  const [patterns, setPatterns] = useState<PatternSignal[]>([]);
+  const [clusters, setClusters] = useState<{ cluster: string; count: number; words: string[] }[]>([]);
+  const [activeTab, setActiveTab] = useState<"overview" | "patterns" | "journey" | "themes" | "history" | "metrics">("overview");
   const [selectedContext, setSelectedContext] = useState<string | null>(null);
 
   useEffect(() => {
@@ -24,12 +26,15 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
     setMetrics(getUsageMetrics());
     setCohort(getCohortMetrics());
     setReadiness(getReadinessData());
+    setPatterns(getAllPatterns());
+    setClusters(getCheckInClusters());
   }, []);
 
   const totalSessions = sessions.length;
   const totalReflections = sessions.filter(s => s.mode === "reflect").length;
   const totalPreparations = sessions.filter(s => s.mode === "prepare").length;
   const totalGrounding = sessions.filter(s => s.mode === "ground").length;
+  const totalBreathe = sessions.filter(s => s.mode === "breathe").length;
 
   // Emotion frequency
   const emotionCounts: Record<string, number> = {};
@@ -157,7 +162,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
       {/* Tabs */}
       <div className="px-6 mb-4">
         <div className="max-w-md mx-auto flex gap-1 bg-white rounded-xl p-1 border border-calm-border">
-          {(["overview", "journey", "themes", "history", "metrics"] as const).map(tab => (
+          {(["overview", "patterns", "journey", "themes", "history", "metrics"] as const).map(tab => (
             <button
               key={tab}
               onClick={() => { setActiveTab(tab); if (tab !== "journey") setSelectedContext(null); }}
@@ -192,7 +197,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
               ) : (
                 <>
                   {/* Session counts */}
-                  <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white rounded-xl p-4 border border-calm-border text-center">
                       <p className="text-2xl font-medium text-calm-text">{totalReflections}</p>
                       <p className="text-[10px] text-calm-muted mt-1">Reflections</p>
@@ -204,6 +209,10 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                     <div className="bg-white rounded-xl p-4 border border-calm-border text-center">
                       <p className="text-2xl font-medium text-calm-text">{totalGrounding}</p>
                       <p className="text-[10px] text-calm-muted mt-1">Grounding</p>
+                    </div>
+                    <div className="bg-white rounded-xl p-4 border border-calm-border text-center">
+                      <p className="text-2xl font-medium text-calm-text">{totalBreathe}</p>
+                      <p className="text-[10px] text-calm-muted mt-1">Breathing</p>
                     </div>
                   </div>
 
@@ -240,6 +249,84 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                       </div>
                     </div>
                   )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* PATTERNS TAB */}
+          {activeTab === "patterns" && (
+            <div className="space-y-4 animate-fade-in">
+              {patterns.length === 0 && clusters.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-12 h-12 rounded-full bg-mind-100 flex items-center justify-center mx-auto mb-4">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-500">
+                      <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    </svg>
+                  </div>
+                  <p className="text-calm-muted text-sm">
+                    Patterns will emerge as you reflect more. Keep showing up.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs text-calm-muted">
+                    What MindM8 has noticed — not labels, just patterns.
+                  </p>
+
+                  {/* Check-in clusters */}
+                  {clusters.length > 0 && (
+                    <div className="bg-white rounded-xl p-4 border border-calm-border">
+                      <p className="text-xs text-calm-muted mb-3">Your emotional landscape (from check-ins)</p>
+                      <div className="space-y-2">
+                        {clusters.map(c => (
+                          <div key={c.cluster} className="flex items-center gap-3">
+                            <span className="text-sm font-medium text-calm-text capitalize w-20">{c.cluster}</span>
+                            <div className="flex-1 h-2 bg-calm-border rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-mind-500 transition-all duration-500"
+                                style={{ width: `${Math.min(c.count * 15, 100)}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-calm-muted w-16 text-right">
+                              {c.words.join(", ")}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Pattern signals */}
+                  {patterns.map(pattern => (
+                    <div
+                      key={pattern.type}
+                      className="bg-white rounded-xl p-4 border border-calm-border"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
+                          pattern.strength > 0.6 ? "bg-amber-100" : "bg-mind-100"
+                        }`}>
+                          <div className={`w-2.5 h-2.5 rounded-full ${
+                            pattern.strength > 0.6 ? "bg-amber-500" : "bg-mind-500"
+                          }`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-calm-text">
+                            {pattern.label}
+                          </p>
+                          <p className="text-xs text-calm-muted mt-1 leading-relaxed">
+                            {pattern.description}
+                          </p>
+                          {pattern.suggestion && (
+                            <p className="text-xs text-mind-600 mt-2 font-light italic">
+                              {pattern.suggestion}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </>
               )}
             </div>
@@ -382,6 +469,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                             <p className="text-[10px] text-calm-muted mt-2 capitalize">
                               {theme.mode === "reflect" ? "Reflection" :
                                theme.mode === "prepare" ? "Preparation" :
+                               theme.mode === "breathe" ? "Breathing" :
                                "Grounding"} session
                             </p>
                           </div>
@@ -457,11 +545,13 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                           <span className={`w-2 h-2 rounded-full ${
                             session.mode === "reflect" ? "bg-mind-500" :
                             session.mode === "prepare" ? "bg-warm-500" :
+                            session.mode === "breathe" ? "bg-blue-400" :
                             "bg-calm-muted"
                           }`} />
                           <p className="text-sm text-calm-text capitalize">
                             {session.mode === "reflect" ? "Reflection" :
                              session.mode === "prepare" ? "Preparation" :
+                             session.mode === "breathe" ? "Breathing" :
                              "Grounding"}
                           </p>
                         </div>
@@ -518,7 +608,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
               <div className="bg-white rounded-xl p-4 border border-calm-border">
                 <p className="text-xs text-calm-muted mb-3">Sessions by mode</p>
                 <div className="space-y-2">
-                  {(["reflect", "prepare", "ground"] as const).map(m => {
+                  {(["reflect", "prepare", "ground", "breathe"] as const).map(m => {
                     const count = metrics.sessionsByMode[m];
                     const pct = metrics.totalSessions > 0
                       ? Math.round((count / metrics.totalSessions) * 100)
@@ -531,6 +621,7 @@ export default function Insights({ onBack, onSettings }: InsightsProps) {
                             className={`h-full rounded-full transition-all duration-500 ${
                               m === "reflect" ? "bg-mind-500" :
                               m === "prepare" ? "bg-warm-500" :
+                              m === "breathe" ? "bg-blue-400" :
                               "bg-calm-muted"
                             }`}
                             style={{ width: `${pct}%` }}
