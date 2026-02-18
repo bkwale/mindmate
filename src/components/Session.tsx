@@ -5,6 +5,7 @@ import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop, getLastTheme } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import RelationshipTag from "./RelationshipTag";
+import MicButton from "./MicButton";
 
 interface SessionProps {
   mode: SessionMode;
@@ -540,12 +541,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
                 <textarea
                   value={letterContent}
                   onChange={e => setLetterContent(e.target.value)}
-                  placeholder="Write freely..."
+                  placeholder="Write or speak freely..."
                   rows={6}
                   className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
                              text-sm text-calm-text placeholder:text-calm-muted/40
                              focus:outline-none focus:border-mind-400 transition-colors resize-none"
                 />
+                <div className="mt-1.5 flex justify-end">
+                  <MicButton onTranscript={(text) => setLetterContent(prev => prev ? prev + " " + text : text)} size="sm" />
+                </div>
               </div>
               <div className="flex gap-2">
                 <button
@@ -646,6 +650,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
                                      text-sm text-calm-text placeholder:text-calm-muted/40
                                      focus:outline-none focus:border-mind-400 transition-colors resize-none"
                         />
+                        <div className="mt-1.5 flex justify-end">
+                          <MicButton onTranscript={(text) => setReadinessNote(text)} size="sm" />
+                        </div>
                       </div>
                     )}
                     <button
@@ -695,6 +702,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
                                    text-sm text-calm-text placeholder:text-calm-muted/40
                                    focus:outline-none focus:border-mind-400 transition-colors resize-none"
                       />
+                      <div className="mt-1.5 flex justify-end">
+                        <MicButton onTranscript={(text) => setTakeaway(text)} size="sm" />
+                      </div>
                     </div>
 
                     {/* Share button — only show if takeaway exists */}
@@ -732,7 +742,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Type your thoughts..."
+                    placeholder="Type or tap the mic to talk..."
                     rows={1}
                     disabled={isLoading}
                     className="flex-1 px-4 py-3 rounded-xl border border-calm-border bg-white
@@ -745,6 +755,10 @@ export default function Session({ mode, onEnd }: SessionProps) {
                       target.style.height = "auto";
                       target.style.height = Math.min(target.scrollHeight, 120) + "px";
                     }}
+                  />
+                  <MicButton
+                    onTranscript={(text) => setInput(text)}
+                    size="md"
                   />
                   <button
                     onClick={sendMessage}

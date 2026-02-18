@@ -6,6 +6,7 @@ import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayC
 import { trackEvent } from "@/lib/cohort";
 import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
 import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
+import MicButton from "./MicButton";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
@@ -286,6 +287,15 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                         : "border-mind-200 focus:border-mind-400"
                     }`}
                   />
+                  <MicButton
+                    onTranscript={(text) => {
+                      // Take just the first word for check-in
+                      const firstWord = text.trim().split(/\s+/)[0] || "";
+                      setCheckInInput(firstWord.toLowerCase());
+                      setCheckInError(false);
+                    }}
+                    size="sm"
+                  />
                   <button
                     onClick={handleCheckInSubmit}
                     className="px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-600 rounded-lg transition-colors text-sm font-medium"
@@ -438,6 +448,9 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                   className="w-full bg-mind-50 border border-mind-200 rounded-lg px-3 py-2 text-sm text-calm-text placeholder-calm-muted focus:outline-none focus:border-mind-400 transition-colors resize-none"
                   rows={4}
                 />
+                <div className="mt-1.5 flex justify-end">
+                  <MicButton onTranscript={(text) => setFollowUpResponse(text)} size="sm" />
+                </div>
                 <button
                   onClick={handleFollowUpSave}
                   className="w-full mt-3 px-3 py-2 bg-mind-500 hover:bg-mind-600 text-white rounded-lg transition-colors text-sm font-medium"
