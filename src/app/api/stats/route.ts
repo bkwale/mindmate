@@ -4,17 +4,16 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { createClient } from "@vercel/kv";
+import { createClient } from "redis";
 
-// Create KV client — try multiple env var naming patterns
-function getKV() {
-  const url = process.env.KV_REST_API_URL || process.env.KV_URL || process.env.REDIS_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.KV_REST_API_READ_ONLY_TOKEN;
+async function getRedis() {
+  const url = process.env.REDIS_URL;
+  if (!url) return null;
 
-  if (!url || !token) return null;
-
-  const restUrl = url.startsWith("redis") ? url.replace(/^redis.*?:\/\//, "https://") : url;
-  return createClient({ url: restUrl, token });
+  const client = createClient({ url });
+  client.on("error", () => {});
+  await client.connect();
+  return client;
 }
 
 export async function GET(req: Request) {
@@ -27,22 +26,22 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let client = null;
   try {
-    const kv = getKV();
-    if (!kv) {
+    client = await getRedis();
+    if (!client) {
       return NextResponse.json({
-        error: "KV not configured. Check that KV_REST_API_URL and KV_REST_API_TOKEN environment variables are set in Vercel.",
-        envCheck: {
-          KV_REST_API_URL: !!process.env.KV_REST_API_URL,
-          KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN,
-          KV_URL: !!process.env.KV_URL,
-          REDIS_URL: !!process.env.REDIS_URL,
-        }
+        error: "Redis not configured. Set REDIS_URL in your Vercel environment variables.",
+        hasRedisUrl: !!process.env.REDIS_URL,
       }, { status: 500 });
     }
 
     // ---- All-time totals ----
-    const totals = (await kv.hgetall("stats:totals")) as Record<string, number> || {};
+    const totals = (await client.hGetAll("stats:totals")) as Record<string, string>;
+    const totalsNum: Record<string, number> = {};
+    for (const [k, v] of Object.entries(totals)) {
+      totalsNum[k] = parseInt(v, 10) || 0;
+    }
 
     // ---- Last 30 days daily breakdown ----
     const dailyData: Record<string, Record<string, number>> = {};
@@ -51,9 +50,13 @@ export async function GET(req: Request) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dateKey = d.toISOString().slice(0, 10);
-      const dayStats = (await kv.hgetall(`stats:daily:${dateKey}`)) as Record<string, number> | null;
+      const dayStats = await client.hGetAll(`stats:daily:${dateKey}`);
       if (dayStats && Object.keys(dayStats).length > 0) {
-        dailyData[dateKey] = dayStats;
+        const parsed: Record<string, number> = {};
+        for (const [k, v] of Object.entries(dayStats)) {
+          parsed[k] = parseInt(v, 10) || 0;
+        }
+        dailyData[dateKey] = parsed;
       }
     }
 
@@ -63,39 +66,49 @@ export async function GET(req: Request) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dateKey = d.toISOString().slice(0, 10);
-      const count = await kv.scard(`stats:visitors:${dateKey}`);
+      const count = await client.sCard(`stats:visitors:${dateKey}`);
       if (count > 0) {
         dailyVisitors[dateKey] = count;
       }
     }
 
     // ---- Hourly distribution ----
-    const hours = (await kv.hgetall("stats:hours")) as Record<string, number> || {};
+    const hoursRaw = await client.hGetAll("stats:hours");
+    const hours: Record<string, number> = {};
+    for (const [k, v] of Object.entries(hoursRaw)) {
+      hours[k] = parseInt(v, 10) || 0;
+    }
 
     // ---- Mode breakdown ----
-    const modes = (await kv.hgetall("stats:modes")) as Record<string, number> || {};
+    const modesRaw = await client.hGetAll("stats:modes");
+    const modes: Record<string, number> = {};
+    for (const [k, v] of Object.entries(modesRaw)) {
+      modes[k] = parseInt(v, 10) || 0;
+    }
 
     // ---- Recent events (last 50) ----
-    const recentRaw = (await kv.lrange("stats:recent", 0, 49)) as string[];
+    const recentRaw = await client.lRange("stats:recent", 0, 49);
     const recent = recentRaw.map(r => {
-      try { return typeof r === "string" ? JSON.parse(r) : r; }
+      try { return JSON.parse(r); }
       catch { return r; }
     });
 
     // ---- Active dates for retention ----
-    const activeDates = await kv.smembers("stats:active_dates") as string[];
+    const activeDates = await client.sMembers("stats:active_dates");
 
     // ---- Computed metrics ----
-    const totalSessions = (totals.session_complete || 0);
-    const totalStarts = (totals.session_start || 0);
+    const totalSessions = totalsNum.session_complete || 0;
+    const totalStarts = totalsNum.session_start || 0;
     const completionRate = totalStarts > 0
       ? Math.round((totalSessions / totalStarts) * 100) : 0;
-    const totalCheckIns = totals.checkin_complete || 0;
-    const totalVoice = totals.voice_used || 0;
-    const totalBreatheSessions = (modes.breathe || 0);
+    const totalCheckIns = totalsNum.checkin_complete || 0;
+    const totalVoice = totalsNum.voice_used || 0;
+    const totalBreatheSessions = modes.breathe || 0;
+
+    await client.quit();
 
     return NextResponse.json({
-      totals,
+      totals: totalsNum,
       computed: {
         completionRate,
         totalSessions,
@@ -112,7 +125,8 @@ export async function GET(req: Request) {
       generatedAt: now.toISOString(),
     });
   } catch (error) {
+    if (client) try { await client.quit(); } catch {}
     console.error("Stats error:", error);
-    return NextResponse.json({ error: "Stats unavailable — KV may not be configured" }, { status: 500 });
+    return NextResponse.json({ error: "Stats unavailable — could not connect to Redis" }, { status: 500 });
   }
 }

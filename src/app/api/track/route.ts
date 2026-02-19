@@ -4,24 +4,20 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { createClient } from "@vercel/kv";
+import { createClient } from "redis";
 
-// Create KV client — try multiple env var naming patterns
-function getKV() {
-  const url = process.env.KV_REST_API_URL || process.env.KV_URL || process.env.REDIS_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.KV_REST_API_READ_ONLY_TOKEN;
+async function getRedis() {
+  const url = process.env.REDIS_URL;
+  if (!url) return null;
 
-  if (!url || !token) {
-    // Fall back to default import (works if env vars follow the standard naming)
-    return null;
-  }
-
-  // Ensure we use the REST API URL (https), not the Redis protocol URL (redis://)
-  const restUrl = url.startsWith("redis") ? url.replace(/^redis.*?:\/\//, "https://") : url;
-  return createClient({ url: restUrl, token });
+  const client = createClient({ url });
+  client.on("error", () => {}); // suppress connection errors
+  await client.connect();
+  return client;
 }
 
 export async function POST(req: Request) {
+  let client = null;
   try {
     const { event, meta } = await req.json();
 
@@ -29,41 +25,35 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing event" }, { status: 400 });
     }
 
-    const kv = getKV();
-    if (!kv) {
-      return NextResponse.json({ ok: true, kv: false, reason: "No KV credentials found" });
+    client = await getRedis();
+    if (!client) {
+      return NextResponse.json({ ok: true, kv: false, reason: "No REDIS_URL configured" });
     }
 
     const now = new Date();
     const dateKey = now.toISOString().slice(0, 10); // "2026-02-19"
     const hourKey = now.getUTCHours();
 
-    // ---- Increment counters in KV ----
+    // ---- Increment counters in Redis ----
 
     // Total event count (all time)
-    await kv.hincrby("stats:totals", event, 1);
+    await client.hIncrBy("stats:totals", event, 1);
 
     // Daily event count
-    await kv.hincrby(`stats:daily:${dateKey}`, event, 1);
+    await client.hIncrBy(`stats:daily:${dateKey}`, event, 1);
 
     // Daily unique visitors (approximate via random session hash)
     if (meta?.sh) {
-      await kv.sadd(`stats:visitors:${dateKey}`, meta.sh);
-      // Auto-expire visitor sets after 90 days
-      await kv.expire(`stats:visitors:${dateKey}`, 90 * 24 * 60 * 60);
+      await client.sAdd(`stats:visitors:${dateKey}`, meta.sh);
+      await client.expire(`stats:visitors:${dateKey}`, 90 * 24 * 60 * 60);
     }
 
     // Hourly distribution (for time-of-day insights)
-    await kv.hincrby("stats:hours", String(hourKey), 1);
+    await client.hIncrBy("stats:hours", String(hourKey), 1);
 
     // Mode breakdown (if event has a mode)
     if (meta?.mode) {
-      await kv.hincrby("stats:modes", meta.mode, 1);
-    }
-
-    // Voice usage tracking
-    if (event === "voice_used") {
-      await kv.hincrby("stats:totals", "voice_used", 0); // already counted above
+      await client.hIncrBy("stats:modes", meta.mode, 1);
     }
 
     // Store last 500 raw events for recent activity feed
@@ -72,19 +62,17 @@ export async function POST(req: Request) {
       t: now.toISOString(),
       m: meta?.mode || null,
     });
-    await kv.lpush("stats:recent", rawEvent);
-    await kv.ltrim("stats:recent", 0, 499);
+    await client.lPush("stats:recent", rawEvent);
+    await client.lTrim("stats:recent", 0, 499);
 
     // Track daily active dates for retention chart
-    await kv.sadd("stats:active_dates", dateKey);
+    await client.sAdd("stats:active_dates", dateKey);
 
+    await client.quit();
     return NextResponse.json({ ok: true });
   } catch (error: unknown) {
-    // If KV is not configured, silently succeed (don't break the app)
-    const msg = error instanceof Error ? error.message : "";
-    if (msg.includes("REDIS") || msg.includes("KV") || msg.includes("connect")) {
-      return NextResponse.json({ ok: true, kv: false });
-    }
+    if (client) try { await client.quit(); } catch {}
+    // Silently succeed — don't break the app
     console.error("Track error:", error);
     return NextResponse.json({ ok: true, kv: false });
   }
