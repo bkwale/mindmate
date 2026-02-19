@@ -1,7 +1,8 @@
 "use client";
 
 import { useSpeech } from "@/lib/useSpeech";
-import { useEffect } from "react";
+import { trackEvent } from "@/lib/cohort";
+import { useEffect, useRef } from "react";
 
 interface MicButtonProps {
   onTranscript: (text: string) => void;  // Called with final text when user stops
@@ -11,6 +12,16 @@ interface MicButtonProps {
 
 export default function MicButton({ onTranscript, size = "md", className = "" }: MicButtonProps) {
   const { isSupported, isListening, transcript, toggleListening } = useSpeech(onTranscript);
+
+  // Track voice usage (once per recording session)
+  const trackedRef = useRef(false);
+  useEffect(() => {
+    if (isListening && !trackedRef.current) {
+      trackEvent("voice_used");
+      trackedRef.current = true;
+    }
+    if (!isListening) trackedRef.current = false;
+  }, [isListening]);
 
   // Live preview: update parent with interim results while speaking
   useEffect(() => {
