@@ -9,9 +9,30 @@ export interface CohortEvent {
 }
 
 const COHORT_KEY = "mindmate_cohort";
+const SESSION_HASH_KEY = "mindmate_sh";
+
+// Generate a random session hash for approximate unique visitor counting
+// Not a user ID — just a random string that rotates every 24 hours
+function getSessionHash(): string {
+  const stored = localStorage.getItem(SESSION_HASH_KEY);
+  if (stored) {
+    try {
+      const { hash, date } = JSON.parse(stored);
+      if (date === new Date().toISOString().slice(0, 10)) return hash;
+    } catch { /* regenerate */ }
+  }
+  const hash = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  localStorage.setItem(SESSION_HASH_KEY, JSON.stringify({
+    hash,
+    date: new Date().toISOString().slice(0, 10),
+  }));
+  return hash;
+}
 
 export function trackEvent(event: string, meta?: Record<string, string>): void {
   if (typeof window === "undefined") return;
+
+  // ---- Local storage (existing behaviour) ----
   const events = getEvents();
   events.push({
     event,
@@ -22,6 +43,16 @@ export function trackEvent(event: string, meta?: Record<string, string>): void {
   const cutoff = Date.now() - 90 * 24 * 60 * 60 * 1000;
   const filtered = events.filter(e => new Date(e.timestamp).getTime() > cutoff);
   localStorage.setItem(COHORT_KEY, JSON.stringify(filtered));
+
+  // ---- Server-side tracking (non-blocking, fire-and-forget) ----
+  try {
+    const sh = getSessionHash();
+    fetch("/api/track", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, meta: { ...meta, sh } }),
+    }).catch(() => { /* silently fail — don't break the app */ });
+  } catch { /* silently fail */ }
 }
 
 export function getEvents(): CohortEvent[] {
