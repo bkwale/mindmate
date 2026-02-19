@@ -4,7 +4,18 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { createClient } from "@vercel/kv";
+
+// Create KV client — try multiple env var naming patterns
+function getKV() {
+  const url = process.env.KV_REST_API_URL || process.env.KV_URL || process.env.REDIS_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.KV_REST_API_READ_ONLY_TOKEN;
+
+  if (!url || !token) return null;
+
+  const restUrl = url.startsWith("redis") ? url.replace(/^redis.*?:\/\//, "https://") : url;
+  return createClient({ url: restUrl, token });
+}
 
 export async function GET(req: Request) {
   // Simple auth — check for STATS_SECRET
@@ -17,6 +28,19 @@ export async function GET(req: Request) {
   }
 
   try {
+    const kv = getKV();
+    if (!kv) {
+      return NextResponse.json({
+        error: "KV not configured. Check that KV_REST_API_URL and KV_REST_API_TOKEN environment variables are set in Vercel.",
+        envCheck: {
+          KV_REST_API_URL: !!process.env.KV_REST_API_URL,
+          KV_REST_API_TOKEN: !!process.env.KV_REST_API_TOKEN,
+          KV_URL: !!process.env.KV_URL,
+          REDIS_URL: !!process.env.REDIS_URL,
+        }
+      }, { status: 500 });
+    }
+
     // ---- All-time totals ----
     const totals = (await kv.hgetall("stats:totals")) as Record<string, number> || {};
 

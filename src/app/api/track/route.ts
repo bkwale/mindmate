@@ -4,7 +4,22 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { kv } from "@vercel/kv";
+import { createClient } from "@vercel/kv";
+
+// Create KV client — try multiple env var naming patterns
+function getKV() {
+  const url = process.env.KV_REST_API_URL || process.env.KV_URL || process.env.REDIS_URL;
+  const token = process.env.KV_REST_API_TOKEN || process.env.KV_REST_API_READ_ONLY_TOKEN;
+
+  if (!url || !token) {
+    // Fall back to default import (works if env vars follow the standard naming)
+    return null;
+  }
+
+  // Ensure we use the REST API URL (https), not the Redis protocol URL (redis://)
+  const restUrl = url.startsWith("redis") ? url.replace(/^redis.*?:\/\//, "https://") : url;
+  return createClient({ url: restUrl, token });
+}
 
 export async function POST(req: Request) {
   try {
@@ -12,6 +27,11 @@ export async function POST(req: Request) {
 
     if (!event || typeof event !== "string") {
       return NextResponse.json({ error: "Missing event" }, { status: 400 });
+    }
+
+    const kv = getKV();
+    if (!kv) {
+      return NextResponse.json({ ok: true, kv: false, reason: "No KV credentials found" });
     }
 
     const now = new Date();
