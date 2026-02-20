@@ -10,7 +10,19 @@ async function getRedis() {
   const url = process.env.REDIS_URL;
   if (!url) return null;
 
-  const client = createClient({ url });
+  // Redis Cloud requires TLS — detect rediss:// or add TLS for cloud hosts
+  const needsTLS = url.startsWith("rediss://") || url.includes("redislabs.com") || url.includes("upstash.io");
+
+  const client = createClient({
+    url,
+    socket: needsTLS ? {
+      tls: true,
+      rejectUnauthorized: false,
+      connectTimeout: 5000,
+    } : {
+      connectTimeout: 5000,
+    },
+  });
   client.on("error", () => {}); // suppress connection errors
   await client.connect();
   return client;
