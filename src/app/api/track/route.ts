@@ -7,21 +7,18 @@ import { NextResponse } from "next/server";
 import { createClient } from "redis";
 
 async function getRedis() {
-  const url = process.env.REDIS_URL;
+  let url = process.env.REDIS_URL;
   if (!url) return null;
 
-  // Redis Cloud requires TLS — detect rediss:// or add TLS for cloud hosts
-  const needsTLS = url.startsWith("rediss://") || url.includes("redislabs.com") || url.includes("upstash.io");
+  // Redis Cloud needs TLS — upgrade redis:// to rediss:// for cloud hosts
+  const isCloud = url.includes("redislabs.com") || url.includes("upstash.io");
+  if (isCloud && url.startsWith("redis://")) {
+    url = url.replace("redis://", "rediss://");
+  }
 
   const client = createClient({
     url,
-    socket: needsTLS ? {
-      tls: true,
-      rejectUnauthorized: false,
-      connectTimeout: 5000,
-    } : {
-      connectTimeout: 5000,
-    },
+    socket: { connectTimeout: 5000 },
   });
   client.on("error", () => {}); // suppress connection errors
   await client.connect();

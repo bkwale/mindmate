@@ -22,17 +22,15 @@ export async function GET(req: Request) {
   const masked = url.replace(/\/\/.*?@/, "//***@");
 
   try {
-    const needsTLS = url.startsWith("rediss://") || url.includes("redislabs.com") || url.includes("upstash.io");
+    let connUrl = url;
+    const isCloud = url.includes("redislabs.com") || url.includes("upstash.io");
+    if (isCloud && url.startsWith("redis://")) {
+      connUrl = url.replace("redis://", "rediss://");
+    }
 
     const client = createClient({
-      url,
-      socket: needsTLS ? {
-        tls: true,
-        rejectUnauthorized: false,
-        connectTimeout: 5000,
-      } : {
-        connectTimeout: 5000,
-      },
+      url: connUrl,
+      socket: { connectTimeout: 5000 },
     });
     client.on("error", () => {});
     await client.connect();
@@ -46,7 +44,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       status: "connected",
       url: masked,
-      tls: needsTLS,
+      tls: isCloud,
       testWrite: result === "pong" ? "OK" : "FAIL",
     });
   } catch (error: unknown) {
