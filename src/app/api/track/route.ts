@@ -6,6 +6,16 @@
 import { NextResponse } from "next/server";
 import { createClient } from "redis";
 
+// Hard timeout to prevent serverless function from hanging
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms)
+    ),
+  ]);
+}
+
 async function getRedis() {
   let url = process.env.REDIS_URL;
   if (!url) return null;
@@ -18,10 +28,10 @@ async function getRedis() {
 
   const client = createClient({
     url,
-    socket: { connectTimeout: 5000 },
+    socket: { connectTimeout: 4000 },
   });
   client.on("error", () => {}); // suppress connection errors
-  await client.connect();
+  await withTimeout(client.connect(), 4000);
   return client;
 }
 
