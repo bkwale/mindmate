@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Mic icon outline -->
+  <g opacity="0.4">
+    <!-- Mic capsule -->
+    <rect x="480" y="250" width="120" height="140" rx="60" ry="60" fill="none" stroke="#6aada5" stroke-width="3"/>
+    <!-- Mic stem -->
+    <rect x="510" y="390" width="60" height="60" fill="none" stroke="#6aada5" stroke-width="3"/>
+  </g>
+  
+  <!-- Main text -->
+  <text x="540" y="520" font-family="DM Sans, Arial, sans-serif" font-size="62" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Some people think
+  </text>
+  <text x="540" y="600" font-family="DM Sans, Arial, sans-serif" font-size="62" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    better when they talk.
+  </text>
+  
+  <!-- Supporting text -->
+  <text x="540" y="720" font-family="DM Sans, Arial, sans-serif" font-size="42" font-weight="400" text-anchor="middle" fill="#7a8382">
+    Now you can speak
+  </text>
+  <text x="540" y="770" font-family="DM Sans, Arial, sans-serif" font-size="42" font-weight="400" text-anchor="middle" fill="#7a8382">
+    instead of type.
+  </text>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>

@@ -43,6 +43,14 @@ export async function POST(req: Request) {
     const dateKey = now.toISOString().slice(0, 10); // "2026-02-19"
     const hourKey = now.getUTCHours();
 
+    // ---- Geolocation from Vercel headers ----
+    const city = req.headers.get("x-vercel-ip-city") || "Unknown";
+    const country = req.headers.get("x-vercel-ip-country") || "Unknown";
+    const region = req.headers.get("x-vercel-ip-country-region") || "";
+    const geoLabel = city !== "Unknown" && country !== "Unknown"
+      ? `${decodeURIComponent(city)}, ${country}`
+      : country !== "Unknown" ? country : "Unknown";
+
     // ---- Increment counters in Redis ----
 
     // Total event count (all time)
@@ -65,11 +73,31 @@ export async function POST(req: Request) {
       await client.hIncrBy("stats:modes", meta.mode, 1);
     }
 
+    // ---- Geography tracking ----
+    // Country breakdown (all time)
+    if (country !== "Unknown") {
+      await client.hIncrBy("stats:geo:countries", country, 1);
+    }
+    // City breakdown (all time) — "City, CC" format
+    if (city !== "Unknown") {
+      await client.hIncrBy("stats:geo:cities", geoLabel, 1);
+    }
+    // Region breakdown (all time) — "Region, CC" format
+    if (region && country !== "Unknown") {
+      await client.hIncrBy("stats:geo:regions", `${region}, ${country}`, 1);
+    }
+    // Daily city visitors (unique per day)
+    if (meta?.sh && city !== "Unknown") {
+      await client.sAdd(`stats:geo:daily:${dateKey}`, `${meta.sh}:${geoLabel}`);
+      await client.expire(`stats:geo:daily:${dateKey}`, 90 * 24 * 60 * 60);
+    }
+
     // Store last 500 raw events for recent activity feed
     const rawEvent = JSON.stringify({
       e: event,
       t: now.toISOString(),
       m: meta?.mode || null,
+      g: geoLabel !== "Unknown" ? geoLabel : undefined,
     });
     await client.lPush("stats:recent", rawEvent);
     await client.lTrim("stats:recent", 0, 499);

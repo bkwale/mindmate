@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Rounded input field shape -->
+  <rect x="350" y="330" width="380" height="80" rx="40" ry="40" fill="none" stroke="#6aada5" stroke-width="3" opacity="0.3"/>
+  
+  <!-- Cursor inside -->
+  <line x1="380" y1="350" x2="380" y2="410" stroke="#6aada5" stroke-width="2" opacity="0.3"/>
+  
+  <!-- Main question -->
+  <text x="540" y="520" font-family="DM Sans, Arial, sans-serif" font-size="64" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    How are you
+  </text>
+  <text x="540" y="600" font-family="DM Sans, Arial, sans-serif" font-size="64" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    arriving today?
+  </text>
+  
+  <!-- Supporting text -->
+  <text x="540" y="730" font-family="DM Sans, Arial, sans-serif" font-size="40" font-weight="400" text-anchor="middle" fill="#7a8382">
+    One word.
+  </text>
+  <text x="540" y="780" font-family="DM Sans, Arial, sans-serif" font-size="40" font-weight="400" text-anchor="middle" fill="#7a8382">
+    That's all it takes.
+  </text>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>

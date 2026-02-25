@@ -15,7 +15,12 @@ interface StatsData {
   dailyVisitors: Record<string, number>;
   hours: Record<string, number>;
   modes: Record<string, number>;
-  recent: Array<{ e: string; t: string; m: string | null }>;
+  geo: {
+    countries: Record<string, number>;
+    cities: Record<string, number>;
+    regions: Record<string, number>;
+  };
+  recent: Array<{ e: string; t: string; m: string | null; g?: string }>;
   activeDates: string[];
   generatedAt: string;
 }
@@ -92,7 +97,7 @@ export default function StatsPage() {
 
   if (!stats) return null;
 
-  const { totals, computed, dailyData, dailyVisitors, hours, modes, recent, activeDates } = stats;
+  const { totals, computed, dailyData, dailyVisitors, hours, modes, geo, recent, activeDates } = stats;
 
   // Get sorted dates for chart (last 14 days)
   const last14 = Array.from({ length: 14 }, (_, i) => {
@@ -160,6 +165,52 @@ export default function StatsPage() {
             ))}
           </div>
         </div>
+
+        {/* Geography — Top Cities */}
+        {geo && Object.keys(geo.cities).length > 0 && (
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">Top Cities</h2>
+            <div className="space-y-2">
+              {Object.entries(geo.cities)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 15)
+                .map(([city, count]) => {
+                  const maxCity = Math.max(...Object.values(geo.cities));
+                  const pct = (count / maxCity) * 100;
+                  return (
+                    <div key={city} className="flex items-center gap-3">
+                      <span className="text-sm text-gray-600 w-40 truncate" title={city}>{city}</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+                        <div
+                          className="h-full bg-teal-500 rounded-full transition-all duration-300"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-gray-800 w-10 text-right">{count}</span>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        )}
+
+        {/* Geography — Countries */}
+        {geo && Object.keys(geo.countries).length > 0 && (
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">Countries</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {Object.entries(geo.countries)
+                .sort(([, a], [, b]) => b - a)
+                .map(([code, count]) => (
+                  <div key={code} className="flex items-center gap-2 bg-gray-50 rounded-xl px-3 py-2">
+                    <span className="text-sm">{countryFlag(code)}</span>
+                    <span className="text-sm text-gray-600">{code}</span>
+                    <span className="text-sm font-medium text-gray-800 ml-auto">{count}</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
 
         {/* Daily Activity Chart (last 14 days) */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">
@@ -257,6 +308,7 @@ export default function StatsPage() {
                   <EventDot event={ev.e} />
                   <span className="text-gray-700 font-medium">{formatEvent(ev.e)}</span>
                   {ev.m && <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{ev.m}</span>}
+                  {ev.g && <span className="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full">{ev.g}</span>}
                   <span className="text-xs text-gray-400 ml-auto">{timeAgo(ev.t)}</span>
                 </div>
               ))}
@@ -316,4 +368,17 @@ function timeAgo(iso: string): string {
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
   return `${days}d ago`;
+}
+
+// Convert 2-letter country code to flag emoji
+function countryFlag(code: string): string {
+  try {
+    const upper = code.toUpperCase();
+    if (upper.length !== 2) return "";
+    return String.fromCodePoint(
+      ...upper.split("").map(c => 0x1F1E6 + c.charCodeAt(0) - 65)
+    );
+  } catch {
+    return "";
+  }
 }

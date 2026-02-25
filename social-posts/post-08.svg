@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Title -->
+  <text x="540" y="200" font-family="DM Sans, Arial, sans-serif" font-size="60" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Four ways to arrive
+  </text>
+  
+  <!-- Top left: Arrive Clearer -->
+  <circle cx="350" cy="480" r="16" fill="#6aada5"/>
+  <text x="350" y="560" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Arrive
+  </text>
+  <text x="350" y="610" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Clearer
+  </text>
+  
+  <!-- Top right: Arrive Ready -->
+  <circle cx="730" cy="480" r="16" fill="#6aada5"/>
+  <text x="730" y="560" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Arrive
+  </text>
+  <text x="730" y="610" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Ready
+  </text>
+  
+  <!-- Bottom left: Arrive Present -->
+  <circle cx="350" cy="820" r="16" fill="#6aada5"/>
+  <text x="350" y="900" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Arrive
+  </text>
+  <text x="350" y="950" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Present
+  </text>
+  
+  <!-- Bottom right: Just Be Here -->
+  <circle cx="730" cy="820" r="16" fill="#6aada5"/>
+  <text x="730" y="900" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Just Be
+  </text>
+  <text x="730" y="950" font-family="DM Sans, Arial, sans-serif" font-size="44" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Here
+  </text>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>

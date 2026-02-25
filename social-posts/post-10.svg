@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Main text -->
+  <text x="540" y="480" font-family="DM Sans, Arial, sans-serif" font-size="80" font-weight="700" text-anchor="middle" fill="#2a2f2e">
+    Built in
+  </text>
+  <text x="540" y="580" font-family="DM Sans, Arial, sans-serif" font-size="80" font-weight="700" text-anchor="middle" fill="#4d908a">
+    Hereford.
+  </text>
+  
+  <!-- Supporting text -->
+  <text x="540" y="730" font-family="DM Sans, Arial, sans-serif" font-size="48" font-weight="400" text-anchor="middle" fill="#7a8382">
+    For anyone, anywhere.
+  </text>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>
