@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Top decorative line -->
+  <line x1="300" y1="280" x2="780" y2="280" stroke="#6aada5" stroke-width="2"/>
+  
+  <!-- Quote text in serif -->
+  <text x="540" y="420" font-family="Libre Baskerville, Georgia, serif" font-size="48" font-style="italic" font-weight="400" text-anchor="middle" fill="#2a2f2e">
+    <tspan x="540" dy="0">I'm not trying to help</tspan>
+    <tspan x="540" dy="70">people feel better.</tspan>
+    <tspan x="540" dy="70">I'm trying to help them</tspan>
+    <tspan x="540" dy="70">arrive clearer.</tspan>
+  </text>
+  
+  <!-- Bottom decorative line -->
+  <line x1="300" y1="800" x2="780" y2="800" stroke="#6aada5" stroke-width="2"/>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>

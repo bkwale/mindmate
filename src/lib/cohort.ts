@@ -2,6 +2,8 @@
 // Anonymous Cohort Tracking — no personal data, retention metrics only
 // ============================================================
 
+import { track as vercelTrack } from "@vercel/analytics";
+
 export interface CohortEvent {
   event: string;
   timestamp: string;
@@ -44,7 +46,13 @@ export function trackEvent(event: string, meta?: Record<string, string>): void {
   const filtered = events.filter(e => new Date(e.timestamp).getTime() > cutoff);
   localStorage.setItem(COHORT_KEY, JSON.stringify(filtered));
 
+  // ---- Vercel Analytics custom events (shows in Events tab) ----
+  try {
+    vercelTrack(event, meta || {});
+  } catch { /* silently fail */ }
+
   // ---- Server-side tracking (non-blocking, fire-and-forget) ----
+  // Geo headers (city, country) are captured server-side by /api/track
   try {
     const sh = getSessionHash();
     fetch("/api/track", {

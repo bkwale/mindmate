@@ -101,6 +101,25 @@ export async function GET(req: Request) {
       catch { return r; }
     });
 
+    // ---- Geography data ----
+    const countriesRaw = await client.hGetAll("stats:geo:countries");
+    const countries: Record<string, number> = {};
+    for (const [k, v] of Object.entries(countriesRaw)) {
+      countries[k] = parseInt(v, 10) || 0;
+    }
+
+    const citiesRaw = await client.hGetAll("stats:geo:cities");
+    const cities: Record<string, number> = {};
+    for (const [k, v] of Object.entries(citiesRaw)) {
+      cities[k] = parseInt(v, 10) || 0;
+    }
+
+    const regionsRaw = await client.hGetAll("stats:geo:regions");
+    const regions: Record<string, number> = {};
+    for (const [k, v] of Object.entries(regionsRaw)) {
+      regions[k] = parseInt(v, 10) || 0;
+    }
+
     // ---- Active dates for retention ----
     const activeDates = await client.sMembers("stats:active_dates");
 
@@ -128,6 +147,7 @@ export async function GET(req: Request) {
       dailyVisitors,
       hours,
       modes,
+      geo: { countries, cities, regions },
       recent,
       activeDates: activeDates.sort(),
       generatedAt: now.toISOString(),

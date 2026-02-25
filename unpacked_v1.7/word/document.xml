@@ -1,0 +1,3699 @@
+<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing">
+  <w:body>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:b/>
+        </w:rPr>
+        <w:t xml:space="preserve">MindM8</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:i/>
+        </w:rPr>
+        <w:t xml:space="preserve">A space to reflect</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Product Document</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Version 1.7 — Analytics</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">February 2026</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">mindm8.app</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Built in Hereford</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">1. What is MindM8</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 is an AI-assisted emotional clarity app. It helps people think more clearly about their emotions and relationships through guided reflection sessions, daily check-ins, and pattern recognition.</w:t>
+      </w:r>
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>It is not therapy. It is not a chatbot. It is a structured space where someone can arrive carrying something — an unnamed feeling, a difficult conversation, a sense of being overwhelmed — and leave having seen it more clearly.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">MindM8 is live at </w:t>
+      </w:r>
+      
+      <w:r>
+        <w:rPr>
+          <w:b/>
+        </w:rPr>
+        <w:t xml:space="preserve">mindm8.app</w:t>
+      </w:r>
+      <w:r>
+        <w:t xml:space="preserve"> as a progressive web app (PWA). All data stays on the user&#x2019;s device. There is no backend database, no account creation, and no personal data ever leaves the browser.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">2. Core Philosophy</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Arrival, Not Usage</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 is framed as a space people arrive at — not a tool they use. Each session mode is designed around arrival language: Arrive Clearer (reflection), Arrive Ready (conversation preparation), Arrive Present (grounding). After a session, the user should feel they have moved — even slightly — toward clarity, readiness, or presence.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Questions, Not Advice</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 never gives advice. It asks questions. The insight comes from the user, not from the AI. The voice is warm but grounded — a thoughtful friend who listens well, not a clinical stranger reading from a script.</w:t>
+      </w:r>
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Privacy by Architecture</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Every piece of data — sessions, themes, check-ins, letters, settings — lives in localStorage on the user&#x2019;s device. There is no server-side storage, no user accounts, and no way for anyone (including us) to access a user&#x2019;s reflections. The only server calls are to the Claude API during active sessions, and those conversations are not retained by Anthropic.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Safety First</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>A dedicated safety layer overrides all other instructions. If a user expresses suicidal intent, self-harm plans, or escalating threats, MindM8 immediately redirects to crisis resources (Samaritans 116 123, 988 Lifeline, findahelpline.com). It never attempts to counsel through a crisis, never asks clinical assessment questions, and never locks the user out.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">4. Session Modes</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 offers four distinct session modes, each designed for a specific emotional need.</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Mode</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Description</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Arrive Clearer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Guided reflection. 5 exchanges. Helps the user process an emotion, an event, or something they can&#x2019;t name yet. Open, exploratory questions that help them see patterns and set things down.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Arrive Ready</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Conversation preparation. 7 exchanges. Helps the user clarify what they want to say before a difficult real-world conversation. Structured, goal-oriented questions. Includes optional letter writing and before/after follow-ups.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Arrive Present</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Grounding. 3 exchanges. For moments of overwhelm. Minimal and containing — name one feeling, sit with it, close warmly.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Just Be Here</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Breathing and grounding. 2 minutes. No AI, no questions. Just guided breathing with visual pacing. For moments when you need to be present without processing.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Each session begins with an intro screen showing the mode heading, a description of what to expect, and a tip. A breathing meditation circle provides a visual anchor. Sessions end with a Readiness Moment and optional takeaway.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">5. Complete Feature Set</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Home Screen</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Feature</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Description</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Daily Check-in</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>One-word mood check-in. &#x201C;How are you arriving today?&#x201D; Tracks the last 7 days and detects patterns (e.g. &#x201C;3 of your last 7 check-ins were anxious&#x201D;).</w:t>
+            </w:r>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Smart Response</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>After check-in, surfaces related themes from past reflections. &#x201C;Last time, it was connected to: feeling unseen at work.&#x201D; Offers a &#x201C;Sit with this?&#x201D; gateway to a reflect session.</w:t>
+            </w:r>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Open Loop</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>Shows the user&#x2019;s most substantive thought from their last session. &#x201C;Something from last time...&#x201D; with a &#x201C;Revisit this&#x201D; button. Cleared when a new session starts.</w:t>
+            </w:r>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Follow-up</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>After a Prepare session, asks &#x201C;Did that conversation happen?&#x201D; with Yes / Not yet / Changed my mind options. If yes, captures how it went.</w:t>
+            </w:r>
+            
+            
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Last Reflection</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Shows the theme and takeaway from the most recent session with a relative timestamp.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">What&#x2019;s New</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Appears once after a version update for returning users. Highlights key changes. Dismissible.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Install Prompt</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Native install dialog on Chrome, Edge, Samsung Internet via beforeinstallprompt. Step-by-step instructions for iOS Safari. Persists until the app is installed; session-level snooze only.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Notification Prompt</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">After first check-in, offers daily reminder notifications. Respects user choice.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Session Limit</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">After 3 sessions in 2 hours, shows a gentle message encouraging the user to step away.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">In-Session Experience</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Feature</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Description</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">AI Dialogue</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Multi-turn conversation powered by Claude Sonnet 4.5. Each exchange builds on previous context with a 5-layer prompt architecture.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Relationship Tag</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Optional context tag before first message: Partner, Family, Work, Friend, Self, Ex, or Child. Shapes theme extraction and creates follow-ups.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Progress Bar</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Visual indicator showing exchange count vs maximum for the current mode.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Voice Input</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Tap mic button to speak instead of type. Uses browser&#x2019;s native Web Speech API (SpeechRecognition). Tap-to-talk / tap-to-stop UX with live transcription preview. Available on Chrome, Edge, Safari (mobile + desktop). Gracefully hidden on unsupported browsers (Firefox). No extra API keys or costs.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Readiness Moment</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>Post-session screen: &#x201C;Do you feel clearer than before?&#x201D; (Yes / A little / Not yet). Optional follow-up: &#x201C;What feels more possible now?&#x201D; No gamification — just noticing.</w:t>
+            </w:r>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Takeaway</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">User&#x2019;s personal insight from the session. Optional, free-text. Shareable via native share or clipboard.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Letter Writing</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Prepare mode only. After session, option to write an unsent letter to the person. Saved privately, never sent.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Theme Extraction</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">AI analyses the full session transcript to identify: primary emotion, behavioural theme (pattern, not event), and relationship context. Stored for Insights.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Open Loop Seed</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Extracts the user&#x2019;s longest substantive message to show on their next visit.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Insights Dashboard</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Five tabs providing a complete picture of the user&#x2019;s reflection journey.</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Tab</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Description</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Overview</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Session counts by mode, top 5 emotions, top 5 relationship contexts.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Journey</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Relationship timeline. Groups reflections by context (Partner, Family, etc.) with chronological vertical timeline, emotion tags, and drill-down.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Themes</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Last 10 AI-extracted behavioural patterns with emotion and context tags.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">History</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Full session log (most recent first) with mode, exchange count, clarity response, and date.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Metrics</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Anonymous usage data: completion rate, clarity rate, takeaway rate, sessions by mode, engagement stats, readiness distribution (last 14 days), retention metrics (streak, active days, return rate).</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Security &amp; Privacy</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Feature</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Description</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">PIN Lock</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Optional 4-digit PIN with SHA-256 hashing and random salt via Web Crypto API. 5 failed attempts triggers 30-second lockout.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Auto-lock</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Configurable idle timeout: Immediately (on tab switch), 1 min, 3 min (default), 5 min, or Never. Locks on both idle detection and tab visibility change.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Age Gate</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">18+ verification during onboarding. Under-18 users are redirected away.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Safety Layer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Overrides all AI instructions. Redirects to crisis resources for self-harm/suicidal intent. Never counsels through crisis.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Data Controls</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Full data deletion from Settings. Clear themes only or delete everything and reset. User always in control.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Local-only Storage</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">All data in localStorage. No server database. No accounts. No data leaves the device.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Recovery Words</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">3 user-chosen emotional words set during PIN setup. Individually hashed with SHA-256. 2-of-3 match required to verify identity and reset PIN without losing data.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Forgot PIN</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Two-tier recovery: recovery words (keeps data) or nuclear reset (type RESET to confirm, wipes everything). Smart routing checks for recovery words first.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Progressive Web App</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Feature</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Description</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Installable</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Full PWA manifest with split icon purposes (any + maskable at 192px and 512px). Native install dialog via beforeinstallprompt on Chrome/Edge/Samsung Internet. Step-by-step iOS Safari instructions. Persistent banner until installed.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Offline Support</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Service worker with network-first caching. App shell cached on install. Works without internet (except AI sessions).</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Push Notifications</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Infrastructure for daily check-in reminders. Permission requested post-first-check-in.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Standalone Mode</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Runs without browser chrome on supported devices.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">6. Technical Architecture</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Stack</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Component</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Technology</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Framework</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Next.js 14 (App Router)</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Language</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">TypeScript</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Styling</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Tailwind CSS</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">AI Model</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Claude Sonnet 4.5 (Anthropic API)</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Hosting</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Vercel (auto-deploy on push)</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Data Storage</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">localStorage (client-only)</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Security</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Web Crypto API (SHA-256 + salt)</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">PWA</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Service Worker + Web App Manifest</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Analytics</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Vercel Analytics + Speed Insights</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Domain</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">mindm8.app</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Prompt Architecture</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 uses a 5-layer prompt system where each layer has clear ownership and can be updated independently:</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Layer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Purpose</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Base Layer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Core identity, arrival framing, voice rules, acknowledgment guidelines. Defines what MindM8 is and is not.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Safety Layer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Crisis detection and response protocol. Overrides all other layers. Handles self-harm, suicidal intent, and escalating threats.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Session Layer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Mode-specific instructions (Reflect/Prepare/Ground), exchange counter, closing reflection trigger at final exchange.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Theme Layer</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Injects abstracted patterns from previous reflections. Enables gentle connections without quoting the user directly.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Personal Context</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>User&#x2019;s self-provided &#x201C;About You&#x201D; text. Shapes questions naturally without reading back what they shared.</w:t>
+            </w:r>
+            
+            
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">API Routes</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Endpoint</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Purpose</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">POST /api/chat</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Sends conversation to Claude with all prompt layers. Returns AI response (max 500 tokens). Auto-detects session completion.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">POST /api/extract</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Analyses full session transcript after completion. Extracts primary emotion, behavioural theme, and relationship context. Flags crisis-adjacent content.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">POST /api/feedback</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Receives user feedback from Settings. Logged to Vercel function logs for review.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">7. Analytics &amp; Metrics</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 tracks two categories of metrics, both anonymous and containing no personal content.</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Cohort Metrics (Anonymous Events)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Event-based tracking with 90-day retention. Events tracked: app_open, checkin_complete, session_start, session_complete. Derived metrics include: unique active days, check-in rate, session completion rate, return within 7 days, weekly session count, streak days, and average sessions per active day.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Usage Metrics (Session Aggregates)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Computed from session records: total sessions, sessions by mode, completion rate, clarity rate (&#x201C;that helped&#x201D;), takeaway rate, average exchanges per session, multi-session day rate, top emotions, top contexts, and days since first session.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Readiness Metrics</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Aggregated from the post-session Readiness Moment. Shows distribution of Yes / A little / Not yet responses over the last 14 days with an interpretive summary.</w:t>
+      </w:r>
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">8. Onboarding Flow</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Five screens, designed to lead with value before asking for anything:</w:t>
+      </w:r>
+    </w:p>
+    <w:tbl>
+      <w:tblPr>
+        <w:tblStyle w:val="Table"/>
+        <w:tblW w:type="pct" w:w="0.0"/>
+        <w:tblLook w:firstRow="0"/>
+      </w:tblPr>
+      <w:tblGrid/>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Screen</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Title</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Content</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">0</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Landing</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Breathing meditation circle, tagline, value proposition. Leads with what MindM8 is before asking anything.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">1</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Age Gate</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t>&#x201C;Are you 18 or older?&#x201D; Required before proceeding.</w:t>
+            </w:r>
+            
+            
+            
+            
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">2</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">Safety</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Explains what MindM8 is not (therapy, crisis service). Lists crisis resources.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">3</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">PIN Setup</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Optional 4-digit PIN. Can skip.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+      <w:tr>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">4</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:rPr>
+                <w:b/>
+              </w:rPr>
+              <w:t xml:space="preserve">About You</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+        <w:tc>
+          <w:p>
+            <w:pPr>
+              <w:pStyle w:val="Compact"/>
+              <w:jc w:val="left"/>
+            </w:pPr>
+            <w:r>
+              <w:t xml:space="preserve">Optional context for the AI. Helps MindM8 ask better questions.</w:t>
+            </w:r>
+          </w:p>
+        </w:tc>
+      </w:tr>
+    </w:tbl>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">9. Version History</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.7 — Analytics (Current)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Server-side anonymous usage tracking via Vercel KV (Redis). Every trackEvent call now also sends a non-blocking POST to /api/track, storing aggregate counters without any personal data.</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Events tracked: app_open, session_start (with mode), session_complete (with mode), checkin_complete, voice_used</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Admin stats dashboard at /stats (protected by STATS_SECRET token) showing: total opens, sessions, completion rate, check-ins, voice usage, mode breakdown, 14-day activity chart, unique visitors, time-of-day distribution, active days, and live activity feed</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Approximate unique visitor counting via rotating daily session hashes (no user IDs, no cookies, no fingerprinting)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Graceful degradation: if Vercel KV is not configured, the app works exactly as before (local-only tracking). Server-side tracking activates automatically once KV environment variables are set.</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Voice usage now tracked as a distinct event for adoption metrics</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.6 — Voice</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Voice Input: tap mic button to speak instead of type across all modes (session chat, daily check-in, takeaway, letter writing, follow-up responses, readiness notes)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Uses browser&#x2019;s native Web Speech API (SpeechRecognition) with tap-to-talk / tap-to-stop UX</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Live transcription preview as you speak</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Works on Chrome, Edge, Safari (mobile + desktop)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Gracefully hidden on unsupported browsers (Firefox)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">No extra API keys or costs</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Implementation: useSpeech custom hook + reusable MicButton component</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Technical configuration: continuous: true, interimResults: true for real-time feedback</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1001"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Default locale: en-GB</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.5 — Awareness</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1002"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Awareness pattern tracking with ND-informed detection and gentle language</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1002"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Session limit: 3 sessions in 2 hours with encouragement to step away</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1002"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Behaviour pattern analysis across emotional themes</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.4 — Presence</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Warm arrival acknowledgment after Readiness Moment — presence, not validation</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Removed redundant post-session helpfulness question; clarity now derived from Readiness Moment</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Conversation pacing: AI acknowledges before asking, never leads with questions</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Recovery words for PIN reset: 3 user-chosen emotional words, SHA-256 hashed, 2-of-3 match</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Forgot PIN flow with two-tier recovery (recovery words or nuclear reset)</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Fixed session notes leaking into AI responses (output rules + API-level filter)</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>PWA install prompt: native beforeinstallprompt, iOS Safari instructions, persistent banner</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1003"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Manifest icon purpose split (any + maskable as separate entries per Chrome requirements)</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.3 — Arrival</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1004"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Arrival framing across all mode copy, intros, prompts, and check-in language</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1004"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Readiness Moment post-session: &#x201C;Do you feel clearer?&#x201D; with optional note</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1004"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Auto-lock with configurable idle timeout and visibility-based re-locking</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1004"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Readiness trend card in Insights metrics (last 14 days)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1004"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">What&#x2019;s New card for returning users</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.2 — Retention &amp; PWA</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1005"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Smart check-in with pattern detection and related theme surfacing</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1005"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Open loops — unfinished thoughts shown on next visit</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1005"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>PWA: manifest, service worker, add-to-homescreen, push notification infrastructure</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1005"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Anonymous cohort tracking with retention metrics</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1005"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Landing screen redesign — value before age gate</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.1 — Features &amp; Polish</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1006"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Relationship journey timeline in Insights</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1006"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Before &amp; after follow-ups for Prepare sessions</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1006"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Letter writing (unsent letters)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1006"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Visual redesign with warm mist aesthetic</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1006"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">18+ age gate, server-side feedback API, PIN lock</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">v1.0 — MVP</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1007"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Three session modes (Reflect, Prepare, Ground)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1007"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">AI-powered dialogue with Claude via Anthropic API</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1007"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Theme extraction and Insights dashboard</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1007"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Onboarding, Settings, relationship tagging</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1007"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">localStorage-based persistence, Vercel deployment</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">10. Scaling &amp; Licensing Model</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8&#x2019;s current architecture is designed for individual privacy: static frontend, localStorage persistence, no accounts, no backend database. This is the right design for building trust with early users. But organisational licensing requires a different model — one that preserves privacy where it matters while adding the visibility that commissioners and partners need.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">What Stays on the Device</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>The content of reflections — what people actually say in sessions — never leaves the device. Session transcripts, themes, takeaways, letters, check-in entries, PIN data, and recovery words remain in localStorage. This is the core privacy promise and it does not change under licensing. No organisation, commissioner, or administrator can read a user&#x2019;s reflections.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">What Moves Server-Side</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Anonymous usage telemetry: session started, session completed, mode used, readiness response, timestamp, and an organisation identifier. No personal content, no names, no reflection text — just event counts. This gives licensing partners three things they need: billing data (monthly active users per organisation), usage analytics (how many people are using the tool and how often), and aggregate outcome signals (readiness trends across a population, completion rates, mode preferences).</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Licensing Structure</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>The intended model is per-organisation licensing based on user bands. An NHS Trust or charity partner pays a monthly fee based on agreed active user tiers (e.g. up to 500 users, up to 2,000 users, up to 5,000 users). The organisation receives a usage dashboard showing anonymous aggregate data: total sessions, completion rates, mode distribution, readiness trends, and monthly active users. API costs (Anthropic Claude) are absorbed into the license fee as an operational expense.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Architecture Changes Required</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Moving to organisational licensing requires a lightweight server-side layer. This includes: an anonymous event ingestion endpoint that receives usage events (no personal content) and stores them in a managed database; an organisation dashboard for commissioners to view aggregate usage and outcomes; organisation-scoped access via invite codes or domain-based routing so users are associated with a licensing partner without creating accounts; and rate limiting per organisation to manage API costs against license tiers.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Critically, the user-facing experience remains unchanged. Sessions still run client-side. Reflections still stay on the device. The server-side layer handles only operational and billing data — the kind of anonymised metrics that GDPR allows without explicit consent under legitimate interest, provided no personal data is processed.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">CBT-Informed Positioning</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8&#x2019;s questioning techniques are informed by cognitive behavioural principles: thought challenging (&#x201C;Has there been a time when that wasn&#x2019;t true?&#x201D;), pattern recognition (&#x201C;You&#x2019;ve noticed this before&#x201D;), reframing (offering a different angle on the same situation), and behavioural nudges (&#x201C;Is there one small thing you could try before next time?&#x201D;). These are embedded in the conversation naturally, not presented as clinical tools.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>This is a deliberate positioning choice. MindM8 is &#x201C;CBT-informed, not CBT-claiming.&#x201D; It uses evidence-based questioning frameworks without making clinical claims, which keeps it outside MHRA medical device classification while still aligning with NHS Talking Therapies language and evidence standards. For NHS partners, this positions MindM8 as a complement to commissioned services — particularly as a &#x201C;waiting well&#x201D; tool for people on therapy waitlists, or a between-session bridging tool for people already in treatment.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">11. Roadmap</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8&#x2019;s development is guided by user feedback and the needs of potential licensing partners. Below is the current thinking on what comes next, organised by phase.</w:t>
+      </w:r>
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Phase 1 — Foundation (v1.0–v1.7, Complete)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>Core reflection experience, four session modes (including Just Be Here breathing mode), insights dashboard with new Patterns tab, PWA with native install, PIN security with recovery words, conversation pacing, retention engine (check-ins, open loops, follow-ups), arrival framing, CBT-informed prompt architecture, ND-aware pattern tracking with 6 detectors (overwhelm cycles, shutdown gaps, fixation loops, time-of-day patterns, rejection sensitivity, energy crashes), AI regulation awareness layer, voice input across all modes via Web Speech API, and anonymous server-side usage analytics with admin dashboard. Product is live at mindm8.app and being tested with real users.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Phase 2 — Validation &amp; Outreach (Next)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1008"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>NHS and charity outreach in Herefordshire &amp; Worcestershire (HACW NHS Trust, ICB, CO-LAB, Talking Therapies, Herefordshire Mind, Melo)</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1008"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Pilot programme with one partner organisation to validate usage patterns and gather structured feedback</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1008"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Aggregate outcome reporting: anonymised readiness trends, completion rates, and mode distribution for commissioning conversations</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1008"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Accessibility audit and improvements (WCAG 2.1 AA compliance)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Phase 3 — Scaling &amp; Licensing</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1009"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Anonymous event ingestion endpoint for server-side usage telemetry (completed in v1.7)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1009"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Organisation dashboard for commissioners (aggregate usage, outcomes, billing)</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1009"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Organisation-scoped access via invite codes or domain-based routing</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1009"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Per-organisation licensing model with tiered pricing by active user bands</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1009"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Rate limiting per organisation to manage API costs against license tiers</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Phase 4 — Product Depth (Future)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1010"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">New session modes (e.g. grief, decision-making, conflict resolution)</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1010"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Longitudinal pattern insights: &#x201C;Over the last month, you&#x2019;ve been returning to...&#x201D;</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1010"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Optional encrypted cloud backup for cross-device sync (user-controlled, end-to-end encrypted)</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1010"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Therapist handoff: exportable reflection summaries for users to share with their therapist</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1010"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Multi-language support</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">12. Positioning</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 occupies a unique space in the emotional wellness market. It is not a therapy app (Woebot, Wysa), not a journaling app (Day One, Reflectly), not a meditation app (Calm, Headspace), and not a companion chatbot (Replika, Character.ai).</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>MindM8 is a readiness engine. It helps people arrive clearer at their own thoughts, readier for their own conversations, and more present in their own lives. The closest analogy is a thoughtful friend who listens well and asks the right question at the right time.</w:t>
+      </w:r>
+      
+      
+      
+      
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">What Makes It Different</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1011"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Relationship-aware: reflections are tagged to specific relationships and tracked over time</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1011"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Privacy-first by architecture: no accounts, no cloud storage, no data leaves the device</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1011"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t xml:space="preserve">Structured sessions with clear endings: not an endless chatbot loop</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1011"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Pattern recognition: AI extracts emotional themes across sessions, surfacing what the user might not see themselves</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:numPr>
+          <w:ilvl w:val="0"/>
+          <w:numId w:val="1011"/>
+        </w:numPr>
+      </w:pPr>
+      <w:r>
+        <w:t>Safety-conscious: crisis detection with immediate redirect, no clinical language, no emotional dependency</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:p>
+      <w:r>
+        <w:pict>
+          <v:rect style="width:0;height:1.5pt" o:hralign="center" o:hrstd="t" o:hr="t"/>
+        </w:pict>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="FirstParagraph"/>
+      </w:pPr>
+      <w:r>
+        <w:rPr>
+          <w:i/>
+        </w:rPr>
+        <w:t xml:space="preserve">MindM8 v1.7 — Analytics</w:t>
+      </w:r>
+    </w:p>
+    <w:p>
+      <w:pPr>
+        <w:pStyle w:val="BodyText"/>
+      </w:pPr>
+      <w:r>
+        <w:t>mindm8.app • Built in Hereford • Free to use • Your data stays on your device</w:t>
+      </w:r>
+      
+      
+    </w:p>
+    <w:sectPr/>
+  </w:body>
+</w:document>

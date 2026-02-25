@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Line 1: "Not therapy." -->
+  <text x="540" y="420" font-family="DM Sans, Arial, sans-serif" font-size="64" font-weight="400" text-anchor="middle" fill="#7a8382">
+    Not therapy.
+  </text>
+  
+  <!-- Line 2: "Not a chatbot." -->
+  <text x="540" y="540" font-family="DM Sans, Arial, sans-serif" font-size="64" font-weight="400" text-anchor="middle" fill="#7a8382">
+    Not a chatbot.
+  </text>
+  
+  <!-- Line 3: "A space to think more clearly." -->
+  <text x="540" y="680" font-family="DM Sans, Arial, sans-serif" font-size="64" font-weight="600" text-anchor="middle" fill="#4d908a">
+    A space to think
+  </text>
+  <text x="540" y="760" font-family="DM Sans, Arial, sans-serif" font-size="64" font-weight="600" text-anchor="middle" fill="#4d908a">
+    more clearly.
+  </text>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>

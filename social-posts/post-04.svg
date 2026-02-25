@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1080 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#f5f3ef"/>
+  
+  <!-- Shield circle decoration -->
+  <circle cx="540" cy="380" r="120" fill="#d5ebe8" opacity="0.5"/>
+  
+  <!-- Headline -->
+  <text x="540" y="400" font-family="DM Sans, Arial, sans-serif" font-size="68" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    Your thoughts
+  </text>
+  <text x="540" y="480" font-family="DM Sans, Arial, sans-serif" font-size="68" font-weight="600" text-anchor="middle" fill="#2a2f2e">
+    stay yours.
+  </text>
+  
+  <!-- Supporting text -->
+  <text x="540" y="650" font-family="DM Sans, Arial, sans-serif" font-size="40" font-weight="400" text-anchor="middle" fill="#7a8382">
+    <tspan x="540" dy="0">No accounts.</tspan>
+    <tspan x="540" dy="60">No cloud.</tspan>
+    <tspan x="540" dy="60">Everything stays on</tspan>
+    <tspan x="540" dy="60">your device.</tspan>
+  </text>
+  
+  <!-- Footer branding -->
+  <text x="540" y="1020" font-family="DM Sans, Arial, sans-serif" font-size="24" text-anchor="middle" fill="#7a8382">
+    mindm8.app
+  </text>
+</svg>
