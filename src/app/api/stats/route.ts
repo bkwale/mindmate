@@ -1,38 +1,11 @@
 // ============================================================
 // Anonymous Stats API — aggregated usage data for admin view
 // Protected by a simple bearer token (STATS_SECRET env var)
+// Uses Vercel KV (Upstash)
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { createClient } from "redis";
-
-// Hard timeout to prevent serverless function from hanging
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) =>
-      setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms)
-    ),
-  ]);
-}
-
-async function getRedis() {
-  let url = process.env.REDIS_URL;
-  if (!url) return null;
-
-  const isCloud = url.includes("redislabs.com") || url.includes("upstash.io");
-  if (isCloud && url.startsWith("redis://")) {
-    url = url.replace("redis://", "rediss://");
-  }
-
-  const client = createClient({
-    url,
-    socket: { connectTimeout: 4000 },
-  });
-  client.on("error", () => {});
-  await withTimeout(client.connect(), 4000);
-  return client;
-}
+import { kv } from "@vercel/kv";
 
 export async function GET(req: Request) {
   // Simple auth — check for STATS_SECRET
@@ -44,22 +17,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let client = null;
   try {
-    client = await getRedis();
-    if (!client) {
-      return NextResponse.json({
-        error: "Redis not configured. Set REDIS_URL in your Vercel environment variables.",
-        hasRedisUrl: !!process.env.REDIS_URL,
-      }, { status: 500 });
-    }
-
     // ---- All-time totals ----
-    const totals = (await client.hGetAll("stats:totals")) as Record<string, string>;
-    const totalsNum: Record<string, number> = {};
-    for (const [k, v] of Object.entries(totals)) {
-      totalsNum[k] = parseInt(v, 10) || 0;
-    }
+    const totals = (await kv.hgetall("stats:totals")) as Record<string, number> || {};
 
     // ---- Last 30 days daily breakdown ----
     const dailyData: Record<string, Record<string, number>> = {};
@@ -68,13 +28,9 @@ export async function GET(req: Request) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dateKey = d.toISOString().slice(0, 10);
-      const dayStats = await client.hGetAll(`stats:daily:${dateKey}`);
+      const dayStats = await kv.hgetall(`stats:daily:${dateKey}`) as Record<string, number> | null;
       if (dayStats && Object.keys(dayStats).length > 0) {
-        const parsed: Record<string, number> = {};
-        for (const [k, v] of Object.entries(dayStats)) {
-          parsed[k] = parseInt(v, 10) || 0;
-        }
-        dailyData[dateKey] = parsed;
+        dailyData[dateKey] = dayStats;
       }
     }
 
@@ -84,68 +40,44 @@ export async function GET(req: Request) {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
       const dateKey = d.toISOString().slice(0, 10);
-      const count = await client.sCard(`stats:visitors:${dateKey}`);
+      const count = await kv.scard(`stats:visitors:${dateKey}`);
       if (count > 0) {
         dailyVisitors[dateKey] = count;
       }
     }
 
     // ---- Hourly distribution ----
-    const hoursRaw = await client.hGetAll("stats:hours");
-    const hours: Record<string, number> = {};
-    for (const [k, v] of Object.entries(hoursRaw)) {
-      hours[k] = parseInt(v, 10) || 0;
-    }
+    const hours = (await kv.hgetall("stats:hours")) as Record<string, number> || {};
 
     // ---- Mode breakdown ----
-    const modesRaw = await client.hGetAll("stats:modes");
-    const modes: Record<string, number> = {};
-    for (const [k, v] of Object.entries(modesRaw)) {
-      modes[k] = parseInt(v, 10) || 0;
-    }
+    const modes = (await kv.hgetall("stats:modes")) as Record<string, number> || {};
 
     // ---- Recent events (last 50) ----
-    const recentRaw = await client.lRange("stats:recent", 0, 49);
-    const recent = recentRaw.map(r => {
-      try { return JSON.parse(r); }
+    const recentRaw = await kv.lrange("stats:recent", 0, 49) as string[];
+    const recent = (recentRaw || []).map(r => {
+      try { return typeof r === "string" ? JSON.parse(r) : r; }
       catch { return r; }
     });
 
     // ---- Geography data ----
-    const countriesRaw = await client.hGetAll("stats:geo:countries");
-    const countries: Record<string, number> = {};
-    for (const [k, v] of Object.entries(countriesRaw)) {
-      countries[k] = parseInt(v, 10) || 0;
-    }
-
-    const citiesRaw = await client.hGetAll("stats:geo:cities");
-    const cities: Record<string, number> = {};
-    for (const [k, v] of Object.entries(citiesRaw)) {
-      cities[k] = parseInt(v, 10) || 0;
-    }
-
-    const regionsRaw = await client.hGetAll("stats:geo:regions");
-    const regions: Record<string, number> = {};
-    for (const [k, v] of Object.entries(regionsRaw)) {
-      regions[k] = parseInt(v, 10) || 0;
-    }
+    const countries = (await kv.hgetall("stats:geo:countries")) as Record<string, number> || {};
+    const cities = (await kv.hgetall("stats:geo:cities")) as Record<string, number> || {};
+    const regions = (await kv.hgetall("stats:geo:regions")) as Record<string, number> || {};
 
     // ---- Active dates for retention ----
-    const activeDates = await client.sMembers("stats:active_dates");
+    const activeDates = await kv.smembers("stats:active_dates") as string[] || [];
 
     // ---- Computed metrics ----
-    const totalSessions = totalsNum.session_complete || 0;
-    const totalStarts = totalsNum.session_start || 0;
+    const totalSessions = totals.session_complete || 0;
+    const totalStarts = totals.session_start || 0;
     const completionRate = totalStarts > 0
       ? Math.round((totalSessions / totalStarts) * 100) : 0;
-    const totalCheckIns = totalsNum.checkin_complete || 0;
-    const totalVoice = totalsNum.voice_used || 0;
+    const totalCheckIns = totals.checkin_complete || 0;
+    const totalVoice = totals.voice_used || 0;
     const totalBreatheSessions = modes.breathe || 0;
 
-    await client.quit();
-
     return NextResponse.json({
-      totals: totalsNum,
+      totals,
       computed: {
         completionRate,
         totalSessions,
@@ -163,8 +95,7 @@ export async function GET(req: Request) {
       generatedAt: now.toISOString(),
     });
   } catch (error) {
-    if (client) try { await client.quit(); } catch {}
     console.error("Stats error:", error);
-    return NextResponse.json({ error: "Stats unavailable — could not connect to Redis" }, { status: 500 });
+    return NextResponse.json({ error: "Stats unavailable — could not connect to KV" }, { status: 500 });
   }
 }

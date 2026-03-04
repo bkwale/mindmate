@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { SessionMode } from "@/lib/prompts";
 import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme, getAllPatterns, PatternSignal } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
-import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
+import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, isIOS, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
 import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
 import MicButton from "./MicButton";
 
@@ -510,8 +510,8 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
         {/* Install app banner — shows for all non-installed visitors, persists until installed */}
         {!showPauseMessage && showInstallPrompt && (
           <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/60 to-white">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600">
                   <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                   <polyline points="7 10 12 15 17 10" />
@@ -519,15 +519,40 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="text-sm text-calm-text">
-                  Install MindM8 for quick access
+                <p className="text-sm font-medium text-calm-text">
+                  Add MindM8 to your home screen
                 </p>
-                {!promptReady && (
+                {/* iOS-specific guide */}
+                {isIOS() && !promptReady && (
+                  <div className="mt-2 space-y-2">
+                    <div className="flex items-center gap-2 text-xs text-calm-muted">
+                      <span className="w-5 h-5 rounded-full bg-mind-100 text-mind-600 flex items-center justify-center font-medium text-[10px]">1</span>
+                      <span>Tap the <strong>Share</strong> button
+                        <svg className="inline ml-1 -mt-0.5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+                          <polyline points="16 6 12 2 8 6" />
+                          <line x1="12" y1="2" x2="12" y2="15" />
+                        </svg>
+                        {" "}at the bottom of Safari
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-calm-muted">
+                      <span className="w-5 h-5 rounded-full bg-mind-100 text-mind-600 flex items-center justify-center font-medium text-[10px]">2</span>
+                      <span>Scroll down and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong></span>
+                    </div>
+                    <p className="text-[11px] text-calm-muted/70 mt-1">
+                      Works just like an app — no App Store needed
+                    </p>
+                  </div>
+                )}
+                {/* Non-iOS fallback (Android/desktop without native prompt) */}
+                {!isIOS() && !promptReady && (
                   <p className="text-xs text-calm-muted mt-1">
                     Tap <strong>Share</strong> then <strong>&ldquo;Add to Home Screen&rdquo;</strong>
                   </p>
                 )}
               </div>
+              {/* Native install button (Chrome/Edge/Samsung) */}
               {promptReady && (
                 <button
                   onClick={async () => {
@@ -547,7 +572,7 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                   snoozeInstallPrompt();
                   setShowInstallPrompt(false);
                 }}
-                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0"
+                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0 mt-0.5"
                 aria-label="Dismiss"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
