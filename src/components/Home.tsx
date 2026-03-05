@@ -5,6 +5,7 @@ import { SessionMode } from "@/lib/prompts";
 import { recentSessionCount, getLastSession, getLastTheme, addCheckIn, getTodayCheckIn, getRecentCheckIns, getUnresolvedFollowUp, resolveFollowUp, dismissFollowUp, getOpenLoop, clearOpenLoop, getCheckInPattern, getRelatedTheme, getAllPatterns, PatternSignal } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, isIOS, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
+import { shouldShowBackupNudge, dismissBackupNudge } from "@/lib/sync";
 import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
 import MicButton from "./MicButton";
 
@@ -95,6 +96,9 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
       setTopPattern(patterns[0]);
     }
   }, []);
+
+  // Backup nudge — shows after 2+ sessions if no backup configured
+  const [showBackupNudge, setShowBackupNudge] = useState(shouldShowBackupNudge);
 
   // Install prompt state — persists until user actually installs
   const [showInstallPrompt, setShowInstallPrompt] = useState(shouldPromptInstall);
@@ -504,6 +508,40 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
                 &ldquo;{lastSession.takeaway}&rdquo;
               </p>
             )}
+          </div>
+        )}
+
+        {/* Backup nudge — shows after 2+ sessions if no backup set up */}
+        {!showPauseMessage && showBackupNudge && (
+          <div className="mb-5 card-serene p-4 animate-fade-in border border-amber-200/60 bg-gradient-to-br from-amber-50/60 to-white">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-calm-text">
+                  Protect your reflections
+                </p>
+                <p className="text-xs text-calm-muted mt-1 leading-relaxed">
+                  Set up a passphrase in Settings so you never lose your sessions if you switch devices or clear your browser.
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  dismissBackupNudge();
+                  setShowBackupNudge(false);
+                }}
+                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0 mt-0.5"
+                aria-label="Dismiss"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+              </button>
+            </div>
           </div>
         )}
 
