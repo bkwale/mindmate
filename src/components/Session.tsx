@@ -117,22 +117,44 @@ export default function Session({ mode, onEnd }: SessionProps) {
       const themes = getThemeSummaries();
       const aboutMe = getAboutMe();
       const lastTheme = getLastTheme();
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: newMessages.map(m => ({ role: m.role, content: m.content })),
-          mode,
-          exchangeCount,
-          themes: themes.length > 0 ? themes : null,
-          aboutMe,
-          recentEnergy: lastTheme?.energy || undefined,
-          recentRegulation: lastTheme?.regulation || undefined,
-        }),
+      const chatBody = JSON.stringify({
+        messages: newMessages.map(m => ({ role: m.role, content: m.content })),
+        mode,
+        exchangeCount,
+        themes: themes.length > 0 ? themes : null,
+        aboutMe,
+        recentEnergy: lastTheme?.energy || undefined,
+        recentRegulation: lastTheme?.regulation || undefined,
       });
 
+      // Retry up to 2 times on network failures
+      let response: Response | null = null;
+      let lastError: Error | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: chatBody,
+          });
+          break; // success — exit retry loop
+        } catch (fetchErr: any) {
+          lastError = fetchErr;
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 1000 * (attempt + 1))); // 1s, 2s backoff
+          }
+        }
+      }
+
+      if (!response) {
+        throw new Error(
+          "Couldn't connect — please check your internet and try again."
+        );
+      }
+
       if (!response.ok) {
-        const errData = await response.json();
+        let errData: any = {};
+        try { errData = await response.json(); } catch {}
         throw new Error(errData.error || "Something went wrong");
       }
 
