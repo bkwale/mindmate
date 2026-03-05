@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { saveProfile } from "@/lib/storage";
+import { restoreFromBackup } from "@/lib/sync";
 import PINSetup from "./PINSetup";
 
 interface OnboardingProps {
@@ -11,6 +12,10 @@ interface OnboardingProps {
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [screen, setScreen] = useState(0);
   const [aboutMe, setAboutMe] = useState("");
+  const [showRestore, setShowRestore] = useState(false);
+  const [restorePhrase, setRestorePhrase] = useState("");
+  const [restoreStatus, setRestoreStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [restoreError, setRestoreError] = useState("");
 
   const handleFinish = () => {
     saveProfile({
@@ -66,6 +71,66 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             >
               Begin
             </button>
+
+            {/* Restore from backup */}
+            {!showRestore ? (
+              <button
+                onClick={() => setShowRestore(true)}
+                className="text-xs text-calm-muted hover:text-mind-600 transition-colors"
+              >
+                Restoring from another device?
+              </button>
+            ) : (
+              <div className="bg-white/80 rounded-xl p-4 border border-calm-border space-y-3 text-left animate-fade-in">
+                <p className="text-sm text-calm-text font-medium">Restore your data</p>
+                <p className="text-xs text-calm-muted">Enter the passphrase you used to back up.</p>
+                {restoreStatus === "error" && (
+                  <p className="text-xs text-red-600">{restoreError}</p>
+                )}
+                <input
+                  type="password"
+                  value={restorePhrase}
+                  onChange={e => setRestorePhrase(e.target.value)}
+                  placeholder="Your passphrase"
+                  className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                             placeholder:text-calm-muted/50 focus:outline-none focus:border-mind-300"
+                />
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      if (restorePhrase.length < 8) return;
+                      setRestoreStatus("loading");
+                      setRestoreError("");
+                      const result = await restoreFromBackup(restorePhrase, "overwrite");
+                      if (result.success) {
+                        // Data restored — reload the app (profile now exists, skips onboarding)
+                        window.location.reload();
+                      } else {
+                        setRestoreStatus("error");
+                        setRestoreError(result.error || "Restore failed");
+                      }
+                    }}
+                    disabled={restorePhrase.length < 8 || restoreStatus === "loading"}
+                    className="flex-1 py-2.5 bg-mind-600 text-white rounded-xl text-xs font-medium
+                               hover:bg-mind-700 transition-colors disabled:opacity-40"
+                  >
+                    {restoreStatus === "loading" ? "Restoring..." : "Restore"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowRestore(false);
+                      setRestorePhrase("");
+                      setRestoreStatus("idle");
+                      setRestoreError("");
+                    }}
+                    className="px-4 py-2.5 rounded-xl text-xs text-calm-muted border border-calm-border
+                               hover:bg-warm-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
