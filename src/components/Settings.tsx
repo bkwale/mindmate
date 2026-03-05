@@ -2,6 +2,7 @@
 
 import { getProfile, getThemes, getSessions, clearAllData, updateAboutMe } from "@/lib/storage";
 import { isPINEnabled, removePIN, getAutoLockTimeout, setAutoLockTimeout, LockTimeout } from "@/lib/security";
+import { getSyncConfig, createBackup, restoreFromBackup } from "@/lib/sync";
 import { useState, useEffect } from "react";
 import PINSetup from "./PINSetup";
 
@@ -23,6 +24,13 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
   const [lockTimeout, setLockTimeout] = useState<LockTimeout>(3);
   const [feedback, setFeedback] = useState("");
   const [feedbackSent, setFeedbackSent] = useState(false);
+  const [syncPassphrase, setSyncPassphrase] = useState("");
+  const [syncConfirm, setSyncConfirm] = useState("");
+  const [syncStatus, setSyncStatus] = useState<"idle" | "backing_up" | "restoring" | "success" | "error">("idle");
+  const [syncMessage, setSyncMessage] = useState("");
+  const [syncMode, setSyncMode] = useState<"setup" | "backup" | "restore">("setup");
+  const [lastBackup, setLastBackup] = useState<string | null>(null);
+  const [showSyncRestore, setShowSyncRestore] = useState(false);
 
   useEffect(() => {
     const profile = getProfile();
@@ -41,6 +49,8 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
     setSessionCount(getSessions().length);
     setPinEnabled(isPINEnabled());
     setLockTimeout(getAutoLockTimeout());
+    const syncConfig = getSyncConfig();
+    setLastBackup(syncConfig.lastBackupAt);
   }, []);
 
   const handleClearThemes = () => {
@@ -359,6 +369,185 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Backup & Sync */}
+          <div className="bg-white rounded-xl p-5 border border-calm-border">
+            <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
+              Backup &amp; Sync
+            </p>
+            <p className="text-xs text-calm-muted mb-4 leading-relaxed">
+              Back up your reflections with a passphrase. Restore on any device — no account needed.
+            </p>
+
+            {/* Status messages */}
+            {syncStatus === "success" && (
+              <div className="mb-4 bg-green-50 border border-green-200 rounded-xl p-3">
+                <p className="text-sm text-green-700">{syncMessage}</p>
+              </div>
+            )}
+            {syncStatus === "error" && (
+              <div className="mb-4 bg-red-50 border border-red-200 rounded-xl p-3">
+                <p className="text-sm text-red-700">{syncMessage}</p>
+              </div>
+            )}
+
+            {/* Last backup info */}
+            {lastBackup && syncStatus === "idle" && (
+              <div className="mb-4 flex items-center gap-2 text-xs text-calm-muted">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                  <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                <span>
+                  Last backup: {new Date(lastBackup).toLocaleDateString("en-GB", {
+                    day: "numeric", month: "short", year: "numeric",
+                    hour: "2-digit", minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            )}
+
+            {/* Backup form */}
+            {!showSyncRestore && (
+              <div className="space-y-3">
+                <input
+                  type="password"
+                  value={syncPassphrase}
+                  onChange={e => setSyncPassphrase(e.target.value)}
+                  placeholder={lastBackup ? "Enter your passphrase to update backup" : "Choose a memorable passphrase"}
+                  className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                             placeholder:text-calm-muted/50 focus:outline-none focus:border-mind-300"
+                />
+                {!lastBackup && syncPassphrase.length > 0 && (
+                  <input
+                    type="password"
+                    value={syncConfirm}
+                    onChange={e => setSyncConfirm(e.target.value)}
+                    placeholder="Confirm passphrase"
+                    className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                               placeholder:text-calm-muted/50 focus:outline-none focus:border-mind-300"
+                  />
+                )}
+                {syncPassphrase.length > 0 && syncPassphrase.length < 8 && (
+                  <p className="text-[10px] text-amber-600">
+                    Use at least 8 characters — try a phrase like &ldquo;morning-calm-river&rdquo;
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      if (syncPassphrase.length < 8) return;
+                      if (!lastBackup && syncPassphrase !== syncConfirm) {
+                        setSyncStatus("error");
+                        setSyncMessage("Passphrases don't match");
+                        return;
+                      }
+                      setSyncStatus("backing_up");
+                      setSyncMessage("");
+                      const result = await createBackup(syncPassphrase);
+                      if (result.success) {
+                        setSyncStatus("success");
+                        setSyncMessage("Backed up successfully");
+                        setLastBackup(new Date().toISOString());
+                        setSyncPassphrase("");
+                        setSyncConfirm("");
+                        setTimeout(() => setSyncStatus("idle"), 3000);
+                      } else {
+                        setSyncStatus("error");
+                        setSyncMessage(result.error || "Backup failed");
+                      }
+                    }}
+                    disabled={
+                      syncPassphrase.length < 8 ||
+                      (!lastBackup && syncPassphrase !== syncConfirm) ||
+                      syncStatus === "backing_up"
+                    }
+                    className="flex-1 px-4 py-2.5 rounded-xl text-xs font-medium transition-all
+                               bg-mind-600 text-white hover:bg-mind-700
+                               disabled:opacity-40 disabled:hover:bg-mind-600"
+                  >
+                    {syncStatus === "backing_up" ? "Encrypting..." : lastBackup ? "Update backup" : "Back up now"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowSyncRestore(true);
+                      setSyncPassphrase("");
+                      setSyncConfirm("");
+                      setSyncStatus("idle");
+                      setSyncMessage("");
+                    }}
+                    className="px-4 py-2.5 rounded-xl text-xs font-medium transition-all
+                               text-mind-600 border border-mind-200 hover:bg-mind-50"
+                  >
+                    Restore
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Restore form */}
+            {showSyncRestore && (
+              <div className="space-y-3">
+                <p className="text-xs text-calm-text font-medium">Restore from backup</p>
+                <input
+                  type="password"
+                  value={syncPassphrase}
+                  onChange={e => setSyncPassphrase(e.target.value)}
+                  placeholder="Enter your passphrase"
+                  className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                             placeholder:text-calm-muted/50 focus:outline-none focus:border-mind-300"
+                />
+                {sessionCount > 0 && (
+                  <p className="text-[10px] text-amber-600">
+                    You have {sessionCount} sessions on this device. Restoring will replace your local data.
+                  </p>
+                )}
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      if (syncPassphrase.length < 8) return;
+                      setSyncStatus("restoring");
+                      setSyncMessage("");
+                      const result = await restoreFromBackup(syncPassphrase, "overwrite");
+                      if (result.success) {
+                        setSyncStatus("success");
+                        setSyncMessage(
+                          `Restored ${result.keysRestored} items from ${
+                            new Date(result.backupDate!).toLocaleDateString("en-GB", {
+                              day: "numeric", month: "short",
+                            })
+                          }. Reloading...`
+                        );
+                        // Reload to apply restored data
+                        setTimeout(() => window.location.reload(), 2000);
+                      } else {
+                        setSyncStatus("error");
+                        setSyncMessage(result.error || "Restore failed");
+                      }
+                    }}
+                    disabled={syncPassphrase.length < 8 || syncStatus === "restoring"}
+                    className="flex-1 px-4 py-2.5 rounded-xl text-xs font-medium transition-all
+                               bg-mind-600 text-white hover:bg-mind-700
+                               disabled:opacity-40 disabled:hover:bg-mind-600"
+                  >
+                    {syncStatus === "restoring" ? "Decrypting..." : "Restore"}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowSyncRestore(false);
+                      setSyncPassphrase("");
+                      setSyncStatus("idle");
+                      setSyncMessage("");
+                    }}
+                    className="px-4 py-2.5 rounded-xl text-xs font-medium transition-all
+                               text-calm-muted border border-calm-border hover:bg-warm-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Feedback */}
