@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop, getLastTheme } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
+import { autoBackup } from "@/lib/sync";
 import RelationshipTag from "./RelationshipTag";
 import MicButton from "./MicButton";
 
@@ -247,6 +248,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
     // Track session completion
     trackEvent("session_complete", { mode });
 
+    // Auto-backup to protect against Safari localStorage purge
+    autoBackup();
+
     setIsSaving(false);
     onEnd();
   };
@@ -292,6 +296,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
     // Track session completion
     trackEvent("session_complete", { mode });
 
+    // Auto-backup to protect against Safari localStorage purge
+    autoBackup();
+
     setIsSaving(false);
     onEnd();
   };
@@ -330,6 +337,9 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
     // Track session completion
     trackEvent("session_complete", { mode });
+
+    // Auto-backup to protect against Safari localStorage purge
+    autoBackup();
 
     setIsSaving(false);
     onEnd();

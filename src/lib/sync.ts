@@ -21,9 +21,11 @@ const SYNC_KEYS = [
 ];
 
 const SYNC_CONFIG_KEY = "mindmate_sync_config";
+const SYNC_CACHED_KEY = "mindmate_sync_cached"; // encrypted passphrase for auto-backup
 
 export interface SyncConfig {
   lastBackupAt: string | null;
+  passphraseHash?: string; // SHA-256 hash for KV lookups
 }
 
 export interface BackupPayload {
@@ -279,8 +281,10 @@ export async function createBackup(passphrase: string): Promise<{
       return { success: false, error: err.error || "Backup failed" };
     }
 
-    // 5. Update local sync config
-    setSyncConfig({ lastBackupAt: new Date().toISOString() });
+    // 5. Update local sync config + cache passphrase for auto-backup
+    setSyncConfig({ lastBackupAt: new Date().toISOString(), passphraseHash });
+    // Cache the raw passphrase in sessionStorage (cleared on browser close, never persisted)
+    sessionStorage.setItem(SYNC_CACHED_KEY, passphrase);
 
     return { success: true };
   } catch (err) {
@@ -346,4 +350,56 @@ export async function restoreFromBackup(
       error: err instanceof Error ? err.message : "Restore failed",
     };
   }
+}
+
+// ---- Auto-backup (runs silently after sessions) ----
+
+// Check if auto-backup is possible (user has set up sync before)
+export function isAutoBackupEnabled(): boolean {
+  if (typeof window === "undefined") return false;
+  const config = getSyncConfig();
+  return !!config.passphraseHash && !!sessionStorage.getItem(SYNC_CACHED_KEY);
+}
+
+// Run auto-backup silently — fire and forget, never blocks the UI
+export async function autoBackup(): Promise<void> {
+  if (!isAutoBackupEnabled()) return;
+
+  try {
+    const passphrase = sessionStorage.getItem(SYNC_CACHED_KEY);
+    if (!passphrase) return;
+
+    await createBackup(passphrase);
+  } catch {
+    // Silent fail — auto-backup should never disrupt the app
+  }
+}
+
+// ---- Backup nudge (prompts users who haven't set up sync) ----
+
+const NUDGE_DISMISSED_KEY = "mindmate_backup_nudge_dismissed";
+
+export function shouldShowBackupNudge(): boolean {
+  if (typeof window === "undefined") return false;
+
+  // Don't nudge if they've already set up backup
+  const config = getSyncConfig();
+  if (config.lastBackupAt) return false;
+
+  // Don't nudge if they dismissed it
+  if (localStorage.getItem(NUDGE_DISMISSED_KEY)) return false;
+
+  // Only nudge after 2+ completed sessions (they have something worth protecting)
+  const sessionsRaw = localStorage.getItem("mindmate_sessions");
+  if (!sessionsRaw) return false;
+  try {
+    const sessions = JSON.parse(sessionsRaw);
+    return Array.isArray(sessions) && sessions.length >= 2;
+  } catch {
+    return false;
+  }
+}
+
+export function dismissBackupNudge(): void {
+  localStorage.setItem(NUDGE_DISMISSED_KEY, "true");
 }
