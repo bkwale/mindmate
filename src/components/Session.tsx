@@ -51,6 +51,28 @@ const firstPrompts: Record<AISessionMode, string> = {
   ground: "Take a breath. What's one word for how you feel right now?",
 };
 
+// Map technical API errors to friendly user-facing messages
+function getFriendlyError(status: number, _technical: string): string {
+  switch (status) {
+    case 401:
+      return "MindM8 isn't set up correctly right now. We're looking into it.";
+    case 429:
+      return "MindM8 is getting a lot of love right now. Please try again in a moment.";
+    case 500:
+      return "Something went wrong on our end. Please try again.";
+    case 502:
+    case 503:
+    case 504:
+      return "MindM8 is temporarily unavailable. Please try again in a moment.";
+    case 529:
+      return "MindM8 is busy right now. Please try again in a moment.";
+    default:
+      if (status >= 500) return "Something went wrong on our end. Please try again.";
+      if (status >= 400) return "Something unexpected happened. Please try again.";
+      return "Something unexpected happened. Please try again.";
+  }
+}
+
 function getTimeOfDay(): "morning" | "afternoon" | "evening" | "night" {
   const h = new Date().getHours();
   if (h < 6) return "night";
@@ -156,7 +178,13 @@ export default function Session({ mode, onEnd }: SessionProps) {
       if (!response.ok) {
         let errData: any = {};
         try { errData = await response.json(); } catch {}
-        throw new Error(errData.error || "Something went wrong");
+        const technicalMsg = errData.error || `HTTP ${response.status}`;
+        const friendlyMsg = getFriendlyError(response.status, technicalMsg);
+        reportError(technicalMsg, "chat", {
+          stack: "",
+          context: { mode, exchangeCount: String(exchangeCount), status: String(response.status) },
+        });
+        throw new Error(friendlyMsg);
       }
 
       const data = await response.json();
@@ -174,12 +202,81 @@ export default function Session({ mode, onEnd }: SessionProps) {
         setShowReadiness(true);
       }
     } catch (err: any) {
-      const errorMsg = err.message || "Something went wrong. Please try again.";
+      const errorMsg = err.message || "Something unexpected happened. Please try again.";
       setError(errorMsg);
-      reportError(errorMsg, "chat", {
-        stack: err.stack,
-        context: { mode, exchangeCount: String(exchangeCount) },
+      // Only report if not already reported above (network errors)
+      if (!err._reported) {
+        reportError(err.message || "Unknown error", "chat", {
+          stack: err.stack,
+          context: { mode, exchangeCount: String(exchangeCount) },
+        });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Retry the last message without re-adding it to the conversation
+  const retryLastMessage = async () => {
+    if (isLoading || isComplete) return;
+    setError(null);
+    setIsLoading(true);
+
+    try {
+      const themes = getThemeSummaries();
+      const aboutMe = getAboutMe();
+      const lastTheme = getLastTheme();
+      const chatBody = JSON.stringify({
+        messages: messages.map(m => ({ role: m.role, content: m.content })),
+        mode,
+        exchangeCount,
+        themes: themes.length > 0 ? themes : null,
+        aboutMe,
+        recentEnergy: lastTheme?.energy || undefined,
+        recentRegulation: lastTheme?.regulation || undefined,
       });
+
+      let response: Response | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          response = await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: chatBody,
+          });
+          break;
+        } catch (fetchErr: any) {
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, 1000 * (attempt + 1)));
+          }
+        }
+      }
+
+      if (!response) {
+        throw new Error("Still couldn't connect. Please check your internet and try again.");
+      }
+
+      if (!response.ok) {
+        let errData: any = {};
+        try { errData = await response.json(); } catch {}
+        const technicalMsg = errData.error || `HTTP ${response.status}`;
+        reportError(technicalMsg, "chat-retry", {
+          context: { mode, exchangeCount: String(exchangeCount), status: String(response.status) },
+        });
+        throw new Error(getFriendlyError(response.status, technicalMsg));
+      }
+
+      const data = await response.json();
+      setMessages(prev => [...prev, { role: "assistant", content: data.message }]);
+
+      const newCount = exchangeCount + 1;
+      setExchangeCount(newCount);
+      if (data.isComplete || newCount >= maxExchanges) {
+        setIsComplete(true);
+        setShowReadiness(true);
+      }
+    } catch (err: any) {
+      setError(err.message || "Something unexpected happened. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -560,6 +657,12 @@ export default function Session({ mode, onEnd }: SessionProps) {
           {error && (
             <div className="bg-warm-50 border border-warm-200 rounded-xl p-4 animate-fade-in">
               <p className="text-sm text-warm-700">{error}</p>
+              <button
+                onClick={retryLastMessage}
+                className="mt-2 text-xs text-teal-600 font-medium hover:text-teal-700 transition"
+              >
+                Try again
+              </button>
             </div>
           )}
 
