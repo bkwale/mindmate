@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { saveProfile } from "@/lib/storage";
 import { restoreFromBackup } from "@/lib/sync";
-import PINSetup from "./PINSetup";
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -11,7 +10,6 @@ interface OnboardingProps {
 
 export default function Onboarding({ onComplete }: OnboardingProps) {
   const [screen, setScreen] = useState(0);
-  const [aboutMe, setAboutMe] = useState("");
   const [showRestore, setShowRestore] = useState(false);
   const [restorePhrase, setRestorePhrase] = useState("");
   const [restoreStatus, setRestoreStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -21,27 +19,17 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     saveProfile({
       name: "",
       onboarded: true,
-      aboutMe: aboutMe.trim() || undefined,
+      onboardedV2: true,
       seedAnswers: {},
       createdAt: new Date().toISOString(),
     });
     onComplete();
   };
 
-  // PIN setup gets its own full-screen layout
-  if (screen === 3) {
-    return (
-      <PINSetup
-        onComplete={() => setScreen(4)}
-        onSkip={() => setScreen(4)}
-      />
-    );
-  }
-
   return (
     <div className="min-h-screen bg-alpine flex items-center justify-center p-6 relative overflow-hidden">
       <div className="max-w-md w-full animate-fade-in">
-        {/* Screen 0 — Landing: the emotional hook */}
+        {/* Screen 0 — Landing + Age Gate (merged) */}
         {screen === 0 && (
           <div className="text-center space-y-8 animate-fade-in">
             <div className="flex justify-center">
@@ -64,13 +52,29 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               It&apos;s a space to reflect.
             </p>
 
-            <button
-              onClick={() => setScreen(1)}
-              className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
-                         hover:bg-mind-700 transition-colors duration-200"
-            >
-              Begin
-            </button>
+            <div className="space-y-3">
+              <p className="text-calm-text text-sm font-medium">
+                Are you 18 or older?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setScreen(1)}
+                  className="flex-1 py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
+                             hover:bg-mind-700 transition-colors duration-200"
+                >
+                  Yes, I&apos;m 18+
+                </button>
+                <button
+                  onClick={() => {
+                    alert("MindM8 is only available to users aged 18 and above. Please come back when you\u2019re old enough.");
+                  }}
+                  className="flex-1 py-3.5 border border-calm-border text-calm-muted rounded-xl text-base
+                             hover:bg-warm-50 transition-colors duration-200"
+                >
+                  No
+                </button>
+              </div>
+            </div>
 
             {/* Restore from backup */}
             {!showRestore ? (
@@ -103,7 +107,6 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       setRestoreError("");
                       const result = await restoreFromBackup(restorePhrase, "overwrite");
                       if (result.success) {
-                        // Data restored — reload the app (profile now exists, skips onboarding)
                         window.location.reload();
                       } else {
                         setRestoreStatus("error");
@@ -134,42 +137,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
           </div>
         )}
 
-        {/* Screen 1 — Age gate: after they know what MindM8 is */}
+        {/* Screen 1 — Crisis disclaimer */}
         {screen === 1 && (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="flex justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/logo.svg" alt="MindM8" width={48} height={48} />
-            </div>
-            <p className="text-calm-muted leading-relaxed">
-              MindM8 explores emotions, relationships, and difficult
-              conversations — topics that need maturity to engage with safely.
-            </p>
-            <p className="text-calm-text text-sm font-medium">
-              Are you 18 or older?
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setScreen(2)}
-                className="flex-1 py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
-                           hover:bg-mind-700 transition-colors duration-200"
-              >
-                Yes, I&apos;m 18+
-              </button>
-              <button
-                onClick={() => {
-                  alert("MindM8 is only available to users aged 18 and above. Please come back when you\u2019re old enough.");
-                }}
-                className="flex-1 py-3.5 border border-calm-border text-calm-muted rounded-xl text-base
-                           hover:bg-warm-50 transition-colors duration-200"
-              >
-                No
-              </button>
-            </div>
-          </div>
-        )}
-
-        {screen === 2 && (
           <div className="text-center space-y-8 animate-fade-in">
             <div className="space-y-3">
               <div className="w-10 h-10 rounded-full bg-warm-100 flex items-center justify-center mx-auto">
@@ -197,56 +166,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </div>
             </div>
             <button
-              onClick={() => setScreen(3)}
+              onClick={handleFinish}
               className="w-full py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
                          hover:bg-mind-700 transition-colors duration-200"
             >
               I understand
             </button>
-          </div>
-        )}
-
-        {screen === 4 && (
-          <div className="text-center space-y-8 animate-fade-in">
-            <div className="space-y-3">
-              <h2 className="text-xl font-serif text-calm-text">
-                Help MindM8 understand you
-              </h2>
-              <p className="text-calm-muted text-sm leading-relaxed">
-                What should MindM8 know about you? This helps it ask
-                better questions from the start.
-              </p>
-            </div>
-            <div className="text-left">
-              <textarea
-                value={aboutMe}
-                onChange={e => setAboutMe(e.target.value)}
-                placeholder={"e.g. I\u2019m going through a career change and struggling with a difficult relationship with my mum. I tend to overthink and avoid confrontation."}
-                rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-calm-border bg-white
-                           text-calm-text placeholder:text-calm-muted/40 text-sm leading-relaxed
-                           focus:outline-none focus:border-mind-400 transition-colors resize-none"
-              />
-              <p className="text-[10px] text-calm-muted mt-2">
-                This stays on your device. You can change it anytime in Settings.
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={handleFinish}
-                className="flex-1 py-3.5 border border-calm-border text-calm-muted rounded-xl text-sm
-                           hover:bg-warm-50 transition-colors duration-200"
-              >
-                Skip
-              </button>
-              <button
-                onClick={handleFinish}
-                className="flex-1 py-3.5 bg-mind-600 text-white rounded-xl text-sm font-medium
-                           hover:bg-mind-700 transition-colors duration-200"
-              >
-                Continue
-              </button>
-            </div>
           </div>
         )}
       </div>
