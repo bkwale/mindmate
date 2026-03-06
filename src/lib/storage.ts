@@ -4,6 +4,8 @@
 export interface UserProfile {
   name: string;
   onboarded: boolean;
+  onboardedV2?: boolean;            // Two-stage onboarding (age gate + disclaimer only)
+  postSessionSetupSeen?: boolean;   // Has seen PIN + About Me prompt after first session
   aboutMe?: string;
   seedAnswers: {
     relationship?: string;
@@ -112,7 +114,29 @@ export function saveProfile(profile: UserProfile): void {
 
 export function isOnboarded(): boolean {
   const profile = getProfile();
-  return profile?.onboarded ?? false;
+  if (!profile) return false;
+  // Support both old (onboarded) and new (onboardedV2) flags
+  if (profile.onboarded || profile.onboardedV2) {
+    // Auto-migrate old profiles
+    if (profile.onboarded && !profile.onboardedV2) {
+      profile.onboardedV2 = true;
+      saveProfile(profile);
+    }
+    return true;
+  }
+  return false;
+}
+
+export function hasCompletedPostSessionSetup(): boolean {
+  const profile = getProfile();
+  return profile?.postSessionSetupSeen ?? false;
+}
+
+export function setPostSessionSetupSeen(): void {
+  const profile = getProfile();
+  if (!profile) return;
+  profile.postSessionSetupSeen = true;
+  saveProfile(profile);
 }
 
 // Themes (Tier 2 equivalent)

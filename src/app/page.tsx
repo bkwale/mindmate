@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { isOnboarded } from "@/lib/storage";
+import { isOnboarded, hasCompletedPostSessionSetup } from "@/lib/storage";
 import { isPINEnabled, shouldAutoLock, updateLastActivity, getAutoLockTimeout } from "@/lib/security";
 import { SessionMode } from "@/lib/prompts";
 import { registerServiceWorker, initInstallPrompt } from "@/lib/notifications";
@@ -13,8 +13,9 @@ import Breathe from "@/components/Breathe";
 import Insights from "@/components/Insights";
 import Settings from "@/components/Settings";
 import PINLock from "@/components/PINLock";
+import PostSessionSetup from "@/components/PostSessionSetup";
 
-type AppState = "loading" | "locked" | "onboarding" | "home" | "session" | "insights" | "settings";
+type AppState = "loading" | "locked" | "onboarding" | "home" | "session" | "insights" | "settings" | "postSessionSetup";
 
 export default function MindM8() {
   const [appState, setAppState] = useState<AppState>("loading");
@@ -131,6 +132,14 @@ export default function MindM8() {
 
   const handleSessionEnd = () => {
     setActiveMode(null);
+    if (!hasCompletedPostSessionSetup()) {
+      setAppState("postSessionSetup");
+    } else {
+      setAppState("home");
+    }
+  };
+
+  const handlePostSessionSetupComplete = () => {
     setAppState("home");
   };
 
@@ -178,7 +187,9 @@ export default function MindM8() {
   // Wrap all pages in a transition container
   return (
     <div key={appState} className="page-enter">
-      {appState === "session" && activeMode === "breathe" ? (
+      {appState === "postSessionSetup" ? (
+        <PostSessionSetup onComplete={handlePostSessionSetupComplete} />
+      ) : appState === "session" && activeMode === "breathe" ? (
         <Breathe onEnd={handleSessionEnd} />
       ) : appState === "session" && activeMode ? (
         <Session mode={activeMode} onEnd={handleSessionEnd} />

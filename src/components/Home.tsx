@@ -622,30 +622,8 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           </div>
         )}
 
-        {/* Notification permission prompt */}
-        {!showPauseMessage && showNotificationPrompt && (
-          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/50">
-            <p className="text-sm text-calm-text mb-3">
-              Want a daily reminder to check in?
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={handleNotificationYes}
-                className="flex-1 px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
-              >
-                Yes
-              </button>
-              <button
-                onClick={handleNotificationNo}
-                className="flex-1 px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium"
-              >
-                Not now
-              </button>
-            </div>
-          </div>
-        )}
-
-        <div className="space-y-3">
+        {/* Session mode buttons — the core experience, shown first */}
+        <div className="space-y-3 mb-6">
           {doors.map((door) => (
             <button
               key={door.mode}
@@ -676,6 +654,29 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
             </button>
           ))}
         </div>
+
+        {/* Notification permission prompt */}
+        {!showPauseMessage && showNotificationPrompt && (
+          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/50">
+            <p className="text-sm text-calm-text mb-3">
+              Want a daily reminder to check in?
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleNotificationYes}
+                className="flex-1 px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
+              >
+                Yes
+              </button>
+              <button
+                onClick={handleNotificationNo}
+                className="flex-1 px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium"
+              >
+                Not now
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Footer */}
         <p className="text-center text-[11px] text-calm-muted/50 mt-10 font-light tracking-wide">
