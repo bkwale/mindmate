@@ -67,6 +67,15 @@ export async function GET(req: Request) {
     // ---- Active dates for retention ----
     const activeDates = await kv.smembers("stats:active_dates") as string[] || [];
 
+    // ---- Error logs ----
+    const errorsRaw = await kv.lrange("stats:errors", 0, 49) as string[];
+    const errors = (errorsRaw || []).map(r => {
+      try { return typeof r === "string" ? JSON.parse(r) : r; }
+      catch { return r; }
+    });
+    const errorSources = (await kv.hgetall("stats:error_sources")) as Record<string, number> || {};
+    const dailyErrors = (await kv.hgetall("stats:daily:errors")) as Record<string, number> || {};
+
     // ---- Computed metrics ----
     const totalSessions = totals.session_complete || 0;
     const totalStarts = totals.session_start || 0;
@@ -92,6 +101,7 @@ export async function GET(req: Request) {
       geo: { countries, cities, regions },
       recent,
       activeDates: activeDates.sort(),
+      errors: { recent: errors, sources: errorSources, daily: dailyErrors },
       generatedAt: now.toISOString(),
     });
   } catch (error) {

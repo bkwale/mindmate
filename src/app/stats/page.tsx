@@ -22,6 +22,20 @@ interface StatsData {
   };
   recent: Array<{ e: string; t: string; m: string | null; g?: string }>;
   activeDates: string[];
+  errors: {
+    recent: Array<{
+      msg: string;
+      src: string;
+      stack?: string;
+      ua?: string;
+      url?: string;
+      ctx?: Record<string, string>;
+      geo?: string;
+      t: string;
+    }>;
+    sources: Record<string, number>;
+    daily: Record<string, number>;
+  };
   generatedAt: string;
 }
 
@@ -97,7 +111,7 @@ export default function StatsPage() {
 
   if (!stats) return null;
 
-  const { totals, computed, dailyData, dailyVisitors, hours, modes, geo, recent, activeDates } = stats;
+  const { totals, computed, dailyData, dailyVisitors, hours, modes, geo, recent, activeDates, errors } = stats;
 
   // Get sorted dates for chart (last 14 days)
   const last14 = Array.from({ length: 14 }, (_, i) => {
@@ -146,6 +160,66 @@ export default function StatsPage() {
           <MetricCard label="Check-ins" value={computed.totalCheckIns} />
           <MetricCard label="Voice Uses" value={computed.totalVoice} />
         </div>
+
+        {/* Error Summary — only show if there are errors */}
+        {errors && errors.recent.length > 0 && (
+          <div className="bg-red-50 border border-red-200 rounded-2xl p-5">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-red-700">
+                Errors ({Object.values(errors.daily).reduce((a, b) => a + b, 0)} total)
+              </h2>
+              <div className="flex gap-2">
+                {Object.entries(errors.sources)
+                  .sort(([, a], [, b]) => b - a)
+                  .slice(0, 4)
+                  .map(([src, count]) => (
+                    <span key={src} className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">
+                      {src}: {count}
+                    </span>
+                  ))}
+              </div>
+            </div>
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {errors.recent.slice(0, 20).map((err, i) => (
+                <div key={i} className="bg-white rounded-xl p-3 border border-red-100">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-medium bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                          {err.src}
+                        </span>
+                        {err.ua && (
+                          <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+                            {err.ua}
+                          </span>
+                        )}
+                        {err.geo && err.geo !== "Unknown" && (
+                          <span className="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full">
+                            {err.geo}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-red-800 font-medium">{err.msg}</p>
+                      {err.ctx && (
+                        <div className="flex gap-2 mt-1">
+                          {Object.entries(err.ctx).map(([k, v]) => (
+                            <span key={k} className="text-xs text-gray-500">{k}: {v}</span>
+                          ))}
+                        </div>
+                      )}
+                      {err.stack && (
+                        <pre className="text-xs text-gray-400 mt-1 whitespace-pre-wrap break-all max-h-16 overflow-hidden">
+                          {err.stack.split("\n").slice(0, 3).join("\n")}
+                        </pre>
+                      )}
+                    </div>
+                    <span className="text-xs text-gray-400 whitespace-nowrap">{timeAgo(err.t)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Mode Breakdown */}
         <div className="bg-white rounded-2xl p-5 shadow-sm">

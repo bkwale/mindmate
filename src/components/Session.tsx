@@ -5,6 +5,7 @@ import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop, getLastTheme } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import { autoBackup } from "@/lib/sync";
+import { reportError } from "@/lib/errorReporter";
 import RelationshipTag from "./RelationshipTag";
 import MicButton from "./MicButton";
 
@@ -173,7 +174,12 @@ export default function Session({ mode, onEnd }: SessionProps) {
         setShowReadiness(true);
       }
     } catch (err: any) {
-      setError(err.message || "Something went wrong. Please try again.");
+      const errorMsg = err.message || "Something went wrong. Please try again.";
+      setError(errorMsg);
+      reportError(errorMsg, "chat", {
+        stack: err.stack,
+        context: { mode, exchangeCount: String(exchangeCount) },
+      });
     } finally {
       setIsLoading(false);
     }
@@ -213,8 +219,12 @@ export default function Session({ mode, onEnd }: SessionProps) {
           });
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Theme extraction failed:", err);
+      reportError(err.message || "Theme extraction failed", "extract", {
+        stack: err.stack,
+        context: { mode },
+      });
     }
   };
 
