@@ -197,7 +197,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
       const newCount = exchangeCount + 1;
       setExchangeCount(newCount);
 
-      if (data.isComplete || newCount >= maxExchanges) {
+      if (data.isComplete || newCount >= maxExchanges + bonusExchanges) {
         setIsComplete(true);
         setShowReadiness(true);
       }
@@ -271,7 +271,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
       const newCount = exchangeCount + 1;
       setExchangeCount(newCount);
-      if (data.isComplete || newCount >= maxExchanges) {
+      if (data.isComplete || newCount >= maxExchanges + bonusExchanges) {
         setIsComplete(true);
         setShowReadiness(true);
       }
@@ -325,12 +325,25 @@ export default function Session({ mode, onEnd }: SessionProps) {
     }
   };
 
+  const [bonusExchanges, setBonusExchanges] = useState(0);
+
   const handleReadinessSelect = (level: "yes" | "a-little" | "not-yet") => {
     setReadinessLevel(level);
   };
 
   const handleReadinessContinue = () => {
     setShowReadiness(false);
+  };
+
+  const handleKeepGoing = () => {
+    // Let the user continue the conversation with extra exchanges
+    setBonusExchanges(prev => prev + 3);
+    setIsComplete(false);
+    setShowReadiness(false);
+    setReadinessLevel(null);
+    setReadinessNote("");
+    // Re-focus input
+    setTimeout(() => inputRef.current?.focus(), 100);
   };
 
   // Derive clarity from readiness level — no need to ask twice
@@ -800,23 +813,43 @@ export default function Session({ mode, onEnd }: SessionProps) {
                         </div>
                       </div>
                     )}
-                    <button
-                      onClick={handleReadinessContinue}
-                      className={`w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200 ${
-                        readinessLevel
-                          ? "bg-mind-600 text-white hover:bg-mind-700"
-                          : "bg-calm-border/50 text-calm-muted"
-                      }`}
-                      disabled={!readinessLevel}
-                    >
-                      Continue
-                    </button>
-                    <button
-                      onClick={() => { setShowReadiness(false); }}
-                      className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
-                    >
-                      Skip
-                    </button>
+                    {readinessLevel === "not-yet" ? (
+                      <>
+                        <button
+                          onClick={handleKeepGoing}
+                          className="w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200
+                                     bg-mind-600 text-white hover:bg-mind-700"
+                        >
+                          Keep going
+                        </button>
+                        <button
+                          onClick={handleReadinessContinue}
+                          className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                        >
+                          End session
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={handleReadinessContinue}
+                          className={`w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200 ${
+                            readinessLevel
+                              ? "bg-mind-600 text-white hover:bg-mind-700"
+                              : "bg-calm-border/50 text-calm-muted"
+                          }`}
+                          disabled={!readinessLevel}
+                        >
+                          Continue
+                        </button>
+                        <button
+                          onClick={() => { setShowReadiness(false); }}
+                          className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                        >
+                          Skip
+                        </button>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 animate-fade-in">
