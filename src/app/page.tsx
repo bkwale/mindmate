@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { isOnboarded, hasCompletedPostSessionSetup } from "@/lib/storage";
+import { isOnboarded, hasCompletedPostSessionSetup, getSessions } from "@/lib/storage";
 import { isPINEnabled, shouldAutoLock, updateLastActivity, getAutoLockTimeout } from "@/lib/security";
 import { SessionMode } from "@/lib/prompts";
 import { registerServiceWorker, initInstallPrompt } from "@/lib/notifications";
@@ -48,8 +48,14 @@ export default function MindM8() {
     // Capture the beforeinstallprompt event for native install
     initInstallPrompt();
 
-    // Track app open
-    trackEvent("app_open");
+    // Track app open with returning user flag
+    const isReturning = getSessions().length > 0;
+    trackEvent("app_open", { isReturning: String(isReturning) });
+
+    // Track return visits separately for retention measurement
+    if (isReturning) {
+      trackEvent("return_visit");
+    }
   }, []);
 
   // Visibility change listener — lock when tab goes to background

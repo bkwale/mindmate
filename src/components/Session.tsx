@@ -1,11 +1,96 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useReducer, useRef, useEffect } from "react";
 import { SessionMode, SESSION_LIMITS } from "@/lib/prompts";
-import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop, getLastTheme } from "@/lib/storage";
+import { getThemeSummaries, getAboutMe, addSession, addTheme, addLetter, addFollowUp, saveOpenLoop, getLastTheme, getSessions } from "@/lib/storage";
 import { trackEvent } from "@/lib/cohort";
 import { autoBackup } from "@/lib/sync";
 import { reportError } from "@/lib/errorReporter";
+import { getRateToken } from "@/lib/rateToken";
+import { shouldEndSession, deriveClarity as deriveClarityFn, canKeepGoing } from "@/lib/sessionLogic";
+
+// --- Flow state reducer ---
+
+type FlowPhase = "intro" | "active" | "clarityCheck" | "takeaway" | "letter" | "saving";
+
+interface FlowState {
+  phase: FlowPhase;
+  readinessLevel: "yes" | "a-little" | "not-yet" | null;
+  readinessNote: string;
+  bonusExchanges: number;
+  exchangeCount: number;
+}
+
+type FlowAction =
+  | { type: "START_SESSION" }
+  | { type: "EXCHANGE_COMPLETE"; apiSignaledComplete: boolean; maxExchanges: number }
+  | { type: "SHOW_CLARITY_CHECK" }
+  | { type: "SELECT_READINESS"; level: "yes" | "a-little" | "not-yet" }
+  | { type: "CONTINUE_TO_TAKEAWAY" }
+  | { type: "KEEP_GOING" }
+  | { type: "SHOW_LETTER" }
+  | { type: "START_SAVING" }
+  | { type: "SET_READINESS_NOTE"; note: string };
+
+const initialFlowState: FlowState = {
+  phase: "intro",
+  readinessLevel: null,
+  readinessNote: "",
+  bonusExchanges: 0,
+  exchangeCount: 0,
+};
+
+function flowReducer(state: FlowState, action: FlowAction): FlowState {
+  switch (action.type) {
+    case "START_SESSION":
+      return { ...state, phase: "active" };
+
+    case "EXCHANGE_COMPLETE": {
+      const newCount = state.exchangeCount + 1;
+      const ended = shouldEndSession(
+        newCount,
+        action.maxExchanges,
+        state.bonusExchanges,
+        action.apiSignaledComplete
+      );
+      return {
+        ...state,
+        exchangeCount: newCount,
+        phase: ended ? "clarityCheck" : state.phase,
+      };
+    }
+
+    case "SHOW_CLARITY_CHECK":
+      return { ...state, phase: "clarityCheck" };
+
+    case "SELECT_READINESS":
+      return { ...state, readinessLevel: action.level };
+
+    case "CONTINUE_TO_TAKEAWAY":
+      return { ...state, phase: "takeaway" };
+
+    case "KEEP_GOING":
+      return {
+        ...state,
+        bonusExchanges: state.bonusExchanges + 3,
+        phase: "active",
+        readinessLevel: null,
+        readinessNote: "",
+      };
+
+    case "SHOW_LETTER":
+      return { ...state, phase: "letter" };
+
+    case "START_SAVING":
+      return { ...state, phase: "saving" };
+
+    case "SET_READINESS_NOTE":
+      return { ...state, readinessNote: action.note };
+
+    default:
+      return state;
+  }
+}
 import RelationshipTag from "./RelationshipTag";
 import MicButton from "./MicButton";
 
@@ -85,25 +170,30 @@ function getTimeOfDay(): "morning" | "afternoon" | "evening" | "night" {
 export default function Session({ mode, onEnd }: SessionProps) {
   const aiMode = mode as AISessionMode;
   const maxExchanges = SESSION_LIMITS[mode];
-  const [showIntro, setShowIntro] = useState(true);
+
+  // Flow state — managed by reducer
+  const [flow, dispatch] = useReducer(flowReducer, initialFlowState);
+  const { phase, readinessLevel, readinessNote, bonusExchanges, exchangeCount } = flow;
+
+  // Content state — independent, stays as useState
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: firstPrompts[aiMode] },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [exchangeCount, setExchangeCount] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [relationshipTag, setRelationshipTag] = useState<string | null>(null);
   const [takeaway, setTakeaway] = useState("");
-  const [isSaving, setIsSaving] = useState(false);
   const [shared, setShared] = useState(false);
-  const [showLetter, setShowLetter] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [letterSaved, setLetterSaved] = useState(false);
-  const [showReadiness, setShowReadiness] = useState(false);
-  const [readinessLevel, setReadinessLevel] = useState<"yes" | "a-little" | "not-yet" | null>(null);
-  const [readinessNote, setReadinessNote] = useState("");
+
+  // Derived booleans for backward-compatible checks in effects/JSX
+  const showIntro = phase === "intro";
+  const isComplete = phase !== "intro" && phase !== "active";
+  const showReadiness = phase === "clarityCheck";
+  const isSaving = phase === "saving";
+  const showLetter = phase === "letter";
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -133,7 +223,8 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
     // Track session start on first message
     if (exchangeCount === 0) {
-      trackEvent("session_start", { mode });
+      const isReturning = getSessions().length > 0;
+      trackEvent("session_start", { mode, isReturning: String(isReturning) });
     }
 
     try {
@@ -157,7 +248,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
         try {
           response = await fetch("/api/chat", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "X-MindM8-Token": getRateToken() },
             body: chatBody,
           });
           break; // success — exit retry loop
@@ -194,13 +285,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
         { role: "assistant", content: data.message },
       ]);
 
-      const newCount = exchangeCount + 1;
-      setExchangeCount(newCount);
-
-      if (data.isComplete || newCount >= maxExchanges + bonusExchanges) {
-        setIsComplete(true);
-        setShowReadiness(true);
-      }
+      dispatch({ type: "EXCHANGE_COMPLETE", apiSignaledComplete: !!data.isComplete, maxExchanges });
     } catch (err: any) {
       const errorMsg = err.message || "Something unexpected happened. Please try again.";
       setError(errorMsg);
@@ -241,7 +326,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
         try {
           response = await fetch("/api/chat", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "X-MindM8-Token": getRateToken() },
             body: chatBody,
           });
           break;
@@ -269,12 +354,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
       const data = await response.json();
       setMessages(prev => [...prev, { role: "assistant", content: data.message }]);
 
-      const newCount = exchangeCount + 1;
-      setExchangeCount(newCount);
-      if (data.isComplete || newCount >= maxExchanges + bonusExchanges) {
-        setIsComplete(true);
-        setShowReadiness(true);
-      }
+      dispatch({ type: "EXCHANGE_COMPLETE", apiSignaledComplete: !!data.isComplete, maxExchanges });
     } catch (err: any) {
       setError(err.message || "Something unexpected happened. Please try again.");
     } finally {
@@ -325,23 +405,16 @@ export default function Session({ mode, onEnd }: SessionProps) {
     }
   };
 
-  const [bonusExchanges, setBonusExchanges] = useState(0);
-
   const handleReadinessSelect = (level: "yes" | "a-little" | "not-yet") => {
-    setReadinessLevel(level);
+    dispatch({ type: "SELECT_READINESS", level });
   };
 
   const handleReadinessContinue = () => {
-    setShowReadiness(false);
+    dispatch({ type: "CONTINUE_TO_TAKEAWAY" });
   };
 
   const handleKeepGoing = () => {
-    // Let the user continue the conversation with extra exchanges
-    setBonusExchanges(prev => prev + 3);
-    setIsComplete(false);
-    setShowReadiness(false);
-    setReadinessLevel(null);
-    setReadinessNote("");
+    dispatch({ type: "KEEP_GOING" });
     // Re-focus input
     setTimeout(() => inputRef.current?.focus(), 100);
   };
@@ -357,11 +430,11 @@ export default function Session({ mode, onEnd }: SessionProps) {
   const handleSoftEnd = async () => {
     // For prepare mode, show letter writing instead of immediately ending
     if (mode === "prepare") {
-      setShowLetter(true);
+      dispatch({ type: "SHOW_LETTER" });
       return;
     }
 
-    setIsSaving(true);
+    dispatch({ type: "START_SAVING" });
 
     // Save session with all data at once
     addSession({
@@ -393,13 +466,13 @@ export default function Session({ mode, onEnd }: SessionProps) {
     // Auto-backup to protect against Safari localStorage purge
     autoBackup();
 
-    setIsSaving(false);
+    // Component unmounts via onEnd — no need to reset saving phase
     onEnd();
   };
 
   const handleLetterSave = async () => {
     setLetterSaved(true);
-    setIsSaving(true);
+    dispatch({ type: "START_SAVING" });
 
     // Save the letter
     if (letterContent.trim()) {
@@ -441,12 +514,12 @@ export default function Session({ mode, onEnd }: SessionProps) {
     // Auto-backup to protect against Safari localStorage purge
     autoBackup();
 
-    setIsSaving(false);
+    // Component unmounts via onEnd — no need to reset saving phase
     onEnd();
   };
 
   const handleLetterSkip = async () => {
-    setIsSaving(true);
+    dispatch({ type: "START_SAVING" });
 
     // Save session without letter
     addSession({
@@ -483,7 +556,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
     // Auto-backup to protect against Safari localStorage purge
     autoBackup();
 
-    setIsSaving(false);
+    // Component unmounts via onEnd — no need to reset saving phase
     onEnd();
   };
 
@@ -554,7 +627,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
               {maxExchanges} exchanges &middot; be honest to get the most from this
             </p>
             <button
-              onClick={() => setShowIntro(false)}
+              onClick={() => dispatch({ type: "START_SESSION" })}
               className="w-full py-3.5 bg-mind-600 text-white rounded-2xl text-base font-medium
                          hover:bg-mind-700 transition-all duration-300"
             >
@@ -590,7 +663,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
               {modeLabels[aiMode]}
             </p>
             <p className="text-xs text-calm-muted">
-              {exchangeCount} of {maxExchanges}
+              {exchangeCount} of {maxExchanges + bonusExchanges}
             </p>
           </div>
           <div className="w-7 flex justify-end">
@@ -604,7 +677,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
         <div className="h-0.5 bg-calm-border">
           <div
             className="h-full bg-mind-500 transition-all duration-500 ease-out"
-            style={{ width: `${(exchangeCount / maxExchanges) * 100}%` }}
+            style={{ width: `${(exchangeCount / (maxExchanges + bonusExchanges)) * 100}%` }}
           />
         </div>
       </header>
@@ -801,7 +874,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                         </label>
                         <textarea
                           value={readinessNote}
-                          onChange={e => setReadinessNote(e.target.value)}
+                          onChange={e => dispatch({ type: "SET_READINESS_NOTE", note: e.target.value })}
                           placeholder="Optional — a word or a sentence"
                           rows={2}
                           className="w-full px-3 py-2.5 rounded-xl border border-calm-border bg-white
@@ -809,12 +882,17 @@ export default function Session({ mode, onEnd }: SessionProps) {
                                      focus:outline-none focus:border-mind-400 transition-colors resize-none"
                         />
                         <div className="mt-1.5 flex justify-end">
-                          <MicButton onTranscript={(text) => setReadinessNote(text)} size="sm" />
+                          <MicButton onTranscript={(text) => dispatch({ type: "SET_READINESS_NOTE", note: text })} size="sm" />
                         </div>
                       </div>
                     )}
                     {readinessLevel === "not-yet" ? (
-                      <>
+                      <div className="space-y-3 animate-fade-in">
+                        <div className="bg-mind-50/60 border border-mind-100/50 rounded-2xl px-4 py-3 text-center">
+                          <p className="text-sm text-mind-700 leading-relaxed font-light">
+                            That&apos;s okay — clarity doesn&apos;t always come in one sitting. Want to keep exploring?
+                          </p>
+                        </div>
                         <button
                           onClick={handleKeepGoing}
                           className="w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200
@@ -828,7 +906,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                         >
                           End session
                         </button>
-                      </>
+                      </div>
                     ) : (
                       <>
                         <button
@@ -843,7 +921,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                           Continue
                         </button>
                         <button
-                          onClick={() => { setShowReadiness(false); }}
+                          onClick={() => dispatch({ type: "CONTINUE_TO_TAKEAWAY" })}
                           className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
                         >
                           Skip

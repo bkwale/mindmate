@@ -2,13 +2,54 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, getPersonalContextLayer, getRegulationLayer, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 
+let kv: any = null;
+try {
+  kv = require("@vercel/kv").kv;
+} catch { /* KV not configured — rate limiting disabled */ }
+
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const RATE_LIMIT_MAX = 50; // max API calls per token per day
+const RATE_LIMIT_PREFIX = "rl:";
+
+async function checkRateLimit(token: string | null): Promise<{ allowed: boolean; remaining: number }> {
+  if (!kv || !token) return { allowed: true, remaining: RATE_LIMIT_MAX };
+
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const key = `${RATE_LIMIT_PREFIX}${token}:${today}`;
+    const count = await kv.incr(key);
+
+    // Set expiry on first use (48 hours to cover timezone edges)
+    if (count === 1) {
+      await kv.expire(key, 172800);
+    }
+
+    return {
+      allowed: count <= RATE_LIMIT_MAX,
+      remaining: Math.max(0, RATE_LIMIT_MAX - count),
+    };
+  } catch {
+    // If KV fails, allow the request — don't break the app
+    return { allowed: true, remaining: RATE_LIMIT_MAX };
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    // Rate limiting — uses anonymous token from client
+    const clientToken = req.headers.get("x-mindm8-token");
+    const { allowed, remaining } = await checkRateLimit(clientToken);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: "You've had a lot of sessions today. Come back tomorrow with fresh eyes." },
+        { status: 429, headers: { "X-RateLimit-Remaining": String(remaining) } }
+      );
+    }
     const {
       messages,
       mode,

@@ -1,5 +1,5 @@
 // MindM8 Service Worker — caching + push notifications
-const CACHE_NAME = "mindm8-v2.0";
+const CACHE_NAME = "mindm8-v2.1";
 
 // Install — cache shell
 self.addEventListener("install", (event) => {
