@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { saveProfile } from "@/lib/storage";
 import { restoreFromBackup } from "@/lib/sync";
+import { trackEvent } from "@/lib/cohort";
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -16,6 +17,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const [restoreError, setRestoreError] = useState("");
 
   const handleFinish = () => {
+    trackEvent("crisis_accepted");
     saveProfile({
       name: "",
       onboarded: true,
@@ -25,6 +27,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     });
     onComplete();
   };
+
+  // Track funnel events
+  useEffect(() => {
+    trackEvent("onboarding_viewed");
+  }, []);
 
   return (
     <div className="min-h-screen bg-alpine flex items-center justify-center p-6 relative overflow-hidden">
@@ -58,7 +65,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
               </p>
               <div className="flex gap-3">
                 <button
-                  onClick={() => setScreen(1)}
+                  onClick={() => {
+                    trackEvent("age_gate_passed");
+                    setScreen(1);
+                  }}
                   className="flex-1 py-3.5 bg-mind-600 text-white rounded-xl text-base font-medium
                              hover:bg-mind-700 transition-colors duration-200"
                 >

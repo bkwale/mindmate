@@ -5,9 +5,9 @@ import ErrorBoundaryInit from "@/components/ErrorBoundaryInit";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MindM8 — A space to reflect",
+  title: "MindM8 — Think clearly about what's on your mind",
   description:
-    "MindM8 helps you think more clearly about your emotions and relationships. Not therapy. Not a chatbot. A space to reflect.",
+    "Process stress, overwhelm, and difficult emotions through guided reflection. Private, no sign-up, 5-minute sessions. Your thoughts stay on your device.",
   icons: {
     icon: [
       {

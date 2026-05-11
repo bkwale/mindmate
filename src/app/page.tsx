@@ -7,6 +7,7 @@ import { SessionMode } from "@/lib/prompts";
 import { registerServiceWorker, initInstallPrompt } from "@/lib/notifications";
 import { trackEvent } from "@/lib/cohort";
 import Onboarding from "@/components/Onboarding";
+import LandingPage from "@/components/LandingPage";
 import Home from "@/components/Home";
 import Session from "@/components/Session";
 import Breathe from "@/components/Breathe";
@@ -185,9 +186,18 @@ export default function MindM8() {
     return <PINLock onUnlock={handleUnlock} />;
   }
 
-  // Onboarding
+  // New visitors — show landing page with value prop, then gate on door tap
   if (appState === "onboarding") {
-    return <Onboarding onComplete={handleOnboardingComplete} />;
+    return (
+      <LandingPage
+        onStartSession={(mode) => {
+          // LandingPage handles onboarding (age gate + crisis disclaimer) internally
+          // By the time this fires, the user is onboarded and ready to start
+          setActiveMode(mode);
+          setAppState("session");
+        }}
+      />
+    );
   }
 
   // Wrap all pages in a transition container
