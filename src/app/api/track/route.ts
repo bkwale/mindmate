@@ -64,12 +64,34 @@ export async function POST(req: Request) {
       await kv.expire(`stats:geo:daily:${dateKey}`, 90 * 24 * 60 * 60);
     }
 
+    // ---- Source/Ref tracking (pilot partners) ----
+    // If the event has a ref tag (e.g. "hmg", "worcester"), track it separately
+    if (meta?.ref) {
+      const ref = meta.ref;
+      // Total events per source
+      await kv.hincrby(`stats:sources:${ref}`, event, 1);
+      // Daily events per source
+      await kv.hincrby(`stats:sources:${ref}:daily:${dateKey}`, event, 1);
+      // Unique visitors per source per day
+      if (meta?.sh) {
+        await kv.sadd(`stats:sources:${ref}:visitors:${dateKey}`, meta.sh);
+        await kv.expire(`stats:sources:${ref}:visitors:${dateKey}`, 90 * 24 * 60 * 60);
+      }
+      // Mode breakdown per source
+      if (meta?.mode) {
+        await kv.hincrby(`stats:sources:${ref}:modes`, meta.mode, 1);
+      }
+      // Track which sources exist
+      await kv.sadd("stats:sources", ref);
+    }
+
     // Store last 500 raw events for recent activity feed
     const rawEvent = JSON.stringify({
       e: event,
       t: now.toISOString(),
       m: meta?.mode || null,
       g: geoLabel !== "Unknown" ? geoLabel : undefined,
+      r: meta?.ref || undefined,
     });
     await kv.lpush("stats:recent", rawEvent);
     await kv.ltrim("stats:recent", 0, 499);

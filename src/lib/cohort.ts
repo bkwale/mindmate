@@ -12,6 +12,31 @@ export interface CohortEvent {
 
 const COHORT_KEY = "mindmate_cohort";
 const SESSION_HASH_KEY = "mindmate_sh";
+const SOURCE_REF_KEY = "mindmate_ref";
+
+// ---- Source/Ref tracking for pilot partners ----
+// Captures ?ref= query param on first visit (e.g. ?ref=hmg, ?ref=worcester)
+// Persists in localStorage so all subsequent events are tagged
+function initSourceRef(): void {
+  if (typeof window === "undefined") return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem(SOURCE_REF_KEY, ref.toLowerCase().trim());
+    }
+  } catch { /* silently fail */ }
+}
+
+export function getSourceRef(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(SOURCE_REF_KEY);
+}
+
+// Initialise source ref on module load (client-side only)
+if (typeof window !== "undefined") {
+  initSourceRef();
+}
 
 // Generate a random session hash for approximate unique visitor counting
 // Not a user ID — just a random string that rotates every 24 hours
@@ -53,12 +78,16 @@ export function trackEvent(event: string, meta?: Record<string, string>): void {
 
   // ---- Server-side tracking (non-blocking, fire-and-forget) ----
   // Geo headers (city, country) are captured server-side by /api/track
+  // Source ref (pilot partner) is included if present
   try {
     const sh = getSessionHash();
+    const ref = getSourceRef();
+    const serverMeta: Record<string, string> = { ...meta, sh };
+    if (ref) serverMeta.ref = ref;
     fetch("/api/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event, meta: { ...meta, sh } }),
+      body: JSON.stringify({ event, meta: serverMeta }),
     }).catch(() => { /* silently fail — don't break the app */ });
   } catch { /* silently fail */ }
 }

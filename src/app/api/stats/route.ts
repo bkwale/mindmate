@@ -76,6 +76,43 @@ export async function GET(req: Request) {
     const errorSources = (await kv.hgetall("stats:error_sources")) as Record<string, number> || {};
     const dailyErrors = (await kv.hgetall("stats:daily:errors")) as Record<string, number> || {};
 
+    // ---- Source/Ref tracking (pilot partners) ----
+    const sourceList = await kv.smembers("stats:sources") as string[] || [];
+    const sources: Record<string, {
+      totals: Record<string, number>;
+      dailyData: Record<string, Record<string, number>>;
+      dailyVisitors: Record<string, number>;
+      modes: Record<string, number>;
+    }> = {};
+
+    for (const ref of sourceList) {
+      const srcTotals = (await kv.hgetall(`stats:sources:${ref}`)) as Record<string, number> || {};
+      const srcModes = (await kv.hgetall(`stats:sources:${ref}:modes`)) as Record<string, number> || {};
+      const srcDaily: Record<string, Record<string, number>> = {};
+      const srcVisitors: Record<string, number> = {};
+
+      for (let i = 0; i < 30; i++) {
+        const d = new Date(now);
+        d.setDate(d.getDate() - i);
+        const dateKey = d.toISOString().slice(0, 10);
+        const dayStats = await kv.hgetall(`stats:sources:${ref}:daily:${dateKey}`) as Record<string, number> | null;
+        if (dayStats && Object.keys(dayStats).length > 0) {
+          srcDaily[dateKey] = dayStats;
+        }
+        const vCount = await kv.scard(`stats:sources:${ref}:visitors:${dateKey}`);
+        if (vCount > 0) {
+          srcVisitors[dateKey] = vCount;
+        }
+      }
+
+      sources[ref] = {
+        totals: srcTotals,
+        dailyData: srcDaily,
+        dailyVisitors: srcVisitors,
+        modes: srcModes,
+      };
+    }
+
     // ---- Computed metrics ----
     const totalSessions = totals.session_complete || 0;
     const totalStarts = totals.session_start || 0;
@@ -99,6 +136,7 @@ export async function GET(req: Request) {
       hours,
       modes,
       geo: { countries, cities, regions },
+      sources,
       recent,
       activeDates: activeDates.sort(),
       errors: { recent: errors, sources: errorSources, daily: dailyErrors },
