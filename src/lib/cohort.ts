@@ -73,7 +73,9 @@ export function trackEvent(event: string, meta?: Record<string, string>): void {
 
   // ---- Vercel Analytics custom events (shows in Events tab) ----
   try {
-    vercelTrack(event, meta || {});
+    const ref = getSourceRef();
+    const vercelMeta = ref ? { ...meta, ref } : meta;
+    vercelTrack(event, vercelMeta || {});
   } catch { /* silently fail */ }
 
   // ---- Server-side tracking (non-blocking, fire-and-forget) ----
