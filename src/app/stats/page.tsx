@@ -20,7 +20,13 @@ interface StatsData {
     cities: Record<string, number>;
     regions: Record<string, number>;
   };
-  recent: Array<{ e: string; t: string; m: string | null; g?: string }>;
+  sources: Record<string, {
+    totals: Record<string, number>;
+    dailyData: Record<string, Record<string, number>>;
+    dailyVisitors: Record<string, number>;
+    modes: Record<string, number>;
+  }>;
+  recent: Array<{ e: string; t: string; m: string | null; g?: string; r?: string }>;
   activeDates: string[];
   errors: {
     recent: Array<{
@@ -111,7 +117,7 @@ export default function StatsPage() {
 
   if (!stats) return null;
 
-  const { totals, computed, dailyData, dailyVisitors, hours, modes, geo, recent, activeDates, errors } = stats;
+  const { totals, computed, dailyData, dailyVisitors, hours, modes, geo, sources, recent, activeDates, errors } = stats;
 
   // Get sorted dates for chart (last 14 days)
   const last14 = Array.from({ length: 14 }, (_, i) => {
@@ -239,6 +245,58 @@ export default function StatsPage() {
             ))}
           </div>
         </div>
+
+        {/* Pilot Sources */}
+        {sources && Object.keys(sources).length > 0 && (
+          <div className="bg-white rounded-2xl p-5 shadow-sm">
+            <h2 className="text-sm font-semibold text-gray-700 mb-3">Pilot Sources</h2>
+            <div className="space-y-4">
+              {Object.entries(sources).map(([ref, data]) => {
+                const srcStarts = data.totals.session_start || 0;
+                const srcCompletes = data.totals.session_complete || 0;
+                const srcOpens = data.totals.app_open || 0;
+                const srcCompletion = srcStarts > 0 ? Math.round((srcCompletes / srcStarts) * 100) : 0;
+                const totalVisitors = Object.values(data.dailyVisitors).reduce((a, b) => a + b, 0);
+                return (
+                  <div key={ref} className="bg-gray-50 rounded-xl p-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-bold bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full uppercase">
+                        {ref}
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                      <div>
+                        <p className="text-xs text-gray-500">Opens</p>
+                        <p className="text-lg font-bold text-gray-800">{srcOpens}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Sessions</p>
+                        <p className="text-lg font-bold text-gray-800">{srcCompletes}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Completion</p>
+                        <p className="text-lg font-bold text-gray-800">{srcCompletion}%</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Visitors</p>
+                        <p className="text-lg font-bold text-gray-800">{totalVisitors}</p>
+                      </div>
+                    </div>
+                    {Object.keys(data.modes).length > 0 && (
+                      <div className="flex gap-2 mt-3">
+                        {Object.entries(data.modes).map(([mode, count]) => (
+                          <span key={mode} className="text-xs bg-white text-gray-600 px-2 py-0.5 rounded-full border border-gray-200">
+                            {mode}: {count}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Geography — Top Cities */}
         {geo && Object.keys(geo.cities).length > 0 && (
@@ -382,6 +440,7 @@ export default function StatsPage() {
                   <EventDot event={ev.e} />
                   <span className="text-gray-700 font-medium">{formatEvent(ev.e)}</span>
                   {ev.m && <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">{ev.m}</span>}
+                  {ev.r && <span className="text-xs bg-amber-50 text-amber-700 px-2 py-0.5 rounded-full font-medium">{ev.r}</span>}
                   {ev.g && <span className="text-xs bg-teal-50 text-teal-600 px-2 py-0.5 rounded-full">{ev.g}</span>}
                   <span className="text-xs text-gray-400 ml-auto">{timeAgo(ev.t)}</span>
                 </div>
