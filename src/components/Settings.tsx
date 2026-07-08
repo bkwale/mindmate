@@ -3,6 +3,7 @@
 import { getProfile, getThemes, getSessions, clearAllData, updateAboutMe } from "@/lib/storage";
 import { isPINEnabled, removePIN, getAutoLockTimeout, setAutoLockTimeout, LockTimeout } from "@/lib/security";
 import { getSyncConfig, createBackup, restoreFromBackup } from "@/lib/sync";
+import { getStoredLanguageCode, setLanguagePreference, SUPPORTED_LANGUAGES, getBrowserLanguage } from "@/lib/language";
 import { useState, useEffect } from "react";
 import PINSetup from "./PINSetup";
 
@@ -31,6 +32,8 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
   const [syncMode, setSyncMode] = useState<"setup" | "backup" | "restore">("setup");
   const [lastBackup, setLastBackup] = useState<string | null>(null);
   const [showSyncRestore, setShowSyncRestore] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("auto");
+  const [languageSaved, setLanguageSaved] = useState(false);
 
   useEffect(() => {
     const profile = getProfile();
@@ -49,6 +52,7 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
     setSessionCount(getSessions().length);
     setPinEnabled(isPINEnabled());
     setLockTimeout(getAutoLockTimeout());
+    setSelectedLanguage(getStoredLanguageCode());
     const syncConfig = getSyncConfig();
     setLastBackup(syncConfig.lastBackupAt);
   }, []);
@@ -119,6 +123,43 @@ export default function Settings({ onBack, onResetApp }: SettingsProps) {
                 <p className="text-xs text-calm-muted">Using MindM8 since {joinedDate}</p>
               </div>
             </div>
+          </div>
+
+          {/* Language */}
+          <div className="bg-white rounded-xl p-5 border border-calm-border">
+            <p className="text-xs text-calm-muted mb-3 font-medium uppercase tracking-wider">
+              Language
+            </p>
+            <p className="text-xs text-calm-muted mb-3 leading-relaxed">
+              MindM8 will speak to you in this language. Auto-detect uses your device language{selectedLanguage === "auto" ? ` (${getBrowserLanguage()})` : ""}.
+            </p>
+            <select
+              value={selectedLanguage}
+              onChange={(e) => {
+                const code = e.target.value;
+                setSelectedLanguage(code);
+                setLanguagePreference(code);
+                setLanguageSaved(true);
+                setTimeout(() => setLanguageSaved(false), 2000);
+              }}
+              className="w-full px-4 py-3 rounded-xl border border-calm-border text-sm text-calm-text
+                         focus:outline-none focus:border-mind-300 bg-white appearance-none
+                         bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%228%22%20viewBox%3D%220%200%2012%208%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M1%201L6%206L11%201%22%20stroke%3D%22%239CA3AF%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22/%3E%3C/svg%3E')]
+                         bg-no-repeat bg-[position:right_1rem_center]"
+            >
+              {SUPPORTED_LANGUAGES.map(lang => (
+                <option key={lang.code} value={lang.code}>
+                  {lang.code === "auto"
+                    ? "Auto-detect"
+                    : `${lang.nativeName} (${lang.name})`}
+                </option>
+              ))}
+            </select>
+            {languageSaved && (
+              <p className="text-xs text-green-600 mt-2">
+                Saved. New sessions will use this language.
+              </p>
+            )}
           </div>
 
           {/* Security */}

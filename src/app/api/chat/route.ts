@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, getPersonalContextLayer, getRegulationLayer, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
+import { BASE_LAYER, SAFETY_LAYER, getSessionLayer, getThemeLayer, getPersonalContextLayer, getRegulationLayer, getLanguageLayer, getOpeningInstruction, SessionMode, SESSION_LIMITS } from "@/lib/prompts";
 
 let kv: any = null;
 try {
@@ -58,6 +58,8 @@ export async function POST(req: NextRequest) {
       aboutMe,
       recentEnergy,
       recentRegulation,
+      language,
+      generateOpening,
     }: {
       messages: { role: "user" | "assistant"; content: string }[];
       mode: SessionMode;
@@ -66,6 +68,8 @@ export async function POST(req: NextRequest) {
       aboutMe: string | null;
       recentEnergy?: string;
       recentRegulation?: string;
+      language?: string;
+      generateOpening?: boolean;
     } = body;
 
     const maxExchanges = SESSION_LIMITS[mode];
@@ -74,27 +78,47 @@ export async function POST(req: NextRequest) {
     const layers = [
       BASE_LAYER,
       SAFETY_LAYER,
-      getSessionLayer(mode, exchangeCount, maxExchanges),
-      getThemeLayer(themes),
     ];
 
-    const personalContext = getPersonalContextLayer(aboutMe);
-    if (personalContext) {
-      layers.push(personalContext);
+    // Add language layer if provided
+    const languageLayer = getLanguageLayer(language);
+    if (languageLayer) {
+      layers.push(languageLayer);
     }
 
-    const regulationContext = getRegulationLayer(recentEnergy, recentRegulation);
-    if (regulationContext) {
-      layers.push(regulationContext);
+    // Handle opening message generation
+    if (generateOpening) {
+      const openingInstruction = getOpeningInstruction(mode);
+      if (openingInstruction) {
+        layers.push(openingInstruction);
+      }
+    } else {
+      layers.push(getSessionLayer(mode, exchangeCount, maxExchanges));
+      layers.push(getThemeLayer(themes));
+
+      const personalContext = getPersonalContextLayer(aboutMe);
+      if (personalContext) {
+        layers.push(personalContext);
+      }
+
+      const regulationContext = getRegulationLayer(recentEnergy, recentRegulation);
+      if (regulationContext) {
+        layers.push(regulationContext);
+      }
     }
 
     const systemPrompt = layers.join("\n\n---\n\n");
 
+    // For opening generation, use a synthetic user message
+    const apiMessages = generateOpening
+      ? [{ role: "user" as const, content: "[begin session]" }]
+      : messages;
+
     const response = await anthropic.messages.create({
       model: "claude-sonnet-4-5-20250929",
-      max_tokens: 500,
+      max_tokens: generateOpening ? 150 : 500,
       system: systemPrompt,
-      messages: messages,
+      messages: apiMessages,
     });
 
     const textContent = response.content.find(c => c.type === "text");

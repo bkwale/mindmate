@@ -8,6 +8,7 @@ import { autoBackup } from "@/lib/sync";
 import { reportError } from "@/lib/errorReporter";
 import { getRateToken } from "@/lib/rateToken";
 import { shouldEndSession, deriveClarity as deriveClarityFn, canKeepGoing } from "@/lib/sessionLogic";
+import { getEffectiveLanguage } from "@/lib/language";
 
 // --- Flow state reducer ---
 
@@ -176,15 +177,57 @@ export default function Session({ mode, onEnd }: SessionProps) {
   const { phase, readinessLevel, readinessNote, bonusExchanges, exchangeCount } = flow;
 
   // Content state — independent, stays as useState
-  const [messages, setMessages] = useState<Message[]>([
-    { role: "assistant", content: firstPrompts[aiMode] },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingOpening, setIsLoadingOpening] = useState(true);
+
+  // Generate opening message in the user's language
+  useEffect(() => {
+    let cancelled = false;
+    async function generateOpening() {
+      const lang = getEffectiveLanguage();
+      // For English, use the hardcoded prompt instantly — no API call needed
+      if (lang === "en") {
+        setMessages([{ role: "assistant", content: firstPrompts[aiMode] }]);
+        setIsLoadingOpening(false);
+        return;
+      }
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "X-MindM8-Token": getRateToken() },
+          body: JSON.stringify({
+            messages: [],
+            mode: aiMode,
+            exchangeCount: 0,
+            themes: null,
+            aboutMe: null,
+            language: lang,
+            generateOpening: true,
+          }),
+        });
+        if (!cancelled && response.ok) {
+          const data = await response.json();
+          setMessages([{ role: "assistant", content: data.message }]);
+        } else if (!cancelled) {
+          setMessages([{ role: "assistant", content: firstPrompts[aiMode] }]);
+        }
+      } catch {
+        if (!cancelled) {
+          setMessages([{ role: "assistant", content: firstPrompts[aiMode] }]);
+        }
+      }
+      if (!cancelled) setIsLoadingOpening(false);
+    }
+    generateOpening();
+    return () => { cancelled = true; };
+  }, [aiMode]);
   const [error, setError] = useState<string | null>(null);
   const [relationshipTag, setRelationshipTag] = useState<string | null>(null);
   const [takeaway, setTakeaway] = useState("");
   const [shared, setShared] = useState(false);
+  const [appLinkCopied, setAppLinkCopied] = useState(false);
   const [letterContent, setLetterContent] = useState("");
   const [letterSaved, setLetterSaved] = useState(false);
 
@@ -239,6 +282,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
         aboutMe,
         recentEnergy: lastTheme?.energy || undefined,
         recentRegulation: lastTheme?.regulation || undefined,
+        language: getEffectiveLanguage(),
       });
 
       // Retry up to 2 times on network failures
@@ -319,6 +363,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
         aboutMe,
         recentEnergy: lastTheme?.energy || undefined,
         recentRegulation: lastTheme?.regulation || undefined,
+        language: getEffectiveLanguage(),
       });
 
       let response: Response | null = null;
@@ -581,6 +626,25 @@ export default function Session({ mode, onEnd }: SessionProps) {
     }
   };
 
+  const handleShareApp = async () => {
+    const shareUrl = "https://mindm8.app";
+    const shareText = "A quiet space to think through what you’re carrying. No sign-up, completely private.";
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "MindM8", text: shareText, url: shareUrl });
+        setAppLinkCopied(true);
+        trackEvent("share_app");
+      } else {
+        await navigator.clipboard.writeText(shareUrl);
+        setAppLinkCopied(true);
+        trackEvent("share_app");
+        setTimeout(() => setAppLinkCopied(false), 3000);
+      }
+    } catch {
+      // User cancelled share sheet — not an error
+    }
+  };
+
   const extractSeed = (): string | null => {
     const userMessages = messages.filter(m => m.role === "user");
     if (userMessages.length === 0) return null;
@@ -725,7 +789,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
             </div>
           ))}
 
-          {isLoading && (
+          {(isLoading || isLoadingOpening) && (
             <div className="flex gap-3 animate-fade-in pr-8">
               <div className="w-7 h-7 rounded-full bg-mind-100 flex items-center justify-center flex-shrink-0">
                 <div className="w-2 h-2 rounded-full bg-mind-500 animate-breathe" />
@@ -983,11 +1047,15 @@ export default function Session({ mode, onEnd }: SessionProps) {
                     >
                       Done
                     </button>
+
+                    {/* Gentle share prompt */}
                     <button
-                      onClick={() => handleSoftEnd()}
-                      className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
+                      onClick={handleShareApp}
+                      className="w-full py-2 text-calm-muted text-xs hover:text-mind-500 transition-colors"
                     >
-                      Just close
+                      {appLinkCopied
+                        ? "Link copied ✓"
+                        : "Know someone who could use a quiet space to think?"}
                     </button>
                   </div>
                 )
