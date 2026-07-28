@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { isPINEnabled } from "@/lib/security";
-import { getAboutMe, updateAboutMe, setPostSessionSetupSeen } from "@/lib/storage";
+import { getAboutMe, updateAboutMe, setPostSessionSetupSeen, getSessions } from "@/lib/storage";
 import PINSetup from "./PINSetup";
 import MicButton from "./MicButton";
 
@@ -13,11 +13,13 @@ interface PostSessionSetupProps {
 export default function PostSessionSetup({ onComplete }: PostSessionSetupProps) {
   const needsPIN = !isPINEnabled();
   const needsAboutMe = !getAboutMe();
+  const sessionCount = getSessions().length;
 
-  // Determine which step to start on
+  // Session 1: PIN only. Session 2+: About Me (if still needed).
   const getInitialStep = (): "pin" | "aboutme" | "done" => {
-    if (needsPIN) return "pin";
-    if (needsAboutMe) return "aboutme";
+    if (sessionCount <= 1 && needsPIN) return "pin";
+    if (sessionCount >= 2 && needsAboutMe) return "aboutme";
+    if (sessionCount <= 1 && !needsPIN) return "done";
     return "done";
   };
 
@@ -25,28 +27,21 @@ export default function PostSessionSetup({ onComplete }: PostSessionSetupProps) 
   const [aboutMeText, setAboutMeText] = useState("");
 
   // If nothing to show, complete immediately
-  if (step === "done" || (!needsPIN && !needsAboutMe)) {
+  if (step === "done") {
     setPostSessionSetupSeen();
     onComplete();
     return null;
   }
 
   const handlePINComplete = () => {
-    if (needsAboutMe) {
-      setStep("aboutme");
-    } else {
-      setPostSessionSetupSeen();
-      onComplete();
-    }
+    // After PIN on session 1, go home. About Me deferred to later sessions.
+    setPostSessionSetupSeen();
+    onComplete();
   };
 
   const handlePINSkip = () => {
-    if (needsAboutMe) {
-      setStep("aboutme");
-    } else {
-      setPostSessionSetupSeen();
-      onComplete();
-    }
+    setPostSessionSetupSeen();
+    onComplete();
   };
 
   const handleAboutMeSave = () => {
@@ -115,7 +110,7 @@ export default function PostSessionSetup({ onComplete }: PostSessionSetupProps) 
                 rows={4}
               />
               <div className="mt-1.5 flex justify-end">
-                <MicButton onTranscript={(text) => setAboutMeText(text)} size="sm" />
+                <MicButton onTranscript={(text) => setAboutMeText(prev => prev ? prev + " " + text : text)} size="sm" />
               </div>
             </div>
 

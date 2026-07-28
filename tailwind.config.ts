@@ -41,7 +41,7 @@ const config: Config = {
           bg: "#f5f3ef",
           card: "#fdfcfa",
           text: "#2a2f2e",
-          muted: "#7a8382",
+          muted: "#5f6a68",
           border: "#e5e2dc",
           accent: "#4d908a",
           accentLight: "#d5ebe8",

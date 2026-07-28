@@ -21,6 +21,3 @@ export function deriveClarity(
   return "no";
 }
 
-export function canKeepGoing(readinessLevel: "yes" | "a-little" | "not-yet" | null): boolean {
-  return readinessLevel === "not-yet";
-}

@@ -7,63 +7,14 @@ import { trackEvent } from "@/lib/cohort";
 import { shouldPromptInstall, snoozeInstallPrompt, hasNativeInstallPrompt, triggerInstallPrompt, isIOS, requestNotificationPermission, hasSeenNotificationPrompt, markNotificationPromptSeen, getNotificationPermission } from "@/lib/notifications";
 import { shouldShowBackupNudge, dismissBackupNudge } from "@/lib/sync";
 import { shouldShowWhatsNew, getLatestChangelog, markVersionSeen } from "@/lib/whatsnew";
+import { doors } from "@/lib/doors";
 import MicButton from "./MicButton";
+import ContextualCard from "./ContextualCard";
 
 interface HomeProps {
   onSelectMode: (mode: SessionMode) => void;
   onOpenInsights: () => void;
 }
-
-const doors = [
-  {
-    mode: "reflect" as SessionMode,
-    title: "Arrive clearer",
-    description: "Process an emotion, an event, or something you can\u2019t name yet.",
-    exchanges: "5 reflections",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 6v6l4 2" />
-      </svg>
-    ),
-  },
-  {
-    mode: "prepare" as SessionMode,
-    title: "Arrive ready",
-    description: "Clarify what you want to say before a difficult conversation.",
-    exchanges: "7 reflections",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
-  },
-  {
-    mode: "ground" as SessionMode,
-    title: "Arrive present",
-    description: "Slow down. Breathe. Name one feeling.",
-    exchanges: "3 reflections",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-        <path d="M12 6v6" />
-        <path d="M12 18h.01" />
-      </svg>
-    ),
-  },
-  {
-    mode: "breathe" as SessionMode,
-    title: "Just be here",
-    description: "No words. No AI. Just guided breathing.",
-    exchanges: "2 minutes",
-    icon: (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="4" />
-      </svg>
-    ),
-  },
-];
 
 export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   const recentCount = recentSessionCount();
@@ -143,6 +94,7 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
   };
 
   const handleFollowUpResolution = (status: "yes" | "not-yet" | "changed-mind") => {
+    clearOpenLoop();
     if (status === "yes") {
       setFollowUpExpanded(true);
     } else if (status === "not-yet") {
@@ -238,6 +190,7 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
 
       {/* Content */}
       <main className="flex-1 px-6 pb-8 max-w-md mx-auto w-full relative z-10 page-enter">
+        {/* Pause message — when user has reflected 3+ times today */}
         {showPauseMessage && (
           <div className="mb-6 bg-warm-100/60 border border-warm-200/50 rounded-2xl p-4 animate-fade-in backdrop-blur-sm">
             <p className="text-sm text-warm-700 leading-relaxed">
@@ -247,388 +200,13 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           </div>
         )}
 
-        {/* One-word check-in card */}
-        {!showPauseMessage && (
-          <div className="mb-5 card-serene p-5 animate-fade-in">
-            {todayCheckIn ? (
-              <>
-                <div className="flex items-center gap-2 mb-3">
-                  <p className="text-sm text-calm-text font-medium">Today: <span className="text-mind-600 font-semibold">{todayCheckIn.word}</span></p>
-                  <div className="w-1.5 h-1.5 rounded-full bg-mind-300" />
-                </div>
-                {recentCheckIns && recentCheckIns.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
-                    {recentCheckIns.map((checkIn, idx) => (
-                      <div key={idx} className="text-xs bg-mind-50 text-mind-600 rounded-full px-3 py-1">
-                        <span className="text-calm-muted">{getDayLabel(idx)}</span>: {checkIn.word}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <label className="text-sm text-calm-text font-medium block mb-3">
-                  How are you arriving today?
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={checkInInput}
-                    onChange={(e) => {
-                      setCheckInInput(e.target.value);
-                      setCheckInError(false);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        handleCheckInSubmit();
-                      }
-                    }}
-                    placeholder="One word..."
-                    className={`flex-1 bg-mind-50 border rounded-lg px-3 py-2 text-sm text-calm-text placeholder-calm-muted focus:outline-none transition-colors ${
-                      checkInError
-                        ? "border-warm-300 focus:border-warm-400"
-                        : "border-mind-200 focus:border-mind-400"
-                    }`}
-                  />
-                  <MicButton
-                    onTranscript={(text) => {
-                      // Take just the first word for check-in
-                      const firstWord = text.trim().split(/\s+/)[0] || "";
-                      setCheckInInput(firstWord.toLowerCase());
-                      setCheckInError(false);
-                    }}
-                    size="sm"
-                  />
-                  <button
-                    onClick={handleCheckInSubmit}
-                    className="px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-600 rounded-lg transition-colors text-sm font-medium"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  </button>
-                </div>
-                {checkInError && (
-                  <p className="text-xs text-warm-600 mt-2">Please enter a single word</p>
-                )}
-              </>
-            )}
-          </div>
-        )}
-
-        {/* What's New card */}
-        {!showPauseMessage && showWhatsNew && (
-          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/80 to-white">
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex items-center gap-2 mb-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-500">
-                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                </svg>
-                <p className="text-xs text-mind-600 font-semibold uppercase tracking-wider">
-                  What&apos;s new
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  markVersionSeen();
-                  setShowWhatsNew(false);
-                }}
-                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0"
-                aria-label="Dismiss"
-              >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-            <p className="text-sm font-medium text-calm-text mb-2">
-              {latestChangelog.title}
-            </p>
-            <ul className="space-y-1.5">
-              {latestChangelog.highlights.map((h, i) => (
-                <li key={i} className="text-xs text-calm-muted leading-relaxed flex gap-2">
-                  <span className="text-mind-400 mt-0.5 flex-shrink-0">&middot;</span>
-                  <span>{h}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {/* Smart check-in response card */}
-        {!showPauseMessage && todayCheckIn && checkInSubmitted && (
-          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-200/50">
-            <div className="space-y-3">
-              {checkInPattern && (
-                <div>
-                  <p className="text-sm text-calm-text">
-                    <span className="text-mind-600 font-semibold">{checkInPattern.count}</span> of your last <span className="text-mind-600 font-semibold">{checkInPattern.total}</span> check-ins were <span className="text-mind-600 font-semibold">{checkInPattern.word}</span>
-                  </p>
-                </div>
-              )}
-              {relatedTheme && (
-                <div className="pt-2 border-t border-mind-100">
-                  <p className="text-xs text-calm-muted mb-2">Last time, it was connected to:</p>
-                  <p className="text-sm text-calm-text italic">{relatedTheme.theme}</p>
-                </div>
-              )}
-              <div className="pt-2">
-                <button
-                  onClick={() => handleSelectModeWithCleanup("reflect")}
-                  className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
-                >
-                  Sit with this?
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Open loop card */}
-        {!showPauseMessage && openLoop && (
-          <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-200/50">
-            <p className="text-xs text-calm-muted uppercase tracking-wider mb-3 font-medium">
-              Something from last time...
-            </p>
-            <p className="text-sm text-calm-text italic mb-4 leading-relaxed">
-              {openLoop.text}
-            </p>
-            <button
-              onClick={handleRevisitOpenLoop}
-              className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
-            >
-              Revisit this
-            </button>
-          </div>
-        )}
-
-        {/* Before & after follow-up card */}
-        {!showPauseMessage && unresolved && (
-          <div className="mb-5 card-serene p-5 animate-fade-in">
-            {!followUpExpanded ? (
-              <>
-                <p className="text-sm text-calm-text mb-4">
-                  You were preparing for a conversation with <span className="font-semibold text-mind-600">{unresolved.person}</span>. Did it happen?
-                </p>
-                <div className="flex flex-col gap-2">
-                  <button
-                    onClick={() => {
-                      clearOpenLoop();
-                      handleFollowUpResolution("yes");
-                    }}
-                    className="w-full px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium text-left"
-                  >
-                    Yes, it happened
-                  </button>
-                  <button
-                    onClick={() => {
-                      clearOpenLoop();
-                      handleFollowUpResolution("not-yet");
-                    }}
-                    className="w-full px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium text-left"
-                  >
-                    Not yet
-                  </button>
-                  <button
-                    onClick={() => {
-                      clearOpenLoop();
-                      handleFollowUpResolution("changed-mind");
-                    }}
-                    className="w-full px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium text-left"
-                  >
-                    I changed my mind
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-sm text-calm-text mb-3 font-medium">How did it go?</p>
-                <textarea
-                  value={followUpResponse}
-                  onChange={(e) => setFollowUpResponse(e.target.value)}
-                  placeholder="Share how the conversation went..."
-                  className="w-full bg-mind-50 border border-mind-200 rounded-lg px-3 py-2 text-sm text-calm-text placeholder-calm-muted focus:outline-none focus:border-mind-400 transition-colors resize-none"
-                  rows={4}
-                />
-                <div className="mt-1.5 flex justify-end">
-                  <MicButton onTranscript={(text) => setFollowUpResponse(text)} size="sm" />
-                </div>
-                <button
-                  onClick={handleFollowUpSave}
-                  className="w-full mt-3 px-3 py-2 bg-mind-500 hover:bg-mind-600 text-white rounded-lg transition-colors text-sm font-medium"
-                >
-                  Save
-                </button>
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Pattern nudge — top detected pattern */}
-        {!showPauseMessage && topPattern && (
-          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/30">
-            <div className="flex items-start gap-3">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
-                topPattern.strength > 0.6 ? "bg-amber-50" : "bg-mind-50"
-              }`}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className={topPattern.strength > 0.6 ? "text-amber-500" : "text-mind-500"}>
-                  <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-xs text-calm-muted uppercase tracking-wider font-medium mb-1">
-                  {topPattern.label}
-                </p>
-                <p className="text-sm text-calm-text leading-relaxed">
-                  {topPattern.description}
-                </p>
-                {topPattern.suggestion && (
-                  <p className="text-xs text-mind-600 mt-2 font-light italic">
-                    {topPattern.suggestion}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Last reflection — connective tissue */}
-        {lastTheme && lastSession && !showPauseMessage && (
-          <div className="mb-5 card-serene p-4 animate-fade-in">
-            <p className="text-[10px] text-calm-muted uppercase tracking-wider mb-2 font-medium">
-              Last time you were here &middot; {getTimeAgo(lastSession.completedAt)}
-            </p>
-            <p className="text-sm text-calm-text leading-relaxed">
-              {lastTheme.theme}
-            </p>
-            {lastSession.takeaway && (
-              <p className="text-xs text-calm-muted mt-2 italic leading-relaxed">
-                &ldquo;{lastSession.takeaway}&rdquo;
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Backup nudge — shows after 2+ sessions if no backup set up */}
-        {!showPauseMessage && showBackupNudge && (
-          <div className="mb-5 card-serene p-4 animate-fade-in border border-amber-200/60 bg-gradient-to-br from-amber-50/60 to-white">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm text-calm-text">
-                  Protect your reflections
-                </p>
-                <p className="text-xs text-calm-muted mt-1 leading-relaxed">
-                  Set up a passphrase in Settings so you never lose your sessions if you switch devices or clear your browser.
-                </p>
-              </div>
-              <button
-                onClick={() => {
-                  dismissBackupNudge();
-                  setShowBackupNudge(false);
-                }}
-                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0 mt-0.5"
-                aria-label="Dismiss"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Install app banner — shows for all non-installed visitors, persists until installed */}
-        {!showPauseMessage && showInstallPrompt && (
-          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/60 to-white">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-calm-text">
-                  Add MindM8 to your home screen
-                </p>
-                {/* iOS-specific guide */}
-                {isIOS() && !promptReady && (
-                  <div className="mt-2 space-y-2">
-                    <div className="flex items-center gap-2 text-xs text-calm-muted">
-                      <span className="w-5 h-5 rounded-full bg-mind-100 text-mind-600 flex items-center justify-center font-medium text-[10px]">1</span>
-                      <span>Tap the <strong>Share</strong> button
-                        <svg className="inline ml-1 -mt-0.5" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                          <polyline points="16 6 12 2 8 6" />
-                          <line x1="12" y1="2" x2="12" y2="15" />
-                        </svg>
-                        {" "}at the bottom of Safari
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs text-calm-muted">
-                      <span className="w-5 h-5 rounded-full bg-mind-100 text-mind-600 flex items-center justify-center font-medium text-[10px]">2</span>
-                      <span>Scroll down and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong></span>
-                    </div>
-                    <p className="text-[11px] text-calm-muted/70 mt-1">
-                      Works just like an app — no App Store needed
-                    </p>
-                  </div>
-                )}
-                {/* Non-iOS fallback (Android/desktop without native prompt) */}
-                {!isIOS() && !promptReady && (
-                  <p className="text-xs text-calm-muted mt-1">
-                    Tap <strong>Share</strong> then <strong>&ldquo;Add to Home Screen&rdquo;</strong>
-                  </p>
-                )}
-              </div>
-              {/* Native install button (Chrome/Edge/Samsung) */}
-              {promptReady && (
-                <button
-                  onClick={async () => {
-                    const accepted = await triggerInstallPrompt();
-                    if (accepted) {
-                      setShowInstallPrompt(false);
-                    }
-                  }}
-                  className="px-4 py-2 bg-mind-600 text-white rounded-xl text-sm font-medium
-                             hover:bg-mind-700 transition-colors duration-200 flex-shrink-0"
-                >
-                  Install
-                </button>
-              )}
-              <button
-                onClick={() => {
-                  snoozeInstallPrompt();
-                  setShowInstallPrompt(false);
-                }}
-                className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0 mt-0.5"
-                aria-label="Dismiss"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Session mode buttons — the core experience, shown first */}
+        {/* === DOORS — always first, always visible === */}
         <div className="space-y-3 mb-6">
-          {doors.map((door) => (
+          {(showPauseMessage ? doors.filter(d => d.mode === "breathe") : doors).map((door) => (
             <button
               key={door.mode}
               onClick={() => handleSelectModeWithCleanup(door.mode)}
-              className="w-full text-left card-serene p-5 group"
+              className="w-full text-left card-serene p-5 group min-h-[72px]"
             >
               <div className="flex items-start gap-4">
                 <div className="text-mind-400 group-hover:text-mind-500 transition-colors mt-0.5">
@@ -655,28 +233,146 @@ export default function Home({ onSelectMode, onOpenInsights }: HomeProps) {
           ))}
         </div>
 
-        {/* Notification permission prompt */}
-        {!showPauseMessage && showNotificationPrompt && (
-          <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/50">
-            <p className="text-sm text-calm-text mb-3">
-              Want a daily reminder to check in?
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={handleNotificationYes}
-                className="flex-1 px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium"
-              >
-                Yes
-              </button>
-              <button
-                onClick={handleNotificationNo}
-                className="flex-1 px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium"
-              >
-                Not now
-              </button>
-            </div>
-          </div>
+        {/* === ONE CONTEXTUAL CARD — priority-based === */}
+        {!showPauseMessage && (
+          <ContextualCard
+            unresolved={unresolved}
+            followUpExpanded={followUpExpanded}
+            followUpResponse={followUpResponse}
+            setFollowUpResponse={setFollowUpResponse}
+            handleFollowUpResolution={handleFollowUpResolution}
+            handleFollowUpSave={handleFollowUpSave}
+            openLoop={openLoop}
+            handleRevisitOpenLoop={handleRevisitOpenLoop}
+            todayCheckIn={todayCheckIn}
+            checkInSubmitted={checkInSubmitted}
+            checkInPattern={checkInPattern}
+            relatedTheme={relatedTheme}
+            handleSelectModeWithCleanup={handleSelectModeWithCleanup}
+            checkInInput={checkInInput}
+            setCheckInInput={setCheckInInput}
+            checkInError={checkInError}
+            setCheckInError={setCheckInError}
+            handleCheckInSubmit={handleCheckInSubmit}
+            recentCheckIns={recentCheckIns}
+            getDayLabel={getDayLabel}
+            topPattern={topPattern}
+            lastTheme={lastTheme}
+            lastSession={lastSession}
+            getTimeAgo={getTimeAgo}
+          />
         )}
+
+        {/* === SYSTEM CARDS — demoted below doors, max one shown === */}
+        {!showPauseMessage && (() => {
+          if (showWhatsNew) return (
+            <div className="mb-5 card-serene p-5 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/80 to-white">
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-500">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                  </svg>
+                  <p className="text-xs text-mind-600 font-semibold uppercase tracking-wider">What&apos;s new</p>
+                </div>
+                <button onClick={() => { markVersionSeen(); setShowWhatsNew(false); }}
+                  className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0" aria-label="Dismiss">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-sm font-medium text-calm-text mb-2">{latestChangelog.title}</p>
+              <div className="space-y-1.5">
+                {latestChangelog.highlights.map((h, i) => (
+                  <p key={i} className="text-xs text-calm-muted leading-relaxed flex gap-2">
+                    <span className="text-mind-400 mt-0.5 flex-shrink-0">&middot;</span>
+                    <span>{h}</span>
+                  </p>
+                ))}
+              </div>
+            </div>
+          );
+
+          if (showBackupNudge) return (
+            <div className="mb-5 card-serene p-4 animate-fade-in border border-warm-300/60 bg-gradient-to-br from-warm-50/60 to-white">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-warm-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-warm-600">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-calm-text">Protect your reflections</p>
+                  <p className="text-xs text-calm-muted mt-1 leading-relaxed">Set up a passphrase in Settings so you never lose your sessions.</p>
+                </div>
+                <button onClick={() => { dismissBackupNudge(); setShowBackupNudge(false); }}
+                  className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0 mt-0.5 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Dismiss">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          );
+
+          if (showInstallPrompt) return (
+            <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-300/40 bg-gradient-to-br from-mind-50/60 to-white">
+              <div className="flex items-start gap-3">
+                <div className="w-9 h-9 rounded-xl bg-mind-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-mind-600">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                    <polyline points="7 10 12 15 17 10" />
+                    <line x1="12" y1="15" x2="12" y2="3" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-calm-text">Add MindM8 to your home screen</p>
+                  {isIOS() && !promptReady && (
+                    <div className="mt-2 space-y-2">
+                      <div className="flex items-center gap-2 text-xs text-calm-muted">
+                        <span className="w-5 h-5 rounded-full bg-mind-100 text-mind-600 flex items-center justify-center font-medium text-[10px]">1</span>
+                        <span>Tap the <strong>Share</strong> button at the bottom of Safari</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-calm-muted">
+                        <span className="w-5 h-5 rounded-full bg-mind-100 text-mind-600 flex items-center justify-center font-medium text-[10px]">2</span>
+                        <span>Scroll down and tap <strong>&ldquo;Add to Home Screen&rdquo;</strong></span>
+                      </div>
+                    </div>
+                  )}
+                  {!isIOS() && !promptReady && (
+                    <p className="text-xs text-calm-muted mt-1">Tap <strong>Share</strong> then <strong>&ldquo;Add to Home Screen&rdquo;</strong></p>
+                  )}
+                </div>
+                {promptReady && (
+                  <button onClick={async () => { const accepted = await triggerInstallPrompt(); if (accepted) setShowInstallPrompt(false); }}
+                    className="px-4 py-2 bg-mind-600 text-white rounded-xl text-sm font-medium hover:bg-mind-700 transition-colors duration-200 flex-shrink-0 min-h-[44px]">
+                    Install
+                  </button>
+                )}
+                <button onClick={() => { snoozeInstallPrompt(); setShowInstallPrompt(false); }}
+                  className="text-calm-muted hover:text-calm-text transition-colors flex-shrink-0 mt-0.5 min-w-[44px] min-h-[44px] flex items-center justify-center" aria-label="Dismiss">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          );
+
+          if (showNotificationPrompt) return (
+            <div className="mb-5 card-serene p-4 animate-fade-in border border-mind-200/50">
+              <p className="text-sm text-calm-text mb-3">Want a daily reminder to check in?</p>
+              <div className="flex gap-2">
+                <button onClick={handleNotificationYes}
+                  className="flex-1 px-3 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg transition-colors text-sm font-medium min-h-[44px]">Yes</button>
+                <button onClick={handleNotificationNo}
+                  className="flex-1 px-3 py-2 bg-calm-border/30 hover:bg-calm-border/50 text-calm-text rounded-lg transition-colors text-sm font-medium min-h-[44px]">Not now</button>
+              </div>
+            </div>
+          );
+
+          return null;
+        })()}
 
         {/* Footer */}
         <p className="text-center text-[11px] text-calm-muted/50 mt-10 font-light tracking-wide">

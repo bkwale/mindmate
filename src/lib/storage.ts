@@ -92,6 +92,23 @@ export interface FollowUp {
   resolvedAt?: string;
 }
 
+// Safe localStorage write — catches quota exceeded and other write failures
+function safeSetItem(key: string, value: string): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (err) {
+    console.error("localStorage write failed:", key, err);
+    // Dispatch a custom event so UI components can show feedback
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("mindm8-storage-error", {
+        detail: { key, error: err instanceof Error ? err.message : "Storage write failed" },
+      }));
+    }
+    return false;
+  }
+}
+
 const KEYS = {
   profile: "mindmate_profile",
   themes: "mindmate_themes",
@@ -109,7 +126,7 @@ export function getProfile(): UserProfile | null {
 }
 
 export function saveProfile(profile: UserProfile): void {
-  localStorage.setItem(KEYS.profile, JSON.stringify(profile));
+  safeSetItem(KEYS.profile, JSON.stringify(profile));
 }
 
 export function isOnboarded(): boolean {
@@ -153,7 +170,7 @@ export function addTheme(theme: Omit<ThemeEntry, "id" | "date">): void {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
   });
-  localStorage.setItem(KEYS.themes, JSON.stringify(themes));
+  safeSetItem(KEYS.themes, JSON.stringify(themes));
 }
 
 // Sessions
@@ -170,7 +187,7 @@ export function addSession(session: Omit<SessionRecord, "id" | "completedAt">): 
     id: crypto.randomUUID(),
     completedAt: new Date().toISOString(),
   });
-  localStorage.setItem(KEYS.sessions, JSON.stringify(sessions));
+  safeSetItem(KEYS.sessions, JSON.stringify(sessions));
 }
 
 // Recent session count (for the 3-session-in-2-hours limit)
@@ -238,7 +255,7 @@ export function addCheckIn(word: string): void {
   // Keep last 30 days only
   const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
   const filtered = checkins.filter(c => new Date(c.timestamp).getTime() > thirtyDaysAgo);
-  localStorage.setItem(KEYS.checkins, JSON.stringify(filtered));
+  safeSetItem(KEYS.checkins, JSON.stringify(filtered));
 }
 
 export function getTodayCheckIn(): CheckIn | null {
@@ -266,7 +283,7 @@ export function getLetters(): Letter[] {
 export function addLetter(to: string, content: string): void {
   const letters = getLetters();
   letters.push({ id: crypto.randomUUID(), to, content, createdAt: new Date().toISOString() });
-  localStorage.setItem(KEYS.letters, JSON.stringify(letters));
+  safeSetItem(KEYS.letters, JSON.stringify(letters));
 }
 
 // ============================================================
@@ -287,7 +304,7 @@ export function addFollowUp(person: string): void {
     createdAt: new Date().toISOString(),
     resolved: false,
   });
-  localStorage.setItem(KEYS.followups, JSON.stringify(followups));
+  safeSetItem(KEYS.followups, JSON.stringify(followups));
 }
 
 export function getUnresolvedFollowUp(): FollowUp | null {
@@ -302,7 +319,7 @@ export function resolveFollowUp(id: string, resolution: string): void {
     followups[idx].resolved = true;
     followups[idx].resolution = resolution;
     followups[idx].resolvedAt = new Date().toISOString();
-    localStorage.setItem(KEYS.followups, JSON.stringify(followups));
+    safeSetItem(KEYS.followups, JSON.stringify(followups));
   }
 }
 
@@ -313,7 +330,7 @@ export function dismissFollowUp(id: string): void {
     followups[idx].resolved = true;
     followups[idx].resolution = "dismissed";
     followups[idx].resolvedAt = new Date().toISOString();
-    localStorage.setItem(KEYS.followups, JSON.stringify(followups));
+    safeSetItem(KEYS.followups, JSON.stringify(followups));
   }
 }
 
@@ -329,7 +346,7 @@ export interface OpenLoop {
 }
 
 export function saveOpenLoop(loop: OpenLoop): void {
-  localStorage.setItem("mindmate_openloop", JSON.stringify(loop));
+  safeSetItem("mindmate_openloop", JSON.stringify(loop));
 }
 
 export function getOpenLoop(): OpenLoop | null {

@@ -5,6 +5,7 @@ import { SessionMode } from "@/lib/prompts";
 import { saveProfile } from "@/lib/storage";
 import { restoreFromBackup } from "@/lib/sync";
 import { trackEvent } from "@/lib/cohort";
+import { doors } from "@/lib/doors";
 
 interface LandingPageProps {
   onStartSession: (mode: SessionMode) => void;
@@ -17,61 +18,14 @@ const sampleExchange = [
   { role: "assistant" as const, text: "What did you need them to hear?" },
 ];
 
-const doors = [
-  {
-    mode: "reflect" as SessionMode,
-    title: "Arrive clearer",
-    description: "Process something you’re carrying.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <path d="M12 6v6l4 2" />
-      </svg>
-    ),
-  },
-  {
-    mode: "prepare" as SessionMode,
-    title: "Arrive ready",
-    description: "Clarify what you need to say.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-      </svg>
-    ),
-  },
-  {
-    mode: "ground" as SessionMode,
-    title: "Arrive present",
-    description: "Slow down. Name one feeling.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-        <path d="M12 6v6" />
-        <path d="M12 18h.01" />
-      </svg>
-    ),
-  },
-  {
-    mode: "breathe" as SessionMode,
-    title: "Just be here",
-    description: "No words. Just guided breathing.",
-    icon: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="4" />
-      </svg>
-    ),
-  },
-];
-
 export default function LandingPage({ onStartSession }: LandingPageProps) {
   // Animation state for sample exchange
   const [visibleMessages, setVisibleMessages] = useState(0);
 
   // Gate modal state
   const [showGate, setShowGate] = useState(false);
-  const [gateStep, setGateStep] = useState<"age" | "crisis">("age");
   const [pendingMode, setPendingMode] = useState<SessionMode | null>(null);
+  const [ageRejected, setAgeRejected] = useState(false);
 
   // Restore state
   const [showRestore, setShowRestore] = useState(false);
@@ -98,21 +52,15 @@ export default function LandingPage({ onStartSession }: LandingPageProps) {
   const handleDoorTap = useCallback((mode: SessionMode) => {
     setPendingMode(mode);
     setShowGate(true);
-    setGateStep("age");
+    setAgeRejected(false);
   }, []);
 
-  const handleAgeConfirm = () => {
-    trackEvent("age_gate_passed");
-    setGateStep("crisis");
-  };
-
   const handleAgeReject = () => {
-    alert("MindM8 is only available to users aged 18 and above. Please come back when you’re old enough.");
-    setShowGate(false);
-    setPendingMode(null);
+    setAgeRejected(true);
   };
 
-  const handleCrisisAccept = () => {
+  const handleGateAccept = () => {
+    trackEvent("age_gate_passed");
     trackEvent("crisis_accepted");
     saveProfile({
       name: "",
@@ -225,7 +173,7 @@ export default function LandingPage({ onStartSession }: LandingPageProps) {
             <button
               key={door.mode}
               onClick={() => handleDoorTap(door.mode)}
-              className="w-full text-left card-serene p-4 group"
+              className="w-full text-left card-serene p-4 group min-h-[72px]"
             >
               <div className="flex items-center gap-3.5">
                 <div className="text-mind-400 group-hover:text-mind-500 transition-colors">
@@ -316,76 +264,76 @@ export default function LandingPage({ onStartSession }: LandingPageProps) {
         </p>
       </main>
 
-      {/* Age gate + crisis disclaimer modal */}
+      {/* Combined age gate + crisis disclaimer modal */}
       {showGate && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/30 backdrop-blur-sm animate-fade-in">
           <div className="bg-white rounded-2xl max-w-sm w-full p-6 shadow-lg animate-slide-up">
-            {gateStep === "age" ? (
-              <div className="space-y-5">
+            {ageRejected ? (
+              <div className="space-y-5 animate-fade-in">
                 <div className="text-center">
-                  <h2 className="text-lg font-serif text-calm-text mb-1">
-                    One quick thing
+                  <h2 className="text-lg font-serif text-calm-text mb-2">
+                    Thank you for being honest
                   </h2>
-                  <p className="text-sm text-calm-muted">
-                    MindM8 is designed for adults.
+                  <p className="text-sm text-calm-muted leading-relaxed">
+                    MindM8 is designed for adults aged 18 and over.
+                    If you need someone to talk to, please reach out to a trusted adult or contact Childline on 0800 1111.
                   </p>
                 </div>
-                <div className="space-y-3">
-                  <p className="text-calm-text text-sm font-medium text-center">
-                    Are you 18 or older?
-                  </p>
-                  <div className="flex gap-3">
-                    <button
-                      onClick={handleAgeConfirm}
-                      className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
-                                 hover:bg-mind-700 transition-colors duration-200"
-                    >
-                      Yes, I&apos;m 18+
-                    </button>
-                    <button
-                      onClick={handleAgeReject}
-                      className="flex-1 py-3 border border-calm-border text-calm-muted rounded-xl text-sm
-                                 hover:bg-warm-50 transition-colors duration-200"
-                    >
-                      No
-                    </button>
-                  </div>
-                </div>
+                <button
+                  onClick={() => { setShowGate(false); setPendingMode(null); setAgeRejected(false); }}
+                  className="w-full py-3 border border-calm-border text-calm-muted rounded-xl text-sm
+                             hover:bg-warm-50 transition-colors duration-200"
+                >
+                  Close
+                </button>
               </div>
             ) : (
               <div className="space-y-5">
                 <div className="text-center">
-                  <div className="w-10 h-10 rounded-full bg-warm-100 flex items-center justify-center mx-auto mb-2">
-                    <span className="text-warm-600 text-lg">&#9888;</span>
-                  </div>
-                  <h2 className="text-lg font-serif text-calm-text">
+                  <h2 className="text-lg font-serif text-calm-text mb-1">
                     Before we begin
                   </h2>
                 </div>
                 <div className="space-y-4 text-left">
                   <p className="text-sm text-calm-muted leading-relaxed">
                     MindM8 is <strong className="text-calm-text">not</strong> a therapist or
-                    crisis service. It&apos;s a reflection tool — it asks questions, it
-                    doesn&apos;t give answers.
+                    crisis service. It&apos;s a reflection tool that asks questions to help
+                    you think more clearly.
+                  </p>
+                  <p className="text-xs text-calm-muted leading-relaxed">
+                    Your reflections stay on your device. They are processed by AI to generate responses but are not stored externally.
                   </p>
                   <div className="bg-warm-50 border border-warm-200 rounded-xl p-4">
                     <p className="text-sm text-warm-700 leading-relaxed">
                       If you&apos;re in crisis, please reach out:
                     </p>
-                    <ul className="text-sm text-warm-700 mt-2 space-y-1">
-                      <li>UK: Samaritans — 116 123</li>
-                      <li>US: 988 Suicide &amp; Crisis Lifeline</li>
-                      <li>International: findahelpline.com</li>
-                    </ul>
+                    <p className="text-sm text-warm-700 mt-2">
+                      UK: Samaritans — 116 123
+                    </p>
+                    <p className="text-sm text-warm-700">
+                      US: 988 Suicide &amp; Crisis Lifeline
+                    </p>
+                    <p className="text-sm text-warm-700">
+                      International: findahelpline.com
+                    </p>
                   </div>
                 </div>
-                <button
-                  onClick={handleCrisisAccept}
-                  className="w-full py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
-                             hover:bg-mind-700 transition-colors duration-200"
-                >
-                  I understand
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleGateAccept}
+                    className="flex-1 py-3 bg-mind-600 text-white rounded-xl text-sm font-medium
+                               hover:bg-mind-700 transition-colors duration-200"
+                  >
+                    I&apos;m 18+ and I understand
+                  </button>
+                  <button
+                    onClick={handleAgeReject}
+                    className="px-4 py-3 border border-calm-border text-calm-muted rounded-xl text-sm
+                               hover:bg-warm-50 transition-colors duration-200"
+                  >
+                    Under 18
+                  </button>
+                </div>
               </div>
             )}
           </div>

@@ -7,7 +7,7 @@ import { trackEvent } from "@/lib/cohort";
 import { autoBackup } from "@/lib/sync";
 import { reportError } from "@/lib/errorReporter";
 import { getRateToken } from "@/lib/rateToken";
-import { shouldEndSession, deriveClarity as deriveClarityFn, canKeepGoing } from "@/lib/sessionLogic";
+import { shouldEndSession, deriveClarity as deriveClarityFn } from "@/lib/sessionLogic";
 import { getEffectiveLanguage } from "@/lib/language";
 
 // --- Flow state reducer ---
@@ -18,7 +18,6 @@ interface FlowState {
   phase: FlowPhase;
   readinessLevel: "yes" | "a-little" | "not-yet" | null;
   readinessNote: string;
-  bonusExchanges: number;
   exchangeCount: number;
 }
 
@@ -28,7 +27,6 @@ type FlowAction =
   | { type: "SHOW_CLARITY_CHECK" }
   | { type: "SELECT_READINESS"; level: "yes" | "a-little" | "not-yet" }
   | { type: "CONTINUE_TO_TAKEAWAY" }
-  | { type: "KEEP_GOING" }
   | { type: "SHOW_LETTER" }
   | { type: "START_SAVING" }
   | { type: "SET_READINESS_NOTE"; note: string };
@@ -37,7 +35,6 @@ const initialFlowState: FlowState = {
   phase: "intro",
   readinessLevel: null,
   readinessNote: "",
-  bonusExchanges: 0,
   exchangeCount: 0,
 };
 
@@ -51,7 +48,7 @@ function flowReducer(state: FlowState, action: FlowAction): FlowState {
       const ended = shouldEndSession(
         newCount,
         action.maxExchanges,
-        state.bonusExchanges,
+        0,
         action.apiSignaledComplete
       );
       return {
@@ -69,15 +66,6 @@ function flowReducer(state: FlowState, action: FlowAction): FlowState {
 
     case "CONTINUE_TO_TAKEAWAY":
       return { ...state, phase: "takeaway" };
-
-    case "KEEP_GOING":
-      return {
-        ...state,
-        bonusExchanges: state.bonusExchanges + 3,
-        phase: "active",
-        readinessLevel: null,
-        readinessNote: "",
-      };
 
     case "SHOW_LETTER":
       return { ...state, phase: "letter" };
@@ -174,7 +162,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
 
   // Flow state — managed by reducer
   const [flow, dispatch] = useReducer(flowReducer, initialFlowState);
-  const { phase, readinessLevel, readinessNote, bonusExchanges, exchangeCount } = flow;
+  const { phase, readinessLevel, readinessNote, exchangeCount } = flow;
 
   // Content state — independent, stays as useState
   const [messages, setMessages] = useState<Message[]>([]);
@@ -458,12 +446,6 @@ export default function Session({ mode, onEnd }: SessionProps) {
     dispatch({ type: "CONTINUE_TO_TAKEAWAY" });
   };
 
-  const handleKeepGoing = () => {
-    dispatch({ type: "KEEP_GOING" });
-    // Re-focus input
-    setTimeout(() => inputRef.current?.focus(), 100);
-  };
-
   // Derive clarity from readiness level — no need to ask twice
   const derivedClarity = (): "yes" | "no" | "skip" => {
     if (!readinessLevel) return "skip";
@@ -688,7 +670,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
               </p>
             </div>
             <p className="text-xs text-calm-muted font-light">
-              {maxExchanges} exchanges &middot; be honest to get the most from this
+              Be honest to get the most from this.
             </p>
             <button
               onClick={() => dispatch({ type: "START_SESSION" })}
@@ -726,9 +708,6 @@ export default function Session({ mode, onEnd }: SessionProps) {
             <p className="text-sm font-medium text-calm-text">
               {modeLabels[aiMode]}
             </p>
-            <p className="text-xs text-calm-muted">
-              {exchangeCount} of {maxExchanges + bonusExchanges}
-            </p>
           </div>
           <div className="w-7 flex justify-end">
             {relationshipTag && (
@@ -737,12 +716,6 @@ export default function Session({ mode, onEnd }: SessionProps) {
               </span>
             )}
           </div>
-        </div>
-        <div className="h-0.5 bg-calm-border">
-          <div
-            className="h-full bg-mind-500 transition-all duration-500 ease-out"
-            style={{ width: `${(exchangeCount / (maxExchanges + bonusExchanges)) * 100}%` }}
-          />
         </div>
       </header>
 
@@ -772,7 +745,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                     <div className="meditation-circle-sm" />
                   </div>
                   <div className="bg-calm-card rounded-2xl rounded-tl-md px-4 py-3 border border-calm-border/50 shadow-sm">
-                    <p className="text-sm text-calm-text leading-relaxed whitespace-pre-wrap">
+                    <p className="text-sm text-calm-text leading-relaxed whitespace-pre-wrap font-serif">
                       {msg.content}
                     </p>
                   </div>
@@ -807,9 +780,10 @@ export default function Session({ mode, onEnd }: SessionProps) {
           {error && (
             <div className="bg-warm-50 border border-warm-200 rounded-xl p-4 animate-fade-in">
               <p className="text-sm text-warm-700">{error}</p>
+              <p className="text-xs text-calm-muted mt-1">Your message is still here. Nothing was lost.</p>
               <button
                 onClick={retryLastMessage}
-                className="mt-2 text-xs text-teal-600 font-medium hover:text-teal-700 transition"
+                className="mt-2 px-4 py-2 bg-mind-100 hover:bg-mind-200 text-mind-700 rounded-lg text-sm font-medium transition-colors min-h-[44px]"
               >
                 Try again
               </button>
@@ -871,6 +845,14 @@ export default function Session({ mode, onEnd }: SessionProps) {
             </div>
           ) : (
             <>
+              {/* Soft session-length checkpoint — gentle nudge near the end */}
+              {!isComplete && !isLoading && exchangeCount >= maxExchanges - 1 && exchangeCount > 0 && (
+                <div className="mb-2 bg-mind-50/60 border border-mind-100/50 rounded-xl px-3 py-2 animate-fade-in">
+                  <p className="text-xs text-mind-700 leading-relaxed text-center">
+                    This might be a good place to pause. Say what feels most important.
+                  </p>
+                </div>
+              )}
               {/* Sticky last question — so user never loses what was asked */}
               {!isComplete && !isLoading && messages.length > 0 && messages[messages.length - 1].role === "assistant" && exchangeCount > 0 && (
                 <div className="mb-2 px-1">
@@ -946,41 +928,23 @@ export default function Session({ mode, onEnd }: SessionProps) {
                                      focus:outline-none focus:border-mind-400 transition-colors resize-none"
                         />
                         <div className="mt-1.5 flex justify-end">
-                          <MicButton onTranscript={(text) => dispatch({ type: "SET_READINESS_NOTE", note: text })} size="sm" />
+                          <MicButton onTranscript={(text) => dispatch({ type: "SET_READINESS_NOTE", note: readinessNote ? readinessNote + " " + text : text })} size="sm" />
                         </div>
                       </div>
                     )}
-                    {readinessLevel === "not-yet" ? (
-                      <div className="space-y-3 animate-fade-in">
-                        <div className="bg-mind-50/60 border border-mind-100/50 rounded-2xl px-4 py-3 text-center">
-                          <p className="text-sm text-mind-700 leading-relaxed font-light">
-                            That&apos;s okay — clarity doesn&apos;t always come in one sitting. Want to keep exploring?
-                          </p>
-                        </div>
+                    {readinessLevel && (
+                      <>
+                        {readinessLevel === "not-yet" && (
+                          <div className="bg-mind-50/60 border border-mind-100/50 rounded-2xl px-4 py-3 text-center animate-fade-in">
+                            <p className="text-sm text-mind-700 leading-relaxed font-light">
+                              That&apos;s okay. Clarity doesn&apos;t always come in one sitting.
+                            </p>
+                          </div>
+                        )}
                         <button
-                          onClick={handleKeepGoing}
+                          onClick={handleReadinessContinue}
                           className="w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200
                                      bg-mind-600 text-white hover:bg-mind-700"
-                        >
-                          Keep going
-                        </button>
-                        <button
-                          onClick={handleReadinessContinue}
-                          className="w-full py-1.5 text-calm-muted text-xs hover:text-calm-text transition-colors"
-                        >
-                          End session
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <button
-                          onClick={handleReadinessContinue}
-                          className={`w-full py-3 rounded-xl text-sm font-medium transition-colors duration-200 ${
-                            readinessLevel
-                              ? "bg-mind-600 text-white hover:bg-mind-700"
-                              : "bg-calm-border/50 text-calm-muted"
-                          }`}
-                          disabled={!readinessLevel}
                         >
                           Continue
                         </button>
@@ -1023,7 +987,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                                    focus:outline-none focus:border-mind-400 transition-colors resize-none"
                       />
                       <div className="mt-1.5 flex justify-end">
-                        <MicButton onTranscript={(text) => setTakeaway(text)} size="sm" />
+                        <MicButton onTranscript={(text) => setTakeaway(prev => prev ? prev + " " + text : text)} size="sm" />
                       </div>
                     </div>
 
@@ -1081,7 +1045,7 @@ export default function Session({ mode, onEnd }: SessionProps) {
                     }}
                   />
                   <MicButton
-                    onTranscript={(text) => setInput(text)}
+                    onTranscript={(text) => setInput(prev => prev ? prev + " " + text : text)}
                     size="md"
                   />
                   <button

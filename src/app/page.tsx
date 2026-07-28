@@ -6,7 +6,6 @@ import { isPINEnabled, shouldAutoLock, updateLastActivity, getAutoLockTimeout } 
 import { SessionMode } from "@/lib/prompts";
 import { registerServiceWorker, initInstallPrompt } from "@/lib/notifications";
 import { trackEvent } from "@/lib/cohort";
-import Onboarding from "@/components/Onboarding";
 import LandingPage from "@/components/LandingPage";
 import Home from "@/components/Home";
 import Session from "@/components/Session";
@@ -21,6 +20,18 @@ type AppState = "loading" | "locked" | "onboarding" | "home" | "session" | "insi
 export default function MindM8() {
   const [appState, setAppState] = useState<AppState>("loading");
   const [activeMode, setActiveMode] = useState<SessionMode | null>(null);
+  const [storageError, setStorageError] = useState<string | null>(null);
+
+  // Listen for storage write failures and show user feedback
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setStorageError(detail?.error || "Your device storage is full. Some data may not have been saved.");
+      setTimeout(() => setStorageError(null), 8000);
+    };
+    window.addEventListener("mindm8-storage-error", handler);
+    return () => window.removeEventListener("mindm8-storage-error", handler);
+  }, []);
 
   // Auto-lock: re-engage PIN when tab goes to background or user is idle
   const triggerLock = useCallback(() => {
@@ -202,20 +213,33 @@ export default function MindM8() {
 
   // Wrap all pages in a transition container
   return (
-    <div key={appState} className="page-enter">
-      {appState === "postSessionSetup" ? (
-        <PostSessionSetup onComplete={handlePostSessionSetupComplete} />
-      ) : appState === "session" && activeMode === "breathe" ? (
-        <Breathe onEnd={handleSessionEnd} />
-      ) : appState === "session" && activeMode ? (
-        <Session mode={activeMode} onEnd={handleSessionEnd} />
-      ) : appState === "insights" ? (
-        <Insights onBack={handleBackToHome} onSettings={handleOpenSettings} />
-      ) : appState === "settings" ? (
-        <Settings onBack={handleBackToHome} onResetApp={handleResetApp} />
-      ) : (
-        <Home onSelectMode={handleSelectMode} onOpenInsights={handleOpenInsights} />
+    <>
+      {/* Storage error toast */}
+      {storageError && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[100] max-w-sm w-full px-4 animate-slide-up">
+          <div className="bg-warm-50 border border-warm-300 rounded-xl px-4 py-3 shadow-lg">
+            <p className="text-sm text-warm-700">Your device storage is full. Some data may not have been saved.</p>
+            <button onClick={() => setStorageError(null)} className="text-xs text-warm-600 mt-1 hover:text-warm-800 transition-colors">
+              Dismiss
+            </button>
+          </div>
+        </div>
       )}
-    </div>
+      <div key={appState} className="page-enter">
+        {appState === "postSessionSetup" ? (
+          <PostSessionSetup onComplete={handlePostSessionSetupComplete} />
+        ) : appState === "session" && activeMode === "breathe" ? (
+          <Breathe onEnd={handleSessionEnd} />
+        ) : appState === "session" && activeMode ? (
+          <Session mode={activeMode} onEnd={handleSessionEnd} />
+        ) : appState === "insights" ? (
+          <Insights onBack={handleBackToHome} onSettings={handleOpenSettings} />
+        ) : appState === "settings" ? (
+          <Settings onBack={handleBackToHome} onResetApp={handleResetApp} />
+        ) : (
+          <Home onSelectMode={handleSelectMode} onOpenInsights={handleOpenInsights} />
+        )}
+      </div>
+    </>
   );
 }

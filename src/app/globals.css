@@ -39,10 +39,11 @@ body {
 
 .bg-stillwater {
   background: linear-gradient(
-    180deg,
+    175deg,
     #f5f3ef 0%,
-    #ecf1f0 45%,
-    #e4eceb 100%
+    #eef2f1 35%,
+    #e6edeb 65%,
+    #dfe8e6 100%
   );
 }
 
@@ -96,7 +97,7 @@ body {
   border: 1px solid rgba(229, 226, 220, 0.7);
   box-shadow: 0 1px 4px rgba(42, 47, 46, 0.04), 0 4px 16px rgba(42, 47, 46, 0.02);
   border-radius: 16px;
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .card-serene:hover {
@@ -133,9 +134,9 @@ body {
   50% { transform: scale(1.1); opacity: 0.9; }
 }
 
-/* Smooth transitions for interactive elements */
+/* Smooth transitions for interactive elements — scoped to transform/opacity */
 button, a, input, textarea {
-  transition: all 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.3s ease, border-color 0.3s ease, background-color 0.2s ease, color 0.2s ease, box-shadow 0.3s ease;
 }
 
 /* === SCROLLBAR === */
@@ -161,6 +162,29 @@ textarea {
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+/* === REDUCED MOTION === */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .meditation-circle,
+  .meditation-circle-sm,
+  .mist-layer,
+  .warm-glow {
+    animation: none !important;
+    opacity: 0.6;
+  }
+
+  .card-serene:hover {
+    transform: none !important;
+  }
 }
 
 @supports (padding: env(safe-area-inset-bottom)) {

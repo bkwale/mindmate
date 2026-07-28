@@ -1,4 +1,4 @@
-import { shouldEndSession, deriveClarity, canKeepGoing } from "./sessionLogic";
+import { shouldEndSession, deriveClarity } from "./sessionLogic";
 
 describe("shouldEndSession", () => {
   // Default: reflect mode has 5 exchanges, no bonus
@@ -82,20 +82,3 @@ describe("deriveClarity", () => {
   });
 });
 
-describe("canKeepGoing", () => {
-  it("returns true for 'not-yet'", () => {
-    expect(canKeepGoing("not-yet")).toBe(true);
-  });
-
-  it("returns false for 'yes'", () => {
-    expect(canKeepGoing("yes")).toBe(false);
-  });
-
-  it("returns false for 'a-little'", () => {
-    expect(canKeepGoing("a-little")).toBe(false);
-  });
-
-  it("returns false for null", () => {
-    expect(canKeepGoing(null)).toBe(false);
-  });
-});
